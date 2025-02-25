@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useCallback, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -6,6 +6,7 @@ import { CurriculumItem } from '../../types/curriculum';
 import { CURRICULUM_DATA } from '../../data/curriculumData';
 import type { Components } from 'react-markdown';
 import { IdeMessengerContext } from '../../context/IdeMessenger';
+import { useWebviewListener } from '../../hooks/useWebviewListener';
 
 interface GuideViewProps {
   tutorialId?: string;
@@ -15,15 +16,49 @@ interface GuideViewProps {
 }
 
 function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 }: GuideViewProps) {
-  console.log('GuideView rendering with tutorialId:', tutorialId);
-  console.log('Available tutorials:', CURRICULUM_DATA);
+  console.log('GuideView 컴포넌트 렌더링 시작');
   
   const ideMessenger = useContext(IdeMessengerContext);
-  const [currentStep, setCurrentStep] = React.useState(initialStep);
-  const [evaluationStarted, setEvaluationStarted] = React.useState(false);
-  const [remainingTime, setRemainingTime] = React.useState<number | null>(null);
-  const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
-  const [feedback, setFeedback] = React.useState<{ score: number; comments: string[]; suggestions: string[]; } | null>(null);
+  const [currentStep, setCurrentStep] = useState(initialStep);
+  const [evaluationStarted, setEvaluationStarted] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [feedback, setFeedback] = useState<{ score: number; comments: string[]; suggestions: string[]; } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  
+  // 직접 DOM 조작으로 토스트 메시지 표시 (React 렌더링과 독립적)
+  const showToastDirectly = useCallback((message: string) => {
+    // 기존 토스트 제거
+    const existingToast = document.getElementById('direct-toast');
+    if (existingToast) {
+      document.body.removeChild(existingToast);
+    }
+    
+    // 새 토스트 생성 및 추가
+    const toast = document.createElement('div');
+    toast.id = 'direct-toast';
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.padding = '8px 16px';
+    toast.style.backgroundColor = 'var(--vscode-editor-background)';
+    toast.style.color = 'var(--vscode-editor-foreground)';
+    toast.style.borderRadius = '4px';
+    toast.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+    toast.style.zIndex = '1000';
+    document.body.appendChild(toast);
+    
+    // 일정 시간 후 토스트 제거
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 2000);
+  }, []);
+  
+
 
   const tutorial = React.useMemo(() => {
     if (!tutorialId) return null;
@@ -41,24 +76,35 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   console.log('Current step data:', currentStepData);
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === tutorial.steps.length - 1;
-
-  // 현재 학습 콘텐츠를 PearAI Chat에 추가하는 함수
-  const addToStudyHelper = () => {
+  
+  // addToStudyHelper 함수를 useCallback으로 감싸서 정의
+  const addToStudyHelper = useCallback(() => {
     // 전달할 콘텐츠 구성
     const content = {
       type: 'studyHelperContent',
-      title: `${tutorial.title} - ${currentStepData.title}`,
-      markdown: currentStepData.content,
-      codeSnippets: currentStepData.codeSnippets || [],
-      category: tutorial.category
+      title: `${tutorial?.title} - ${currentStepData?.title}`,
+      markdown: currentStepData?.content,
+      codeSnippets: currentStepData?.codeSnippets || [],
+      category: tutorial?.category
     };
     
-    // IdeMessenger를 통해 메시지 전송
-    ideMessenger.post('addEducationContextToChat' as any, content);
+    console.log('[GuideView] 학습 도우미에 콘텐츠 추가 시도:', content);
+    // IdeMessenger를 통해 메시지 전송 - content 필드로 감싸기
+    ideMessenger?.post('addEducationContextToChat', { content });
     
-    // 사용자에게 피드백 제공
-    alert('학습 내용이 PearAI Chat에 추가되었습니다.');
-  };
+    // 토스트 메시지 제거 - ideMessenger.post 테스트
+    
+  }, [currentStepData, tutorial, ideMessenger]);
+
+  // showToast 웹뷰 리스너 복원
+  useWebviewListener(
+    "showToast", 
+    async (data) => {
+      console.log('[GuideView] 토스트 메시지 수신:', data);
+      showToastDirectly(data.message);
+    },
+    [showToastDirectly]
+  );
 
   const handlePrevStep = () => {
     if (!isFirstStep) {
@@ -131,6 +177,7 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   React.useEffect(() => {
     setCurrentStep(initialStep);
   }, [initialStep]);
+
 
   return (
     <div className={`guide-view ${isMobileView ? 'mobile-view' : ''}`}>
@@ -405,10 +452,26 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
       <div className="guide-view-content">
         <h3 className="step-title">{currentStepData.title}</h3>
         <div className="guide-content-wrapper">
-          <div className="help-button-container">
+          <div className="help-button-container" style={{margin: '20px 0', zIndex: 1000}}>
             <button 
               className="add-to-helper-button"
-              onClick={addToStudyHelper}
+              style={{
+                padding: '10px 15px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                background: 'var(--vscode-button-background)',
+                color: 'var(--vscode-button-foreground)',
+                border: 'none',
+                borderRadius: '4px'
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                ideMessenger?.post('showMessage' as any, {
+                  type: 'info',
+                  message: '버튼 클릭됨!'
+                });
+                addToStudyHelper();
+              }}
               title="현재 학습 내용을 PearAI Chat에 추가합니다"
             >
               💬 학습 도우미에 추가
@@ -464,27 +527,9 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
                                 markdown: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```',
                                 category: tutorial.category
                               };
-                              
+
                               ideMessenger.post('addEducationContextToChat' as any, content);
                               
-                              // 작은 토스트 메시지로 피드백
-                              const toast = document.createElement('div');
-                              toast.textContent = '코드가 학습 도우미에 추가되었습니다';
-                              toast.style.position = 'fixed';
-                              toast.style.bottom = '20px';
-                              toast.style.left = '50%';
-                              toast.style.transform = 'translateX(-50%)';
-                              toast.style.padding = '8px 16px';
-                              toast.style.backgroundColor = 'var(--vscode-editor-background)';
-                              toast.style.color = 'var(--vscode-editor-foreground)';
-                              toast.style.borderRadius = '4px';
-                              toast.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-                              toast.style.zIndex = '1000';
-                              document.body.appendChild(toast);
-                              
-                              setTimeout(() => {
-                                document.body.removeChild(toast);
-                              }, 2000);
                             }}
                           >
                             💬
@@ -650,6 +695,26 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           </button>
         </div>
       </div>
+      
+      {/* 토스트 메시지 UI (React 상태 기반) */}
+      {toast && (
+        <div 
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '8px 16px',
+            backgroundColor: 'var(--vscode-editor-background)',
+            color: 'var(--vscode-editor-foreground)',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            zIndex: '9999'
+          }}
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

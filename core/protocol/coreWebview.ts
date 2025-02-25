@@ -4,7 +4,12 @@ import { ToWebviewFromIdeOrCoreProtocol } from "./webview.js";
 
 export type ToCoreFromWebviewProtocol = ToCoreFromIdeOrWebviewProtocol & {
   didChangeSelectedProfile: [{ id: string }, void];
+  addEducationContextToChat: [{ content: any }, void];
+
 };
 export type ToWebviewFromCoreProtocol = ToWebviewFromIdeOrCoreProtocol & {
   didChangeAvailableProfiles: [{ profiles: ProfileDescription[] }, void];
-};
+  showToast: [{ message: string }, void];
+  addEducationContextToChat: [{ content: any }, void];
+
+  };

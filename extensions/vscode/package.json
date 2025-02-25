@@ -205,7 +205,6 @@
         "title": "Focus PearAI Search View",
         "group": "PearAI"
       },
-
       {
         "command": "pearai.focusPearAIMem0View",
         "category": "PearAI",

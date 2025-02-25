@@ -63,6 +63,9 @@ import { getLogoPath } from "./welcome/setup/ImportExtensions";
 import { Badge } from "../components/ui/badge";
 import { cn } from "@/lib/utils";
 
+// ContextItemId 타입을 인라인으로 정의
+type ContextItemId = string;
+
 const LENGTHY_MESSAGE_WARNING_INDEX = 14; // number of messages after which we show the warning card
 
 export const TopGuiDiv = styled.div<{ isNewSession: boolean }>`
@@ -148,6 +151,14 @@ export function fallbackRender({ error, resetErrorBoundary }) {
       </div>
     </div>
   );
+}
+
+// 타입 선언 추가
+interface EducationContent {
+  title: string;
+  markdown: string;
+  category: string;
+  codeSnippets?: Array<{code: string; language?: string}>;
 }
 
 function GUI() {
@@ -380,47 +391,85 @@ function GUI() {
   }, []);
 
   // 교육 콘텐츠를 Chat 컨텍스트에 추가하는 리스너 추가
-  useWebviewListener("addEducationContextToChat", async (content) => {
-    // 콘텐츠를 컨텍스트 아이템 형식으로 변환
-    const contextItem = {
-      id: `edu-${Date.now()}`,
-      type: "file",
-      name: content.title,
-      content: content.markdown,
-      language: "markdown",
-      source: "education",
-      path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
+  // useWebviewListener("addEducationContextToChat" as any, async (content: EducationContent) => {
+  //   console.log('[GUI] 교육 콘텐츠 수신:', content);
+    
+  //   // 콘텐츠를 컨텍스트 아이템 형식으로 변환
+  //   const contextItem = {
+  //     id: `edu-${Date.now()}` as ContextItemId,
+  //     itemType: "file",
+  //     name: content.title,
+  //     content: content.markdown,
+  //     language: "markdown",
+  //     source: "education",
+  //     path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
+  //     description: `${content.title}에 대한 교육 자료`,
+  //   } as any;
+    
+  //   console.log('[GUI] 생성된 컨텍스트 아이템:', contextItem);
+    
+  //   // 코드 스니펫이 있으면 추가
+  //   if (content.codeSnippets && content.codeSnippets.length > 0) {
+  //     content.codeSnippets.forEach((snippet, index) => {
+  //       const snippetItem = {
+  //         id: `edu-code-${Date.now()}-${index}` as ContextItemId,
+  //         itemType: "file",
+  //         name: `${content.title} - 코드 예제 ${index + 1}`,
+  //         content: snippet.code,
+  //         language: snippet.language || "typescript",
+  //         source: "education",
+  //         path: `education/${content.category}/code-snippets/example-${index + 1}.${snippet.language || 'ts'}`,
+  //         description: `${content.title}의 코드 예제 ${index + 1}`,
+  //       } as any;
+  //       console.log('[GUI] 스니펫 컨텍스트 아이템 추가:', snippetItem);
+  //       dispatch(addContextItems([snippetItem]));
+  //     });
+  //   }
+    
+  //   // 메인 콘텐츠 컨텍스트 추가
+  //   dispatch(addContextItems([contextItem as any]));
+    
+  //   // 메인 페이지로 이동
+  //   navigate("/");
+    
+  //   // 사용자에게 알림 (React 요소로 변환)
+  //   dispatch(setBottomMessage(<span>교육 콘텐츠가 PearAI Chat에 추가되었습니다.</span>));
+    
+  //   // 타이머로 알림 메시지 제거
+  //   setTimeout(() => {
+  //     dispatch(setBottomMessage(undefined));
+  //   }, 3000);
+  // });
+
+  useEffect(() => {
+    const handleWindowMessage = (event) => {
+      if (event.data && event.data.type === 'addEducationContextToChat') {
+        const content = event.data.content;
+        console.log('[GUI-Window] 교육 콘텐츠 수신:', content);
+        
+        // 기존 처리 로직과 동일하게 처리
+        const contextItem = {
+          id: `edu-${Date.now()}` as ContextItemId,
+          itemType: "file",
+          name: content.title,
+          content: content.markdown,
+          language: "markdown",
+          source: "education",
+          path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
+          description: `${content.title}에 대한 교육 자료`,
+        } as any;
+        
+        dispatch(addContextItems([contextItem as any]));
+        
+        // 코드 스니펫 처리 등 나머지 코드...
+      }
     };
     
-    // 코드 스니펫이 있으면 추가
-    if (content.codeSnippets && content.codeSnippets.length > 0) {
-      content.codeSnippets.forEach((snippet, index) => {
-        dispatch(addContextItems({
-          id: `edu-code-${Date.now()}-${index}`,
-          type: "file",
-          name: `${content.title} - 코드 예제 ${index + 1}`,
-          content: snippet.code,
-          language: snippet.language || "typescript",
-          source: "education",
-          path: `education/${content.category}/code-snippets/example-${index + 1}.${snippet.language || 'ts'}`,
-        }));
-      });
-    }
-    
-    // 메인 콘텐츠 컨텍스트 추가
-    dispatch(addContextItems(contextItem));
-    
-    // 메인 페이지로 이동
-    navigate("/");
-    
-    // 사용자에게 알림
-    dispatch(setBottomMessage("교육 콘텐츠가 PearAI Chat에 추가되었습니다."));
-    
-    // 타이머로 알림 메시지 제거
-    setTimeout(() => {
-      dispatch(setBottomMessage(undefined));
-    }, 3000);
-  });
+    window.addEventListener('message', handleWindowMessage);
+    return () => {
+      window.removeEventListener('message', handleWindowMessage);
+    };
+  }, [dispatch, navigate]);
 
   return (
     <>
