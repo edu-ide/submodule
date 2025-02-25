@@ -62,6 +62,7 @@ import OnboardingTutorial from "./onboarding/OnboardingTutorial";
 import { getLogoPath } from "./welcome/setup/ImportExtensions";
 import { Badge } from "../components/ui/badge";
 import { cn } from "@/lib/utils";
+import { EducationContent } from 'core/protocol/types.js';
 
 // ContextItemId 타입을 인라인으로 정의
 type ContextItemId = string;
@@ -151,14 +152,6 @@ export function fallbackRender({ error, resetErrorBoundary }) {
       </div>
     </div>
   );
-}
-
-// 타입 선언 추가
-interface EducationContent {
-  title: string;
-  markdown: string;
-  category: string;
-  codeSnippets?: Array<{code: string; language?: string}>;
 }
 
 function GUI() {
@@ -391,85 +384,92 @@ function GUI() {
   }, []);
 
   // 교육 콘텐츠를 Chat 컨텍스트에 추가하는 리스너 추가
-  // useWebviewListener("addEducationContextToChat" as any, async (content: EducationContent) => {
-  //   console.log('[GUI] 교육 콘텐츠 수신:', content);
+  useWebviewListener("addEducationContextToChat", async (data: { content: EducationContent }) => {
+    // content 객체 추출
+    const content = data.content;
+    console.log('[GUI] 교육 콘텐츠 수신:', content);
     
-  //   // 콘텐츠를 컨텍스트 아이템 형식으로 변환
-  //   const contextItem = {
-  //     id: `edu-${Date.now()}` as ContextItemId,
-  //     itemType: "file",
-  //     name: content.title,
-  //     content: content.markdown,
-  //     language: "markdown",
-  //     source: "education",
-  //     path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
-  //     description: `${content.title}에 대한 교육 자료`,
-  //   } as any;
+    // 콘텐츠를 컨텍스트 아이템 형식으로 변환
+    const contextItem = {
+      id: `edu-${Date.now()}` as ContextItemId,
+      itemType: "file",
+      name: content.title,
+      content: content.markdown,
+      language: "markdown",
+      source: "education",
+      path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
+      description: `${content.title}에 대한 교육 자료`,
+    } as any;
     
-  //   console.log('[GUI] 생성된 컨텍스트 아이템:', contextItem);
+    console.log('[GUI] 생성된 컨텍스트 아이템:', contextItem);
     
-  //   // 코드 스니펫이 있으면 추가
-  //   if (content.codeSnippets && content.codeSnippets.length > 0) {
-  //     content.codeSnippets.forEach((snippet, index) => {
-  //       const snippetItem = {
-  //         id: `edu-code-${Date.now()}-${index}` as ContextItemId,
-  //         itemType: "file",
-  //         name: `${content.title} - 코드 예제 ${index + 1}`,
-  //         content: snippet.code,
-  //         language: snippet.language || "typescript",
-  //         source: "education",
-  //         path: `education/${content.category}/code-snippets/example-${index + 1}.${snippet.language || 'ts'}`,
-  //         description: `${content.title}의 코드 예제 ${index + 1}`,
-  //       } as any;
-  //       console.log('[GUI] 스니펫 컨텍스트 아이템 추가:', snippetItem);
-  //       dispatch(addContextItems([snippetItem]));
-  //     });
-  //   }
-    
-  //   // 메인 콘텐츠 컨텍스트 추가
-  //   dispatch(addContextItems([contextItem as any]));
-    
-  //   // 메인 페이지로 이동
-  //   navigate("/");
-    
-  //   // 사용자에게 알림 (React 요소로 변환)
-  //   dispatch(setBottomMessage(<span>교육 콘텐츠가 PearAI Chat에 추가되었습니다.</span>));
-    
-  //   // 타이머로 알림 메시지 제거
-  //   setTimeout(() => {
-  //     dispatch(setBottomMessage(undefined));
-  //   }, 3000);
-  // });
-
-  useEffect(() => {
-    const handleWindowMessage = (event) => {
-      if (event.data && event.data.type === 'addEducationContextToChat') {
-        const content = event.data.content;
-        console.log('[GUI-Window] 교육 콘텐츠 수신:', content);
-        
-        // 기존 처리 로직과 동일하게 처리
-        const contextItem = {
-          id: `edu-${Date.now()}` as ContextItemId,
+    // 코드 스니펫이 있으면 추가
+    if (content.codeSnippets && content.codeSnippets.length > 0) {
+      content.codeSnippets.forEach((snippet, index) => {
+        const snippetItem = {
+          id: `edu-code-${Date.now()}-${index}` as ContextItemId,
           itemType: "file",
-          name: content.title,
-          content: content.markdown,
-          language: "markdown",
+          name: `${content.title} - 코드 예제 ${index + 1}`,
+          content: snippet.code,
+          language: snippet.language || "typescript",
           source: "education",
-          path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
-          description: `${content.title}에 대한 교육 자료`,
+          path: `education/${content.category}/code-snippets/example-${index + 1}.${snippet.language || 'ts'}`,
+          description: `${content.title}의 코드 예제 ${index + 1}`,
         } as any;
-        
-        dispatch(addContextItems([contextItem as any]));
-        
-        // 코드 스니펫 처리 등 나머지 코드...
-      }
-    };
+        console.log('[GUI] 스니펫 컨텍스트 아이템 추가:', snippetItem);
+        dispatch(addContextItems([snippetItem]));
+      });
+    }
     
-    window.addEventListener('message', handleWindowMessage);
-    return () => {
-      window.removeEventListener('message', handleWindowMessage);
-    };
-  }, [dispatch, navigate]);
+    // 메인 콘텐츠 컨텍스트 추가
+    dispatch(addContextItems([contextItem as any]));
+    
+    // 메인 페이지로 이동
+    navigate("/");
+    
+    // 사용자에게 알림 (React 요소로 변환)
+    dispatch(setBottomMessage(<span>교육 콘텐츠가 PearAI Chat에 추가되었습니다.</span>));
+    
+    // 추가: VS Code 스타일의 토스트 메시지 표시
+    showToastDirectly(`"${content.title}"이(가) 채팅에 추가되었습니다`);
+    
+    // 타이머로 알림 메시지 제거
+    setTimeout(() => {
+      dispatch(setBottomMessage(undefined));
+    }, 3000);
+  });
+
+  // 토스트 메시지를 직접 표시하는 함수 추가
+  const showToastDirectly = (message: string) => {
+    // 기존 토스트 제거
+    const existingToast = document.getElementById('direct-toast');
+    if (existingToast) {
+      document.body.removeChild(existingToast);
+    }
+    
+    // 새 토스트 생성 및 추가
+    const toast = document.createElement('div');
+    toast.id = 'direct-toast';
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.padding = '8px 16px';
+    toast.style.backgroundColor = 'var(--vscode-editor-background)';
+    toast.style.color = 'var(--vscode-editor-foreground)';
+    toast.style.borderRadius = '4px';
+    toast.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+    toast.style.zIndex = '1000';
+    document.body.appendChild(toast);
+    
+    // 일정 시간 후 토스트 제거
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 2000);
+  };
 
   return (
     <>

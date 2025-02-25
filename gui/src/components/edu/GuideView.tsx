@@ -7,6 +7,8 @@ import { CURRICULUM_DATA } from '../../data/curriculumData';
 import type { Components } from 'react-markdown';
 import { IdeMessengerContext } from '../../context/IdeMessenger';
 import { useWebviewListener } from '../../hooks/useWebviewListener';
+// core 프로토콜에서 정의된 타입 임포트
+import { EducationContent } from 'core/protocol/types.js';
 
 interface GuideViewProps {
   tutorialId?: string;
@@ -80,7 +82,7 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   // addToStudyHelper 함수를 useCallback으로 감싸서 정의
   const addToStudyHelper = useCallback(() => {
     // 전달할 콘텐츠 구성
-    const content = {
+    const content: EducationContent = {
       type: 'studyHelperContent',
       title: `${tutorial?.title} - ${currentStepData?.title}`,
       markdown: currentStepData?.content,
@@ -89,10 +91,8 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
     };
     
     console.log('[GuideView] 학습 도우미에 콘텐츠 추가 시도:', content);
-    // IdeMessenger를 통해 메시지 전송 - content 필드로 감싸기
+    // 타입 캐스팅 제거
     ideMessenger?.post('addEducationContextToChat', { content });
-    
-    // 토스트 메시지 제거 - ideMessenger.post 테스트
     
   }, [currentStepData, tutorial, ideMessenger]);
 
@@ -521,15 +521,16 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
                             title="학습 도우미에 추가"
                             onClick={() => {
                               // 해당 코드 스니펫만 도우미에 추가
-                              const content = {
+                              const content: EducationContent = {
                                 type: 'studyHelperContent',
                                 title: `${tutorial.title} - ${currentStepData.title} (코드 예제)`,
                                 markdown: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```',
+                                codeSnippets: [],
                                 category: tutorial.category
                               };
 
-                              ideMessenger.post('addEducationContextToChat' as any, content);
-                              
+                              // 타입 캐스팅 제거
+                              ideMessenger.post('addEducationContextToChat', { content });
                             }}
                           >
                             💬
