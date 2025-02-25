@@ -48,7 +48,9 @@ import {
   setDefaultModel,
   setInactive,
   setShowInteractiveContinueTutorial,
+  addContextItems,
 } from "../redux/slices/stateSlice";
+import { setBottomMessage } from "../redux/slices/uiStateSlice";
 import { RootState } from "../redux/store";
 import {
   getFontSize,
@@ -376,6 +378,49 @@ function GUI() {
       topGuiDivRef.current.style.paddingBottom = `${height + 20}px`;
     }
   }, []);
+
+  // 교육 콘텐츠를 Chat 컨텍스트에 추가하는 리스너 추가
+  useWebviewListener("addEducationContextToChat", async (content) => {
+    // 콘텐츠를 컨텍스트 아이템 형식으로 변환
+    const contextItem = {
+      id: `edu-${Date.now()}`,
+      type: "file",
+      name: content.title,
+      content: content.markdown,
+      language: "markdown",
+      source: "education",
+      path: `education/${content.category}/${content.title.toLowerCase().replace(/\s+/g, '-')}`,
+    };
+    
+    // 코드 스니펫이 있으면 추가
+    if (content.codeSnippets && content.codeSnippets.length > 0) {
+      content.codeSnippets.forEach((snippet, index) => {
+        dispatch(addContextItems({
+          id: `edu-code-${Date.now()}-${index}`,
+          type: "file",
+          name: `${content.title} - 코드 예제 ${index + 1}`,
+          content: snippet.code,
+          language: snippet.language || "typescript",
+          source: "education",
+          path: `education/${content.category}/code-snippets/example-${index + 1}.${snippet.language || 'ts'}`,
+        }));
+      });
+    }
+    
+    // 메인 콘텐츠 컨텍스트 추가
+    dispatch(addContextItems(contextItem));
+    
+    // 메인 페이지로 이동
+    navigate("/");
+    
+    // 사용자에게 알림
+    dispatch(setBottomMessage("교육 콘텐츠가 PearAI Chat에 추가되었습니다."));
+    
+    // 타이머로 알림 메시지 제거
+    setTimeout(() => {
+      dispatch(setBottomMessage(undefined));
+    }, 3000);
+  });
 
   return (
     <>

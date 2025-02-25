@@ -1,20 +1,25 @@
+import React, { useContext } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CurriculumItem } from '../../types/curriculum';
 import { CURRICULUM_DATA } from '../../data/curriculumData';
 import type { Components } from 'react-markdown';
-import React from 'react';
+import { IdeMessengerContext } from '../../context/IdeMessenger';
+
 interface GuideViewProps {
   tutorialId?: string;
   onClose: () => void;
+  isMobileView?: boolean;
+  initialStep?: number;
 }
 
-function GuideView({ tutorialId, onClose }: GuideViewProps) {
+function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 }: GuideViewProps) {
   console.log('GuideView rendering with tutorialId:', tutorialId);
   console.log('Available tutorials:', CURRICULUM_DATA);
-
-  const [currentStep, setCurrentStep] = React.useState(0);
+  
+  const ideMessenger = useContext(IdeMessengerContext);
+  const [currentStep, setCurrentStep] = React.useState(initialStep);
   const [evaluationStarted, setEvaluationStarted] = React.useState(false);
   const [remainingTime, setRemainingTime] = React.useState<number | null>(null);
   const [answers, setAnswers] = React.useState<{ [key: string]: string }>({});
@@ -36,6 +41,24 @@ function GuideView({ tutorialId, onClose }: GuideViewProps) {
   console.log('Current step data:', currentStepData);
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === tutorial.steps.length - 1;
+
+  // 현재 학습 콘텐츠를 PearAI Chat에 추가하는 함수
+  const addToStudyHelper = () => {
+    // 전달할 콘텐츠 구성
+    const content = {
+      type: 'studyHelperContent',
+      title: `${tutorial.title} - ${currentStepData.title}`,
+      markdown: currentStepData.content,
+      codeSnippets: currentStepData.codeSnippets || [],
+      category: tutorial.category
+    };
+    
+    // IdeMessenger를 통해 메시지 전송
+    ideMessenger.post('addEducationContextToChat' as any, content);
+    
+    // 사용자에게 피드백 제공
+    alert('학습 내용이 PearAI Chat에 추가되었습니다.');
+  };
 
   const handlePrevStep = () => {
     if (!isFirstStep) {
@@ -104,8 +127,13 @@ function GuideView({ tutorialId, onClose }: GuideViewProps) {
     };
   }, [evaluationStarted, remainingTime]);
 
+  // initialStep이 변경되면 현재 스텝 업데이트
+  React.useEffect(() => {
+    setCurrentStep(initialStep);
+  }, [initialStep]);
+
   return (
-    <div className="guide-view">
+    <div className={`guide-view ${isMobileView ? 'mobile-view' : ''}`}>
       <style>{`
         .guide-view {
           position: fixed;
@@ -407,170 +435,225 @@ function GuideView({ tutorialId, onClose }: GuideViewProps) {
         .draggable-content:active {
           cursor: grabbing;
         }
+
+        .guide-view.mobile-view {
+          position: relative;
+          height: 100%;
+          border: none;
+          padding-bottom: 0;
+        }
+        
+        .guide-view.mobile-view .guide-view-header {
+          display: none;
+        }
+        
+        .guide-view.mobile-view .navigation-buttons {
+          bottom: 0;
+          width: 100%;
+          border-radius: 0;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .help-button-container {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 16px;
+        }
+        
+        .add-to-helper-button {
+          background-color: var(--vscode-button-background);
+          color: var(--vscode-button-foreground);
+          border: none;
+          padding: 8px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: background-color 0.2s;
+        }
+        
+        .add-to-helper-button:hover {
+          background-color: var(--vscode-button-hoverBackground);
+        }
       `}</style>
-      <div className="guide-view-header">
-        <div className="header-content">
-          <h2>{tutorial.title}</h2>
-          <div className="step-indicator">
-            Step {currentStep + 1} of {tutorial.steps.length}
+      {!isMobileView && (
+        <div className="guide-view-header">
+          <div className="header-content">
+            <h2>{tutorial.title}</h2>
+            <div className="step-indicator">
+              Step {currentStep + 1} of {tutorial.steps.length}
+            </div>
           </div>
+          <button onClick={onClose} className="close-button">
+            ×
+          </button>
         </div>
-        <button onClick={onClose} className="close-button">
-          ×
-        </button>
-      </div>
+      )}
       <div className="guide-view-content">
         <h3 className="step-title">{currentStepData.title}</h3>
-        <div className="markdown-content">
-          <ReactMarkdown
-            components={{
-              code: ({ node, inline, className, children, ...props }: { node?: any; inline?: boolean; className?: string; children?: React.ReactNode; }) => {
-                const match = /language-(\w+)/.exec(className || '');
-                return !inline && match ? (
-                  <div style={{ position: 'relative' }}>
-                    <div className="code-actions" style={{ position: 'absolute', top: '5px', right: '5px', zIndex: 10 }}>
-                      <button
-                        className="add-to-chat-btn"
-                        onClick={() => {
-                          window.parent.postMessage({
-                            type: 'ADD_CONTEXT',
-                            context: String(children).replace(/\n$/, ''),
-                            category: match[1].toUpperCase()
-                          }, '*');
+        <div className="guide-content-wrapper">
+          <div className="help-button-container">
+            <button 
+              className="add-to-helper-button"
+              onClick={addToStudyHelper}
+              title="현재 학습 내용을 PearAI Chat에 추가합니다"
+            >
+              💬 학습 도우미에 추가
+            </button>
+          </div>
+          <div className="markdown-content">
+            <ReactMarkdown
+              components={{
+                code: ({ node, inline, className, children, ...props }: { node?: any; inline?: boolean; className?: string; children?: React.ReactNode; }) => {
+                  const match = /language-(\w+)/.exec(className || '');
+                  return !inline && match ? (
+                    <div style={{ position: 'relative' }}>
+                      <div className="code-actions" style={{ position: 'absolute', top: '5px', right: '5px', zIndex: 10 }}>
+                        <button
+                          className="add-to-chat-btn"
+                          onClick={() => {
+                            window.parent.postMessage({
+                              type: 'ADD_CONTEXT',
+                              context: String(children).replace(/\n$/, ''),
+                              category: match[1].toUpperCase()
+                            }, '*');
+                          }}
+                        >
+                          학습 도우미에 추가 🤖
+                        </button>
+                      </div>
+                      <SyntaxHighlighter
+                        style={{
+                          ...vscDarkPlus,
+                          'pre[class*="language-"]': {
+                            ...vscDarkPlus['pre[class*="language-"]'],
+                            background: '#1e1e1e',
+                          },
+                          'pre[class*="language-"] code': {
+                            ...vscDarkPlus['pre[class*="language-"] code'],
+                            borderSpacing: '0',
+                          }
                         }}
+                        language={match[1]}
+                        PreTag="div"
+                        draggable="true"
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('text/plain', String(children).replace(/\n$/, ''));
+                          e.dataTransfer.setData('text/curriculum-code', JSON.stringify({
+                            language: match[1],
+                            stepTitle: currentStepData.title
+                          }));
+                        }}
+                        customStyle={{
+                          padding: '1rem',
+                          margin: '1rem 0',
+                          borderRadius: '8px',
+                          border: '1px solid #30363d',
+                          backgroundColor: '#1e1e1e',
+                          fontSize: '0.9em',
+                          lineHeight: '1.5',
+                          overflow: 'auto',
+                          cursor: 'grab'
+                        }}
+                        {...props}
                       >
-                        학습 도우미에 추가 🤖
-                      </button>
+                        {String(children).replace(/\n$/, '')}
+                      </SyntaxHighlighter>
                     </div>
-                    <SyntaxHighlighter
+                  ) : (
+                    <code
+                      className={className}
                       style={{
-                        ...vscDarkPlus,
-                        'pre[class*="language-"]': {
-                          ...vscDarkPlus['pre[class*="language-"]'],
-                          background: '#1e1e1e',
-                        },
-                        'pre[class*="language-"] code': {
-                          ...vscDarkPlus['pre[class*="language-"] code'],
-                          borderSpacing: '0',
-                        }
-                      }}
-                      language={match[1]}
-                      PreTag="div"
-                      draggable="true"
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData('text/plain', String(children).replace(/\n$/, ''));
-                        e.dataTransfer.setData('text/curriculum-code', JSON.stringify({
-                          language: match[1],
-                          stepTitle: currentStepData.title
-                        }));
-                      }}
-                      customStyle={{
-                        padding: '1rem',
-                        margin: '1rem 0',
-                        borderRadius: '8px',
-                        border: '1px solid #30363d',
+                        padding: '0.2em 0.4em',
+                        borderRadius: '4px',
                         backgroundColor: '#1e1e1e',
-                        fontSize: '0.9em',
-                        lineHeight: '1.5',
-                        overflow: 'auto',
-                        cursor: 'grab'
+                        fontSize: '0.9em'
                       }}
                       {...props}
                     >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
-                  </div>
-                ) : (
-                  <code
-                    className={className}
-                    style={{
-                      padding: '0.2em 0.4em',
-                      borderRadius: '4px',
-                      backgroundColor: '#1e1e1e',
-                      fontSize: '0.9em'
+                      {children}
+                    </code>
+                  );
+                },
+                p: ({node, children, ...props}) => (
+                  <p
+                    draggable="true"
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/plain', children as string);
+                      e.dataTransfer.setData('text/curriculum-content', JSON.stringify({
+                        type: 'paragraph',
+                        stepTitle: currentStepData.title
+                      }));
                     }}
+                    style={{cursor: 'grab'}}
                     {...props}
                   >
                     {children}
-                  </code>
-                );
-              },
-              p: ({node, children, ...props}) => (
-                <p
-                  draggable="true"
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('text/plain', children as string);
-                    e.dataTransfer.setData('text/curriculum-content', JSON.stringify({
-                      type: 'paragraph',
-                      stepTitle: currentStepData.title
-                    }));
-                  }}
-                  style={{cursor: 'grab'}}
-                  {...props}
-                >
-                  {children}
-                </p>
-              ),
-            }}
-          >
-            {currentStepData.content}
-          </ReactMarkdown>
-          {currentStepData.codingTask && (
-            <div className="evaluation-section">
-              <div className="requirements">
-                <h4>요구사항:</h4>
-                <ul>
-                  {currentStepData.codingTask.requirements.map((req, index) => (
-                    <li key={index}>{req}</li>
-                  ))}
-                </ul>
-              </div>
+                  </p>
+                ),
+              }}
+            >
+              {currentStepData.content}
+            </ReactMarkdown>
+            {currentStepData.codingTask && (
+              <div className="evaluation-section">
+                <div className="requirements">
+                  <h4>요구사항:</h4>
+                  <ul>
+                    {currentStepData.codingTask.requirements.map((req, index) => (
+                      <li key={index}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
 
-              {!evaluationStarted && !feedback ? (
-                <button onClick={handleStartEvaluation} className="nav-button evaluation-button">
-                  평가 시작하기
-                </button>
-              ) : evaluationStarted ? (
-                <div className="evaluation-content">
-                  <div className="timer">
-                    남은 시간: {Math.floor(remainingTime! / 60)}:{String(remainingTime! % 60).padStart(2, '0')}
-                  </div>
-                  <div className="file-status">
-                    <h4>작업할 파일:</h4>
-                    <ul>
-                      {currentStepData.codingTask.expectedFiles.map((file, index) => (
-                        <li key={index}>{file}</li>
-                      ))}
-                    </ul>
-                  </div>
-                  <button onClick={handleSubmitEvaluation} className="nav-button evaluation-submit">
-                    과제 제출하기
+                {!evaluationStarted && !feedback ? (
+                  <button onClick={handleStartEvaluation} className="nav-button evaluation-button">
+                    평가 시작하기
                   </button>
-                </div>
-              ) : feedback ? (
-                <div className="feedback-section">
-                  <h4>평가 결과</h4>
-                  <div className="score">점수: {feedback.score}점</div>
-                  <div className="feedback-comments">
-                    <h5>피드백:</h5>
-                    <ul>
-                      {feedback.comments.map((comment, index) => (
-                        <li key={index}>{comment}</li>
-                      ))}
-                    </ul>
+                ) : evaluationStarted ? (
+                  <div className="evaluation-content">
+                    <div className="timer">
+                      남은 시간: {Math.floor(remainingTime! / 60)}:{String(remainingTime! % 60).padStart(2, '0')}
+                    </div>
+                    <div className="file-status">
+                      <h4>작업할 파일:</h4>
+                      <ul>
+                        {currentStepData.codingTask.expectedFiles.map((file, index) => (
+                          <li key={index}>{file}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <button onClick={handleSubmitEvaluation} className="nav-button evaluation-submit">
+                      과제 제출하기
+                    </button>
                   </div>
-                  <div className="feedback-suggestions">
-                    <h5>개선사항:</h5>
-                    <ul>
-                      {feedback.suggestions.map((suggestion, index) => (
-                        <li key={index}>{suggestion}</li>
-                      ))}
-                    </ul>
+                ) : feedback ? (
+                  <div className="feedback-section">
+                    <h4>평가 결과</h4>
+                    <div className="score">점수: {feedback.score}점</div>
+                    <div className="feedback-comments">
+                      <h5>피드백:</h5>
+                      <ul>
+                        {feedback.comments.map((comment, index) => (
+                          <li key={index}>{comment}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="feedback-suggestions">
+                      <h5>개선사항:</h5>
+                      <ul>
+                        {feedback.suggestions.map((suggestion, index) => (
+                          <li key={index}>{suggestion}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              ) : null}
-            </div>
-          )}
+                ) : null}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="guide-view-footer">

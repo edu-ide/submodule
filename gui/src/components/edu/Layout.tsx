@@ -9,7 +9,6 @@ function Layout({ children }: LayoutProps) {
   return (
     <div className="layout">
       {children}
-      <ChatBot />
       <style>{`
         .layout {
           position: relative;

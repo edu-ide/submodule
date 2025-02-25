@@ -17,7 +17,7 @@ export interface CodingTask {
 export interface CurriculumStep {
   title: string;
   content: string;
-  completed: boolean;
+  completed?: boolean;
   evaluation?: {
     timeLimit: number;
     questions: Array<{
@@ -34,6 +34,10 @@ export interface CurriculumStep {
     initialFiles: Record<string, string>;
     expectedFiles: string[];
   };
+  codeSnippets?: Array<{
+    code: string;
+    language?: string;
+  }>;
 }
 
 export interface CurriculumState {

@@ -204,6 +204,14 @@ const Layout = () => {
     [navigate],
   );
 
+  useWebviewListener(
+    "forwardEducationContextToChat" as any,
+    async (data) => {
+      ideMessenger.post("addEducationContextToChat" as any, data);
+    },
+    [ideMessenger],
+  );
+
   const [indexingState, setIndexingState] = useState<IndexingProgressUpdate>({
     desc: "Loading indexing config",
     progress: 0.0,
