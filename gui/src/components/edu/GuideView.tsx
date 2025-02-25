@@ -354,6 +354,40 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
           z-index: 100;
         }
+
+        .code-actions {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          z-index: 10;
+        }
+
+        .icon-buttons {
+          display: flex;
+          gap: 5px;
+        }
+        
+        .icon-button {
+          background: transparent;
+          border: none;
+          color: var(--vscode-editor-foreground);
+          border-radius: 50%;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.2s;
+          opacity: 0.7;
+        }
+        
+        .icon-button:hover {
+          opacity: 1;
+          background-color: rgba(255, 255, 255, 0.1);
+          transform: scale(1.1);
+        }
       `}</style>
       {!isMobileView && (
         <div className="guide-view-header">
@@ -388,18 +422,74 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
                   return !inline && match ? (
                     <div style={{ position: 'relative' }}>
                       <div className="code-actions" style={{ position: 'absolute', top: '5px', right: '5px', zIndex: 10 }}>
-                        <button
-                          className="add-to-chat-btn"
-                          onClick={() => {
-                            window.parent.postMessage({
-                              type: 'ADD_CONTEXT',
-                              context: String(children).replace(/\n$/, ''),
-                              category: match[1].toUpperCase()
-                            }, '*');
-                          }}
-                        >
-                          학습 도우미에 추가 🤖
-                        </button>
+                        <div className="icon-buttons">
+                          <button
+                            className="icon-button"
+                            title="코드 복사하기"
+                            onClick={() => {
+                              navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+                              
+                              // 복사 성공 알림
+                              const toast = document.createElement('div');
+                              toast.textContent = '코드가 복사되었습니다';
+                              toast.style.position = 'fixed';
+                              toast.style.bottom = '20px';
+                              toast.style.left = '50%';
+                              toast.style.transform = 'translateX(-50%)';
+                              toast.style.padding = '8px 16px';
+                              toast.style.backgroundColor = 'var(--vscode-editor-background)';
+                              toast.style.color = 'var(--vscode-editor-foreground)';
+                              toast.style.borderRadius = '4px';
+                              toast.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+                              toast.style.zIndex = '1000';
+                              document.body.appendChild(toast);
+                              
+                              // 2초 후 토스트 메시지 제거
+                              setTimeout(() => {
+                                document.body.removeChild(toast);
+                              }, 2000);
+                            }}
+                          >
+                            📋
+                          </button>
+                          
+                          <button
+                            className="icon-button"
+                            title="학습 도우미에 추가"
+                            onClick={() => {
+                              // 해당 코드 스니펫만 도우미에 추가
+                              const content = {
+                                type: 'studyHelperContent',
+                                title: `${tutorial.title} - ${currentStepData.title} (코드 예제)`,
+                                markdown: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```',
+                                category: tutorial.category
+                              };
+                              
+                              ideMessenger.post('addEducationContextToChat' as any, content);
+                              
+                              // 작은 토스트 메시지로 피드백
+                              const toast = document.createElement('div');
+                              toast.textContent = '코드가 학습 도우미에 추가되었습니다';
+                              toast.style.position = 'fixed';
+                              toast.style.bottom = '20px';
+                              toast.style.left = '50%';
+                              toast.style.transform = 'translateX(-50%)';
+                              toast.style.padding = '8px 16px';
+                              toast.style.backgroundColor = 'var(--vscode-editor-background)';
+                              toast.style.color = 'var(--vscode-editor-foreground)';
+                              toast.style.borderRadius = '4px';
+                              toast.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+                              toast.style.zIndex = '1000';
+                              document.body.appendChild(toast);
+                              
+                              setTimeout(() => {
+                                document.body.removeChild(toast);
+                              }, 2000);
+                            }}
+                          >
+                            💬
+                          </button>
+                        </div>
                       </div>
                       <SyntaxHighlighter
                         style={{
