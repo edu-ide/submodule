@@ -624,6 +624,11 @@
           "command": "pearai.viewHistorySearch",
           "group": "navigation@1",
           "when": "view == pearai.searchView"
+        },
+        {
+          "command": "pearai.openCurriculum",
+          "group": "navigation",
+          "when": "view == pearai.curriculum"
         }
       ],
       "editor/title": [
@@ -657,6 +662,13 @@
           "title": "PearAI Memory",
           "icon": "media/sidebar-icon.png"
         }
+      ],
+      "activitybar": [
+        {
+          "id": "pearai-curriculum",
+          "title": "EduSense 커리큘럼",
+          "icon": "media/curriculum-icon.svg"
+        }
       ]
     },
     "views": {
@@ -681,6 +693,14 @@
           "type": "webview",
           "id": "pearai.mem0View",
           "name": "PearAI Memory",
+          "visibility": "visible"
+        }
+      ],
+      "pearai-curriculum": [
+        {
+          "type": "webview",
+          "id": "pearai.curriculum",
+          "name": "EduSense 커리큘럼",
           "visibility": "visible"
         }
       ]

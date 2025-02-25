@@ -8,6 +8,9 @@ import { setupCa } from "core/util/ca";
 import { Telemetry } from "core/util/posthog";
 import * as vscode from "vscode";
 import { getExtensionVersion } from "./util/util";
+import { EduSenseGUIWebviewViewProvider } from "./EduSenseGUIWebviewViewProvider";
+import { ConfigHandler } from "core/config/ConfigHandler";
+import { getUniqueId } from "./util/vscode";
 
 async function dynamicImportAndActivate(context: vscode.ExtensionContext) {
   const { activateExtension } = await import("./activation/activate");

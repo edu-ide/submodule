@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
-import { CurriculumItem } from '../types/curriculum';
+import { CurriculumItem } from '../../types/curriculum';
 
 interface LeftPanelProps {
     items: CurriculumItem[];
