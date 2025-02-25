@@ -152,6 +152,14 @@ const Layout = () => {
     [location, navigate],
   );
 
+  useWebviewListener(
+    "openEducation" as any,
+    async () => {
+      navigate("/education");
+    },
+    [navigate],
+  );
+
   useWebviewListener("indexProgress", async (data) => {
     setIndexingState(data);
   });
@@ -201,6 +209,8 @@ const Layout = () => {
     progress: 0.0,
     status: "loading",
   });
+
+  console.log('Layout 렌더링 중...');
 
   if (window.isPearOverlay) {
     return <OverlayContainer isPearOverlay={window.isPearOverlay} path={location.pathname}>

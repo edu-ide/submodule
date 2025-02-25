@@ -9,8 +9,8 @@ import { useVscTheme } from "./hooks/useVscTheme";
 import { AddNewModel, ConfigureProvider } from "./pages/AddNewModel";
 import ErrorPage from "./pages/error";
 import GUI from "./pages/gui";
-import { default as Help, default as HelpPage } from "./pages/help";
 import History from "./pages/history";
+import { default as Help, default as HelpPage } from "./pages/help";
 import MigrationPage from "./pages/migration";
 import MonacoPage from "./pages/monaco";
 import ApiKeyAutocompleteOnboarding from "./pages/onboarding/apiKeyAutocompleteOnboarding";
@@ -26,6 +26,7 @@ import { ContextMenuProvider } from './components/ContextMenuProvider';
 import Mem0GUI from "./integrations/mem0/mem0gui";
 // import PerplexitySidebarGUI from "./integrations/perplexity/PerplexitySidebarGUI";
 import Mem0SidebarGUI from "./integrations/mem0/Mem0SidebarGUI";
+import EducationGUI from './pages/education';
 
 
 declare global {
@@ -55,6 +56,10 @@ const router = createMemoryRouter(
                    window.viewType === 'pearai.mem0View' ? <Mem0SidebarGUI /> :
                   <GUI />, // default to GUI if viewType is undefined or different
 
+        },
+            {
+          path: "/education",
+          element: <EducationGUI />,
         },
         {
           path: "/perplexityMode",
