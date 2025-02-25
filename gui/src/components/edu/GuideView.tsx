@@ -146,6 +146,8 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           z-index: 1000;
           display: grid;
           grid-template-rows: auto 1fr auto;
+          padding-bottom: 60px;
+          position: relative;
         }
 
         .guide-view-header {
@@ -212,28 +214,23 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
         }
 
         .guide-view-footer {
-          border-top: 1px solid var(--vscode-panel-border);
-          padding: 20px;
+          position: sticky;
+          bottom: 0;
+          width: 100%;
           background-color: var(--vscode-editor-background);
-          padding-bottom: 100px;
+          border-top: 1px solid var(--vscode-panel-border);
+          padding: 12px 0;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+          z-index: 10;
         }
 
         .navigation-buttons {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          gap: 1rem;
+          gap: 20px;
           max-width: 600px;
           margin: 0 auto;
-          position: fixed;
-          bottom: 20px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: var(--vscode-editor-background);
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-          z-index: 9998;
         }
 
         .nav-button {
@@ -241,199 +238,54 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           color: var(--vscode-button-foreground);
           border: none;
           padding: 8px 16px;
-          border-radius: 3px;
-          cursor: pointer;
-          min-width: 80px;
+          border-radius: 4px;
           font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          min-width: 80px;
+          justify-content: center;
         }
 
         .nav-button:disabled {
           opacity: 0.5;
           cursor: not-allowed;
-          background-color: var(--vscode-button-secondaryBackground);
         }
 
         .nav-button:not(:disabled):hover {
           background-color: var(--vscode-button-hoverBackground);
         }
 
+        .prev-button {
+          border-radius: 20px 4px 4px 20px;
+        }
+
+        .next-button {
+          border-radius: 4px 20px 20px 4px;
+        }
+
         .step-dots {
           display: flex;
           gap: 8px;
+          justify-content: center;
           align-items: center;
         }
 
         .step-dot {
-          width: 8px;
-          height: 8px;
+          width: 10px;
+          height: 10px;
           border-radius: 50%;
-          background-color: var(--vscode-button-secondaryBackground);
+          background-color: var(--vscode-badge-background);
+          opacity: 0.5;
           cursor: pointer;
-          border: none;
-          padding: 0;
+          transition: opacity 0.2s, transform 0.2s;
         }
 
         .step-dot.active {
-          background-color: var(--vscode-button-background);
+          opacity: 1;
           transform: scale(1.2);
-        }
-
-        .step-dot:hover {
-          background-color: var(--vscode-button-hoverBackground);
-        }
-
-        @media (max-width: 768px) {
-          .guide-view {
-            width: 100%;
-          }
-
-          .nav-button {
-            padding: 6px 12px;
-            min-width: 70px;
-          }
-        }
-
-        .evaluation-section {
-          margin-top: 2rem;
-          padding: 1rem;
-          border: 1px solid var(--vscode-panel-border);
-          border-radius: 4px;
-        }
-
-        .evaluation-button {
-          display: block;
-          margin: 0 auto;
-          font-size: 1rem;
-          padding: 12px 24px;
-        }
-
-        .evaluation-content {
-          margin-top: 1rem;
-        }
-
-        .timer {
-          text-align: center;
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
-          padding: 0.5rem;
-          background-color: var(--vscode-button-secondaryBackground);
-          border-radius: 4px;
-        }
-
-        .question {
-          margin-bottom: 2rem;
-        }
-
-        .question h4 {
-          margin: 0 0 1rem 0;
-        }
-
-        .options {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .option {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          cursor: pointer;
-        }
-
-        .option input[type="radio"] {
-          margin: 0;
-        }
-
-        textarea {
-          width: 100%;
-          padding: 0.5rem;
-          border: 1px solid var(--vscode-panel-border);
-          border-radius: 4px;
-          background-color: var(--vscode-input-background);
-          color: var(--vscode-input-foreground);
-          resize: vertical;
-        }
-
-        .evaluation-submit {
-          display: block;
-          margin: 2rem auto 0;
-          font-size: 1rem;
-          padding: 12px 24px;
-        }
-
-        .requirements {
-          margin-bottom: 1.5rem;
-        }
-
-        .requirements ul {
-          margin: 0.5rem 0;
-          padding-left: 1.5rem;
-        }
-
-        .file-status {
-          margin: 1rem 0;
-        }
-
-        .file-status ul {
-          list-style: none;
-          padding: 0;
-        }
-
-        .file-status li {
-          padding: 0.5rem;
-          background: var(--vscode-input-background);
-          margin: 0.5rem 0;
-          border-radius: 4px;
-        }
-
-        .feedback-section {
-          background: var(--vscode-input-background);
-          padding: 1rem;
-          border-radius: 4px;
-        }
-
-        .score {
-          font-size: 1.2rem;
-          font-weight: bold;
-          margin: 1rem 0;
-          color: var(--vscode-textLink-foreground);
-        }
-
-        .feedback-comments, .feedback-suggestions {
-          margin: 1rem 0;
-        }
-
-        .feedback-comments h5, .feedback-suggestions h5 {
-          margin: 0.5rem 0;
-        }
-
-        .feedback-comments ul, .feedback-suggestions ul {
-          margin: 0.5rem 0;
-          padding-left: 1.5rem;
-        }
-
-        .draggable-content {
-          position: relative;
-          cursor: grab;
-        }
-
-        .draggable-content:hover::before {
-          content: '↓ 챗봇에 끌어다 놓기';
-          position: absolute;
-          right: 8px;
-          top: 8px;
-          background-color: var(--vscode-editor-selectionBackground);
-          color: var(--vscode-editor-selectionForeground);
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 10px;
-          opacity: 0.9;
-          z-index: 10;
-        }
-
-        .draggable-content:active {
-          cursor: grabbing;
+          background-color: var(--vscode-button-background);
         }
 
         .guide-view.mobile-view {
@@ -476,6 +328,31 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
         
         .add-to-helper-button:hover {
           background-color: var(--vscode-button-hoverBackground);
+        }
+
+        .guide-navigation-container {
+          position: sticky;
+          bottom: 0;
+          width: 100%;
+          background-color: var(--vscode-editor-background);
+          border-top: 1px solid var(--vscode-panel-border);
+          padding: 12px 0;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+          z-index: 100;
+          margin-top: auto;
+        }
+
+        .bottom-navigation {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100%;
+          background-color: var(--vscode-editor-background);
+          border-top: 1px solid var(--vscode-panel-border);
+          padding: 12px 0;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+          z-index: 100;
         }
       `}</style>
       {!isMobileView && (
@@ -656,14 +533,14 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           </div>
         </div>
       </div>
-      <div className="guide-view-footer">
+      <div className="guide-navigation-container">
         <div className="navigation-buttons">
           <button
             onClick={handlePrevStep}
             disabled={isFirstStep}
-            className="nav-button"
+            className="nav-button prev-button"
           >
-            이전
+            ← 이전
           </button>
           <div className="step-dots">
             {tutorial.steps.map((_, index) => (
@@ -677,9 +554,9 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
           <button
             onClick={handleNextStep}
             disabled={isLastStep}
-            className="nav-button"
+            className="nav-button next-button"
           >
-            다음
+            다음 →
           </button>
         </div>
       </div>
