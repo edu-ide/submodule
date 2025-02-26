@@ -44,11 +44,13 @@ const saveSubsetFilters = [
     "sessionId",
     "defaultModelTitle",
   ]),
+  createFilter("uiState", [], ["bottomMessage"]),
 ];
 
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: ['uiState'],
   transforms: [
     ...saveSubsetFilters,
     // windowIDTransform((window as any).windowId || "undefinedWindowId"),
