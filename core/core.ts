@@ -711,7 +711,7 @@ export class Core {
         message: "학습 도우미에 콘텐츠가 추가되었습니다."
       });
       
-      this.messenger.send("addEducationContextToChat", msg.data);
+      this.messenger.send("forwardEducationContextToChat", msg.data);
     });
   }
 

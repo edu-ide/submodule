@@ -18,7 +18,7 @@ export type ToWebviewFromCoreProtocol = ToWebviewFromIdeOrCoreProtocol & {
   didChangeAvailableProfiles: [{ profiles: ProfileDescription[] }, void];
   showToast: [{ message: string }, void];
   // EditorContent 타입도 허용하도록 변경
-  addEducationContextToChat: [{ 
+  forwardEducationContextToChat: [{ 
     content:  EditorContent, 
     shouldRun?: boolean, 
     prompt?: string 

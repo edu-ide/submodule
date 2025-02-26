@@ -60,5 +60,5 @@ export const CORE_TO_WEBVIEW_PASS_THROUGH: (keyof ToWebviewFromCoreProtocol)[] =
     "isContinueInputFocused",
     "didChangeAvailableProfiles",
     "showToast",
-    "addEducationContextToChat",
+    "forwardEducationContextToChat",
   ];
