@@ -205,7 +205,6 @@
         "title": "Focus PearAI Search View",
         "group": "PearAI"
       },
-
       {
         "command": "pearai.focusPearAIMem0View",
         "category": "PearAI",
@@ -390,6 +389,24 @@
         "category": "PearAI",
         "title": "Show Chat Tutorial",
         "group": "PearAI"
+      },
+      {
+        "command": "pearai.toggleCurriculum",
+        "category": "PearAI",
+        "title": "EduSense 커리큘럼 토글",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.focusCurriculum",
+        "category": "PearAI",
+        "title": "EduSense 커리큘럼 포커스",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.toggleFileExplorer",
+        "category": "PearAI",
+        "title": "파일 탐색기 토글",
+        "group": "PearAI"
       }
     ],
     "keybindings": [
@@ -507,6 +524,16 @@
         "command": "pearai.viewHistory",
         "mac": "cmd+h",
         "key": "ctrl+h"
+      },
+      {
+        "command": "pearai.toggleCurriculum",
+        "mac": "cmd+4",
+        "key": "ctrl+4"
+      },
+      {
+        "command": "pearai.toggleFileExplorer",
+        "mac": "cmd+5",
+        "key": "ctrl+5"
       }
     ],
     "submenus": [
@@ -546,6 +573,12 @@
         },
         {
           "command": "pearai.showInteractiveContinueTutorial"
+        },
+        {
+          "command": "pearai.toggleCurriculum"
+        },
+        {
+          "command": "pearai.focusCurriculum"
         }
       ],
       "editor/context": [
@@ -657,6 +690,13 @@
           "title": "PearAI Memory",
           "icon": "media/sidebar-icon.png"
         }
+      ],
+      "activitybar": [
+        {
+          "id": "pearai-curriculum",
+          "title": "EduSense 커리큘럼",
+          "icon": "media/curriculum-icon.svg"
+        }
       ]
     },
     "views": {
@@ -681,6 +721,14 @@
           "type": "webview",
           "id": "pearai.mem0View",
           "name": "PearAI Memory",
+          "visibility": "visible"
+        }
+      ],
+      "pearai-curriculum": [
+        {
+          "type": "webview",
+          "id": "pearai.curriculum",
+          "name": "EduSense 커리큘럼",
           "visibility": "visible"
         }
       ]

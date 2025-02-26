@@ -31,7 +31,6 @@ export interface ListHistoryOptions {
 export type ToCoreFromIdeOrWebviewProtocol = {
   "update/modelChange": [string, void];
   "update/selectTabAutocompleteModel": [string, void];
-
   // Special
   ping: [string, string];
   abort: [undefined, void];
@@ -154,4 +153,5 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   "profiles/switch": [{ id: string }, undefined];
 
   "auth/getAuthUrl": [undefined, { url: string }];
+
 };

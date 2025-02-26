@@ -92,6 +92,21 @@ async function resolveEditorContent(
           url: p.attrs.src,
         },
       });
+    } else if (p.type === "educationBlock") {
+      const title = p.attrs?.title || "교육 자료";
+      const category = p.attrs?.category ? `[${p.attrs.category}]` : "";
+      let content = p.attrs?.markdown || p.attrs?.content || "";
+      
+      const text = `### ${title} ${category}\n\n${content}\n`;
+      
+      if (parts[parts.length - 1]?.type === "text") {
+        parts[parts.length - 1].text += "\n" + text;
+      } else {
+        parts.push({
+          type: "text",
+          text,
+        });
+      }
     } else {
       console.warn("Unexpected content type", p.type);
     }

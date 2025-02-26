@@ -703,6 +703,16 @@ export class Core {
     on("didChangeActiveTextEditor", ({ data: { filepath } }) => {
       recentlyEditedFilesCache.set(filepath, filepath);
     });
+
+    on("addEducationContextToChat", (msg) => {
+      console.log('교육 콘텐츠가 추가되었습니다:', msg.data);
+      
+      this.messenger.send("showToast", {
+        message: "학습 도우미에 콘텐츠가 추가되었습니다."
+      });
+      
+      this.messenger.send("forwardEducationContextToChat", msg.data);
+    });
   }
 
   private indexingCancellationController: AbortController | undefined;
