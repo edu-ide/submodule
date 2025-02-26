@@ -8,7 +8,7 @@ import type { Components } from 'react-markdown';
 import { IdeMessengerContext } from '../../context/IdeMessenger';
 import { useWebviewListener } from '../../hooks/useWebviewListener';
 // core 프로토콜에서 정의된 타입 임포트
-import { EducationContent } from 'core/protocol/types.js';
+import { EditorContent } from 'core/protocol/types.js';
 
 interface GuideViewProps {
   tutorialId?: string;
@@ -81,18 +81,30 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   
   // addToStudyHelper 함수를 useCallback으로 감싸서 정의
   const addToStudyHelper = useCallback(() => {
-    // 전달할 콘텐츠 구성
-    const content: EducationContent = {
-      type: 'studyHelperContent',
-      title: `${tutorial?.title} - ${currentStepData?.title}`,
-      markdown: currentStepData?.content,
-      codeSnippets: currentStepData?.codeSnippets || [],
-      category: tutorial?.category
+    // 완전한 editorContent 형식으로 준비 (TipTap 에디터 형식)
+    const editorContent: EditorContent = {
+      type: "doc",
+      content: [
+        {
+          type: "educationBlock",
+          attrs: {
+            title: `${tutorial?.title || ""} - ${currentStepData?.title || ""}`,
+            content: currentStepData?.content || "",
+            category: tutorial?.category || "",
+            markdown: currentStepData?.content || ""
+          }
+        }
+      ]
     };
     
-    console.log('[GuideView] 학습 도우미에 콘텐츠 추가 시도:', content);
-    // 타입 캐스팅 제거
-    ideMessenger?.post('addEducationContextToChat', { content });
+    console.log('[GuideView] 학습 도우미에 콘텐츠 구조:', JSON.stringify(editorContent));
+    
+    // 수정된 데이터 형식으로 전달
+    ideMessenger?.post('addEducationContextToChat', { 
+      content: editorContent,
+      shouldRun: true,
+      prompt: "이 내용을 분석하고 도움을 주세요"
+    });
     
   }, [currentStepData, tutorial, ideMessenger]);
 
@@ -521,16 +533,23 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
                             title="학습 도우미에 추가"
                             onClick={() => {
                               // 해당 코드 스니펫만 도우미에 추가
-                              const content: EducationContent = {
-                                type: 'studyHelperContent',
-                                title: `${tutorial.title} - ${currentStepData.title} (코드 예제)`,
-                                markdown: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```',
-                                codeSnippets: [],
-                                category: tutorial.category
+                              const content: EditorContent = {
+                                type: "doc",
+                                content: [
+                                  {
+                                    type: "educationBlock",
+                                    attrs: {
+                                      title: `${tutorial.title} - ${currentStepData.title} (코드 예제)`,  
+                                      content: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```',
+                                      category: tutorial.category,
+                                      markdown: '```' + match[1] + '\n' + String(children).replace(/\n$/, '') + '\n```'
+                                    }
+                                  }
+                                ] 
                               };
 
                               // 타입 캐스팅 제거
-                              ideMessenger.post('addEducationContextToChat', { content });
+                                  ideMessenger.post('addEducationContextToChat', { content });
                             }}
                           >
                             💬

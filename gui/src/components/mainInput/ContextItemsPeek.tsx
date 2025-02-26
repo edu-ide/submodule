@@ -13,7 +13,6 @@ import { IdeMessengerContext } from "../../context/IdeMessenger";
 import { getFontSize } from "../../util";
 import FileIcon from "../FileIcon";
 import SafeImg from "../SafeImg";
-import { BookOpenIcon } from "@heroicons/react/24/outline";
 
 const ContextItemDiv = styled.div`
   cursor: pointer;
@@ -57,9 +56,7 @@ const ContextItemsPeek = (props: ContextItemsPeekProps) => {
   }
 
   function openContextItem(contextItem: ContextItemWithId) {
-    if ((contextItem as any).source === "education") {
-      ideMessenger.ide.showVirtualFile(contextItem.name, contextItem.content);
-    } else if (contextItem.description.startsWith("http")) {
+    if (contextItem.description.startsWith("http")) {
       window.open(isSafeUrl(contextItem.description) ? contextItem.description : '#', "_blank");
     } else if (
       contextItem.description.startsWith("/") ||
@@ -121,27 +118,11 @@ const ContextItemsPeek = (props: ContextItemsPeekProps) => {
           }}
         >
           {props.contextItems?.map((contextItem, idx) => {
-            if ((contextItem as any).source === "education") {
-              return (
-                <ContextItemDiv
-                  key={idx}
-                  onClick={() => {
-                    openContextItem(contextItem);
-                  }}
-                >
-                  <BookOpenIcon
-                    height="1.6em"
-                    width="1.6em"
-                    style={{ marginRight: "0.5em" }}
-                  />
-                  {contextItem.name}
-                </ContextItemDiv>
-              );
-            } else if (contextItem.description.startsWith("http")) {
+            if (contextItem.description.startsWith("http")) {
               return (
                 <a
                   key={idx}
-                  href={isSafeUrl(contextItem.description) ? contextItem.description : '#'}
+                  href={isSafeUrl(contextItem.description) ? contextItem.description : '#'} // Protects against Client-side URL Redirects
                   target="_blank"
                   style={{ color: vscForeground, textDecoration: "none" }}
                 >

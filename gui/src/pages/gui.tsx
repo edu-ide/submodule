@@ -62,10 +62,6 @@ import OnboardingTutorial from "./onboarding/OnboardingTutorial";
 import { getLogoPath } from "./welcome/setup/ImportExtensions";
 import { Badge } from "../components/ui/badge";
 import { cn } from "@/lib/utils";
-import { EducationContent } from 'core/protocol/types.js';
-
-// ContextItemId 타입을 인라인으로 정의
-type ContextItemId = string;
 
 const LENGTHY_MESSAGE_WARNING_INDEX = 14; // number of messages after which we show the warning card
 
@@ -387,6 +383,8 @@ function GUI() {
     // 앱 시작 시 contextItems 초기화
     dispatch({ type: 'state/clearContextItems' });
   }, []);
+
+
 
   return (
     <>

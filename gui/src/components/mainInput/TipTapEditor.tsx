@@ -63,6 +63,9 @@ import {
 import { ComboBoxItem } from "./types";
 import { useLocation } from "react-router-dom";
 import { TipTapContextMenu } from './TipTapContextMenu';
+import EducationBlock from './EducationBlockExtension';
+import { makeEducationBlockSerializable } from './EducationBlockExtension';
+import { setBottomMessage, setBottomMessageCloseTimeout } from "../../redux/slices/uiStateSlice";
 
 const InputBoxDiv = styled.div<{ isNewSession?: boolean }>`
 	position: relative;
@@ -588,6 +591,9 @@ const TipTapEditor = memo(function TipTapEditor({
           return '\n'
         },
       }),
+      EducationBlock.configure({
+        // 추가 설정이 필요하면 여기에 작성
+      }),
     ],
     editorProps: {
       attributes: {
@@ -1085,6 +1091,84 @@ const TipTapEditor = memo(function TipTapEditor({
       return () => observer.disconnect();
     }
   }, [onHeightChange]);
+
+  // 교육 콘텐츠를 에디터에 추가하는 리스너
+  useWebviewListener("addEducationContextToChat", async (data) => {
+    console.log("교육 콘텐츠 데이터 수신:", JSON.stringify(data, null, 2));
+    
+    if (!isMainInput || !editor || !data) {
+      console.log("에디터 또는 데이터 없음");
+      return;
+    }
+    
+    const content = data.content;
+    
+    if (!content) {
+      console.error("콘텐츠가 없습니다:", data);
+      dispatch(setBottomMessage(<div>교육 자료 형식이 올바르지 않습니다</div>));
+      return;
+    }
+    
+    console.log("교육 콘텐츠 구조:", JSON.stringify(content, null, 2));
+    console.log("EducationBlock 등록 여부:", editor.schema.nodes.educationBlock !== undefined);
+    
+    try {
+      // doc 타입인지 확인
+      if (content.type === "doc" && Array.isArray(content.content)) {
+        const block = content.content[0];
+        console.log("첫 번째 블록:", block);
+        
+        if (block && block.type === "educationBlock" && block.attrs) {
+          // 직접 교육 블록의 속성을 로그로 확인
+          console.log("교육 블록 속성:", block.attrs);
+          
+          // 에디터에 직접 삽입
+          editor.commands.insertContent(content);
+          
+          dispatch(setBottomMessage(<div>교육 자료가 추가되었습니다</div>));
+        } else {
+          console.error("필요한 교육 블록이 없습니다");
+          dispatch(setBottomMessage(<div>교육 블록 형식이 올바르지 않습니다</div>));
+        }
+      } else {
+        console.error("문서 형식이 아닙니다:", content);
+        dispatch(setBottomMessage(<div>지원되지 않는 문서 형식입니다</div>));
+      }
+      
+      // 프롬프트와 자동 실행 처리는 유지
+      // ...
+    } catch (error) {
+      console.error("교육 콘텐츠 추가 중 오류:", error);
+      dispatch(setBottomMessage(<div>오류: {error.message || "알 수 없는 오류"}</div>));
+    }
+  }, [editor, isMainInput, onEnterRef.current, dispatch]);
+
+  useEffect(() => {
+    if (editor && typeof editor.getJSON === 'function') {
+      const originalGetJSON = editor.getJSON.bind(editor);
+      editor.getJSON = (...args) => {
+        const json = originalGetJSON(...args);
+        if (json && json.content) {
+          json.content = json.content.map((node: any) => 
+            makeEducationBlockSerializable(node)
+          );
+        }
+        return json;
+      };
+    }
+  }, [editor]);
+
+  useEffect(() => {
+    if (editor) {
+      // 안전한 방식으로 노드 이름만 출력
+      console.log("등록된 노드 유형:", 
+        Object.keys(editor.schema.nodes).join(', '));
+      
+      // educationBlock이 등록되었는지 확인
+      console.log("EducationBlock 등록 여부:", 
+        Object.keys(editor.schema.nodes).includes('educationBlock'));
+    }
+  }, [editor]);
 
   return (
     <InputBoxDiv
