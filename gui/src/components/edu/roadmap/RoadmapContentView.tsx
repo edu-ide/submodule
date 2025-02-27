@@ -4,6 +4,7 @@ import Markdown from 'react-markdown';
 import pythonContent from './data/pythonRoadmapContent.json';
 import { useDispatch } from 'react-redux';
 import { setNodeProgress } from '../../../redux/roadmapSlice';
+import { VscCopy, VscOpenPreview } from 'react-icons/vsc';
 
 interface Resource {
   title: string;
@@ -92,6 +93,27 @@ const RoadmapContentView: React.FC = () => {
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        alert('클립보드에 복사되었습니다!');
+      })
+      .catch(err => {
+        console.error('복사 실패:', err);
+      });
+  };
+
+  const sendToEditor = (content: string) => {
+    if (window.vscode) {
+      window.vscode.postMessage({
+        command: 'insertCode',
+        text: content
+      });
+    } else {
+      alert('VS Code 에디터에서만 사용 가능한 기능입니다.');
+    }
+  };
+
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러: {error}</div>;
   if (!contentData) return <div>콘텐츠를 찾을 수 없습니다.</div>;
@@ -118,6 +140,13 @@ const RoadmapContentView: React.FC = () => {
                   <a href={resource.url} target="_blank" rel="noopener noreferrer">
                     {resource.title}
                   </a>
+                  <div className="action-icons">
+                    <VscCopy 
+                      onClick={() => copyToClipboard(resource.url)} 
+                      className="icon" 
+                      title="링크 복사"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -132,6 +161,18 @@ const RoadmapContentView: React.FC = () => {
                 <li key={index}>
                   <h3>{challenge.title}</h3>
                   <p>{challenge.description}</p>
+                  <div className="action-icons">
+                    <VscCopy
+                      onClick={() => copyToClipboard(challenge.description)}
+                      className="icon"
+                      title="설명 복사"
+                    />
+                    <VscOpenPreview
+                      onClick={() => sendToEditor(challenge.description)}
+                      className="icon"
+                      title="에디터로 보내기"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -221,6 +262,22 @@ const RoadmapContentView: React.FC = () => {
         
         a:hover {
           text-decoration: underline;
+        }
+        
+        .action-icons {
+          display: flex;
+          gap: 8px;
+          margin-top: 5px;
+        }
+        
+        .icon {
+          cursor: pointer;
+          color: var(--vscode-icon-foreground);
+          transition: color 0.2s;
+        }
+        
+        .icon:hover {
+          color: var(--vscode-button-hoverBackground);
         }
       `}</style>
     </div>
