@@ -171,6 +171,7 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
   const [customValue, setCustomValue] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const customInputRef = useRef<HTMLInputElement>(null);
+  const [customRequirements, setCustomRequirements] = useState<string>('');
 
   // 필터 선택 토글 함수 - 직접 상태 업데이트
   const toggleFilter = (groupId: string, optionId: string, multiSelect: boolean) => {
@@ -314,41 +315,14 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
 
   // 로드맵 생성 함수
   const generateRoadmap = () => {
-    // 최소한 역할은 선택해야 함
-    if (!selectedFilters['role'] || selectedFilters['role'].length === 0) {
-      alert('최소한 하나의 역할을 선택해주세요.');
-      setActiveTab('기본 관점');
-      return;
-    }
-    
     setIsGenerating(true);
     
-    // 선택된 필터를 기반으로 로드맵 생성 요청
-    const formattedFilters: Record<string, string[]> = {};
-    
-    // 선택된 일반 옵션 처리
-    Object.entries(selectedFilters).forEach(([groupId, optionIds]) => {
-      formattedFilters[groupId] = [];
-      
-      optionIds.forEach(optionId => {
-        // 커스텀 옵션인 경우
-        if (optionId.startsWith('custom-')) {
-          const customOption = customOptions.find(opt => 
-            opt.groupId === groupId && `custom-${groupId}-${optionId.split('-').pop()}` === optionId);
-          if (customOption) {
-            formattedFilters[groupId].push(customOption.value);
-          }
-        } else {
-          // 일반 옵션인 경우
-          const option = findOptionById(optionId);
-          if (option) {
-            formattedFilters[groupId].push(option.label);
-          }
-        }
-      });
+    // 선택된 필터와 사용자 정의 요구사항을 함께 전달
+    onGenerateRoadmap({
+      filters: selectedFilters,
+      customOptions,
+      requirements: customRequirements
     });
-    
-    onGenerateRoadmap(formattedFilters);
     
     setTimeout(() => {
       setIsGenerating(false);
@@ -525,6 +499,25 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
     );
   };
 
+  // 요구사항 렌더링 함수 추가
+  const renderCustomRequirements = () => {
+    return (
+      <div className="custom-requirements-container">
+        <h3 className="requirements-title">추가 요구사항</h3>
+        <p className="requirements-description">
+          선택하신 옵션 외에 로드맵에 반영되었으면 하는 추가 요구사항이 있다면 작성해 주세요.
+        </p>
+        <textarea
+          className="requirements-textarea"
+          placeholder="예: '자바 백엔드 개발자로 취업하기 위한 로드맵을 만들어주세요.' 또는 '클라우드 기술에 중점을 두고 싶습니다.'"
+          value={customRequirements}
+          onChange={(e) => setCustomRequirements(e.target.value)}
+          rows={4}
+        />
+      </div>
+    );
+  };
+
   // 디버그 정보 추가 (문제 해결 시 제거)
   const renderDebugInfo = () => {
     return (
@@ -569,10 +562,10 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
       {/* 커스텀 입력 UI */}
       {renderCustomInput()}
       
-      {/* 선택된 항목 요약 */}
-      <div className="selected-summary">
-        <h3>
-          선택된 필터
+      {/* 선택된 항목들 표시 */}
+      <div className="selected-items-container">
+        <h3 className="selected-title">
+          선택된 항목
           <button 
             className="clear-button" 
             onClick={clearAllSelections}
@@ -584,11 +577,14 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
         {renderSelectedTags()}
       </div>
       
+      {/* 추가 요구사항 입력 */}
+      {renderCustomRequirements()}
+      
       {/* 로드맵 생성 버튼 */}
       <button
         className="generate-button"
         onClick={generateRoadmap}
-        disabled={isGenerating || !selectedFilters['role'] || selectedFilters['role'].length === 0}
+        disabled={isGenerating || Object.keys(selectedFilters).length === 0}
       >
         {isGenerating ? '생성 중...' : '로드맵 생성하기'}
       </button>
@@ -796,14 +792,14 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
           cursor: not-allowed;
         }
         
-        .selected-summary {
+        .selected-items-container {
           margin-bottom: 16px;
           border: 1px solid var(--vscode-panel-border);
           border-radius: 6px;
           padding: 12px;
         }
         
-        .selected-summary h3 {
+        .selected-title {
           margin-top: 0;
           margin-bottom: 12px;
           font-size: 14px;
@@ -864,6 +860,44 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
           display: flex;
           align-items: center;
           padding: 0 2px;
+        }
+        
+        .custom-requirements-container {
+          margin: 20px 0;
+          padding: 15px;
+          background-color: var(--vscode-editor-background);
+          border: 1px solid var(--vscode-panel-border);
+          border-radius: 4px;
+        }
+        
+        .requirements-title {
+          font-size: 14px;
+          margin: 0 0 8px 0;
+          color: var(--vscode-editor-foreground);
+        }
+        
+        .requirements-description {
+          font-size: 12px;
+          color: var(--vscode-descriptionForeground);
+          margin-bottom: 10px;
+        }
+        
+        .requirements-textarea {
+          width: 100%;
+          padding: 8px;
+          font-size: 13px;
+          color: var(--vscode-input-foreground);
+          background-color: var(--vscode-input-background);
+          border: 1px solid var(--vscode-input-border);
+          border-radius: 2px;
+          resize: vertical;
+          min-height: 80px;
+          font-family: var(--vscode-font-family);
+        }
+        
+        .requirements-textarea:focus {
+          outline: 1px solid var(--vscode-focusBorder);
+          border-color: var(--vscode-focusBorder);
         }
         
         .generate-button {
