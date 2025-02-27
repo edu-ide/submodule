@@ -14,6 +14,7 @@ import {
   Position
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { saveAs } from 'file-saver';
 
 // 노드 프롭스 타입 정의
 interface NodePropsType {
@@ -27,6 +28,7 @@ interface NodePropsType {
 // 노드 컴포넌트들 - 필요시 별도 파일로 분리할 수 있음
 const NodeContent = memo((props: NodePropsType) => {
   const data = props.data as NodeData;
+  const { handles = { top: false, left: false, right: false, bottom: false, 'left-out': false, 'right-out': false } } = data;
   
   const getNodeStyle = () => {
     switch (data.status) {
@@ -61,7 +63,10 @@ const NodeContent = memo((props: NodePropsType) => {
       fontSize: '14px',
       boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
     }}>
-      <Handle type="target" position={Position.Top} />
+      {handles.top && <Handle type="target" position={Position.Top} id="top" />}
+      {handles.left && <Handle type="target" position={Position.Left} id="left" />}
+      {handles.right && <Handle type="target" position={Position.Right} id="right" />}
+      
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <div style={{ 
@@ -77,7 +82,6 @@ const NodeContent = memo((props: NodePropsType) => {
           }}>{data.title}</div>
         </div>
         
-        {/* 선택적 학습 표시 */}
         {data.isOptional && (
           <div style={{
             fontSize: '10px',
@@ -92,7 +96,6 @@ const NodeContent = memo((props: NodePropsType) => {
         )}
       </div>
       
-      {/* 필요한 선수 기술 표시 */}
       {data.requiresSkill && data.requiresSkill.length > 0 && (
         <div style={{
           marginTop: '8px',
@@ -119,7 +122,9 @@ const NodeContent = memo((props: NodePropsType) => {
         </div>
       )}
       
-      <Handle type="source" position={Position.Bottom} />
+      {handles.bottom && <Handle type="source" position={Position.Bottom} id="bottom" />}
+      {handles['left-out'] && <Handle type="source" position={Position.Left} id="left-out" />}
+      {handles['right-out'] && <Handle type="source" position={Position.Right} id="right-out" />}
     </div>
   );
 });
@@ -166,6 +171,14 @@ interface NodeData extends Record<string, unknown> {
   tooltip?: string;
   isOptional?: boolean;
   requiresSkill?: string[];
+  handles?: {
+    top: boolean;
+    left: boolean;
+    right: boolean;
+    bottom: boolean;
+    'left-out': boolean;
+    'right-out': boolean;
+  };
 }
 
 // RoadmapView 속성
@@ -192,12 +205,14 @@ interface Edge {
   animated?: boolean;
   markerEnd?: any;
   style?: React.CSSProperties;
+  sourceHandle?: string;
+  targetHandle?: string;
   [key: string]: any;
 }
 
-// 파이썬 로드맵 노드 데이터 - 단순 수직 흐름으로 복원
+// JSON에 따라 노드 위치 업데이트
 const pythonNodes: Node[] = [
-  // 카테고리 그룹 노드 - 수직 배열
+  // 카테고리 그룹 노드
   {
     id: 'group-1',
     type: 'groupNode',
@@ -221,7 +236,7 @@ const pythonNodes: Node[] = [
   {
     id: 'group-3',
     type: 'groupNode',
-    position: { x: 350, y: 390 },
+    position: { x: 90, y: 400 }, // 위치 수정
     style: { width: 300, height: 120, zIndex: -10 },
     data: { 
       title: '제어 구조',
@@ -229,7 +244,7 @@ const pythonNodes: Node[] = [
     }
   },
   
-  // 시작점 - 최상단 중앙
+  // 시작점
   {
     id: 'start',
     type: 'roadmapNode',
@@ -238,11 +253,12 @@ const pythonNodes: Node[] = [
       title: '파이썬 학습 시작',
       description: '파이썬 프로그래밍 학습 여정을 시작합니다.',
       status: 'completed',
-      column: '시작'
+      column: '시작',
+      handles: { top: false, bottom: true, left: false, right: false, 'left-out': false, 'right-out': false }
     }
   },
   
-  // 기초 단계 - 위치 지정
+  // 기초 단계
   {
     id: '1-1',
     type: 'roadmapNode',
@@ -251,11 +267,12 @@ const pythonNodes: Node[] = [
       title: '파이썬 소개',
       description: '파이썬 프로그래밍 언어의 특징과 활용 분야를 이해합니다.',
       status: 'completed',
-      column: '기초'
+      column: '기초',
+      handles: { top: true, bottom: true, left: false, right: false, 'left-out': false, 'right-out': false }
     }
   },
   
-  // 변수와 자료형 - 위치 지정
+  // 변수와 자료형
   {
     id: '2-1',
     type: 'roadmapNode',
@@ -264,48 +281,52 @@ const pythonNodes: Node[] = [
       title: '변수와 기본 자료형',
       description: '문자열, 숫자, 불리언 등 기본 자료형과 변수 사용법을 학습합니다.',
       status: 'in-progress',
-      column: '변수와 자료형'
+      column: '변수와 자료형',
+      handles: { top: true, bottom: true, left: false, right: false, 'left-out': true, 'right-out': false }
     }
   },
   
-  // 제어 구조 - 위치 지정
+  // 조건문 (위치 수정)
   {
     id: '3-1',
     type: 'roadmapNode',
-    position: { x: 400, y: 440 },
+    position: { x: 110, y: 440 },
     data: { 
       title: '조건문',
       description: 'if, elif, else를 사용한 조건 분기를 학습합니다.',
       status: 'not-started',
-      column: '제어 구조'
+      column: '제어 구조',
+      handles: { top: false, bottom: true, left: false, right: true, 'left-out': false, 'right-out': false }
     }
   },
   
-  // 선택적 노드 - 오른쪽에 배치
+  // 컬렉션 자료형 (위치 수정)
   {
     id: '2-4',
     type: 'roadmapNode',
-    position: { x: 700, y: 280 },
+    position: { x: 110, y: 280 },
     data: { 
       title: '컬렉션 자료형',
       description: '리스트, 딕셔너리, 세트, 튜플 등의 복합 자료형을 학습합니다.',
       status: 'not-started',
       column: '변수와 자료형',
-      isOptional: true
+      isOptional: true,
+      handles: { top: false, bottom: false, left: false, right: true, 'left-out': false, 'right-out': false }
     }
   },
   
-  // 고급 노드 - 아래 오른쪽 배치
+  // 고급 제어 패턴 (위치 수정)
   {
     id: 'adv-1',
     type: 'roadmapNode',
-    position: { x: 700, y: 360 },
+    position: { x: 400, y: 610 },
     data: { 
       title: '고급 제어 패턴',
       description: '고급 제어 흐름 패턴과 함수형 접근법을 학습합니다.',
       status: 'not-started',
       column: '제어 구조',
-      requiresSkill: ['2-1', '3-1']
+      requiresSkill: ['2-1', '3-1'],
+      handles: { top: true, bottom: false, left: true, right: false, 'left-out': false, 'right-out': false }
     }
   }
 ];
@@ -320,16 +341,22 @@ const pythonEdges: Edge[] = [
   { id: 'e-1-1-2-1', source: '1-1', target: '2-1', type: 'smoothstep', 
     style: { stroke: '#3b82f6', strokeWidth: 3 } },
   
-  // 변수에서 제어로
-  { id: 'e-2-1-3-1', source: '2-1', target: '3-1', type: 'smoothstep', 
+  // 변수에서 제어로 - 왼쪽 노드에 연결되므로 horizontal 타입 사용
+  { id: 'e-2-1-3-1', source: '2-1', target: '3-1', type: 'default', 
+    sourceHandle: 'left-out', targetHandle: 'right',
     style: { stroke: '#8b5cf6', strokeWidth: 3 } },
   
-  // 특수 경로 연결
-  { id: 'e-2-1-2-4', source: '2-1', target: '2-4', type: 'step', 
+  // 선택 학습 노드 연결 - 핸들 지정하여 수평 연결
+  { id: 'e-2-1-2-4', source: '2-1', target: '2-4', type: 'default', 
+    sourceHandle: 'left-out', targetHandle: 'right',
     style: { stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '5,5' } },
-  { id: 'e-2-1-adv-1', source: '2-1', target: 'adv-1', type: 'step', 
+  
+  // 고급 노드로의 연결
+  { id: 'e-2-1-adv-1', source: '2-1', target: 'adv-1', type: 'default', 
     style: { stroke: '#8b5cf6', strokeWidth: 2 } },
-  { id: 'e-3-1-adv-1', source: '3-1', target: 'adv-1', type: 'step', 
+  
+  { id: 'e-3-1-adv-1', source: '3-1', target: 'adv-1', type: 'default', 
+    sourceHandle: 'bottom', targetHandle: 'left',
     style: { stroke: '#8b5cf6', strokeWidth: 2 } }
 ];
 
@@ -358,6 +385,24 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
     []
   );
   
+  // JSON 추출 함수
+  const exportRoadmapToJson = useCallback(() => {
+    const roadmapData = {
+      id: roadmapId,
+      exportedAt: new Date().toISOString(),
+      nodes: nodes,
+      edges: edges
+    };
+    
+    const jsonString = JSON.stringify(roadmapData, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    saveAs(blob, `${roadmapId}-roadmap.json`);
+    
+    // 또는 클립보드에 복사하는 옵션도 제공할 수 있습니다
+    // navigator.clipboard.writeText(jsonString);
+    // alert("로드맵 JSON이 클립보드에 복사되었습니다.");
+  }, [roadmapId, nodes, edges]);
+  
   return (
     <div className="roadmap-container">
       <div className="back-button-container">
@@ -365,6 +410,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
           <i className="codicon codicon-arrow-left"></i> 돌아가기
         </button>
         <h2 className="roadmap-title">{roadmapId} 로드맵</h2>
+        
+        {/* JSON 추출 버튼 추가 */}
+        <div className="roadmap-actions">
+          <button onClick={exportRoadmapToJson} className="export-button">
+            <i className="codicon codicon-json"></i> JSON으로 내보내기
+          </button>
+        </div>
       </div>
       
       <div style={{ width: '100%', height: 'calc(100vh - 150px)' }}>
@@ -543,6 +595,28 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
           color: var(--vscode-button-secondaryForeground);
           border: 1px solid var(--vscode-button-border);
         }
+        
+        .roadmap-actions {
+          margin-left: auto;
+        }
+        
+        .export-button {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          background: var(--vscode-button-secondaryBackground);
+          color: var(--vscode-button-secondaryForeground);
+          border: 1px solid var(--vscode-button-border);
+          border-radius: 4px;
+          padding: 4px 10px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+        
+        .export-button:hover {
+          background: var(--vscode-button-hoverBackground);
+        }
       `}</style>
 
       <style jsx global>{`
@@ -569,6 +643,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
         
         .custom-controls {
           opacity: 0.85;
+        }
+        
+        /* 핸들 스타일 개선 */
+        .react-flow__handle {
+          width: 8px !important;
+          height: 8px !important;
+          opacity: 0.75 !important;
+          background-color: var(--vscode-button-background) !important;
+          border: 1px solid var(--vscode-editor-background) !important;
         }
       `}</style>
     </div>
