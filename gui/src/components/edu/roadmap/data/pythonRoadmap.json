@@ -130,7 +130,7 @@
         "status": "not-started",
         "column": "제어 구조",
         "handles": {
-          "top": false,
+          "top": true,
           "bottom": true,
           "left": false,
           "right": true,
@@ -154,7 +154,7 @@
         "isOptional": true,
         "handles": {
           "top": false,
-          "bottom": false,
+          "bottom": true,
           "left": false,
           "right": true,
           "left-out": false,
@@ -194,7 +194,7 @@
       "id": "e-start-1-1",
       "source": "start",
       "target": "1-1",
-      "type": "smoothstep",
+      "type": "bezier",
       "animated": true,
       "style": {
         "stroke": "#10b981",
@@ -205,7 +205,7 @@
       "id": "e-1-1-2-1",
       "source": "1-1",
       "target": "2-1",
-      "type": "smoothstep",
+      "type": "bezier",
       "style": {
         "stroke": "#3b82f6",
         "strokeWidth": 3
@@ -215,7 +215,7 @@
       "id": "e-2-1-3-1",
       "source": "2-1",
       "target": "3-1",
-      "type": "default",
+      "type": "bezier",
       "sourceHandle": "left-out",
       "targetHandle": "right",
       "style": {
@@ -227,7 +227,7 @@
       "id": "e-2-1-2-4",
       "source": "2-1",
       "target": "2-4",
-      "type": "default",
+      "type": "bezier",
       "sourceHandle": "left-out",
       "targetHandle": "right",
       "style": {
@@ -240,7 +240,7 @@
       "id": "e-2-1-adv-1",
       "source": "2-1",
       "target": "adv-1",
-      "type": "default",
+      "type": "bezier",
       "style": {
         "stroke": "#8b5cf6",
         "strokeWidth": 2
@@ -250,9 +250,57 @@
       "id": "e-3-1-adv-1",
       "source": "3-1",
       "target": "adv-1",
-      "type": "default",
+      "type": "bezier",
       "sourceHandle": "bottom",
       "targetHandle": "left",
+      "style": {
+        "stroke": "#8b5cf6",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-control-to-functions",
+      "source": "control-structures",
+      "target": "functions", 
+      "type": "bezier"
+    },
+    {
+      "id": "e-variables-to-control",
+      "source": "variables",
+      "target": "control-structures",
+      "type": "bezier"
+    },
+    {
+      "id": "e-variables-to-conditionals",
+      "source": "variables",
+      "target": "conditionals",
+      "type": "bezier"
+    },
+    {
+      "id": "e-conditionals-to-loops",
+      "source": "conditionals",
+      "target": "loops",
+      "type": "bezier"
+    },
+    {
+      "id": "e-variables-to-collections",
+      "source": "variables",
+      "target": "collections",
+      "type": "bezier"
+    },
+    {
+      "id": "e-collections-to-loops",
+      "source": "collections",
+      "target": "loops",
+      "type": "bezier"
+    },
+    {
+      "id": "e-2-4-3-1",
+      "source": "2-4",
+      "target": "3-1",
+      "type": "bezier",
+      "sourceHandle": "bottom",
+      "targetHandle": "top",
       "style": {
         "stroke": "#8b5cf6",
         "strokeWidth": 2

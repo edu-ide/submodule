@@ -1,22 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getLearningContent, generateLearningContent } from './utils';
 import { LearningContentViewProps } from './types';
 
-const LearningContentView: React.FC<LearningContentViewProps> = ({ content, nodeData, onBack }) => {
+const LearningContentView: React.FC<LearningContentViewProps> = ({ content: initialContent, nodeData, onBack }) => {
+  const { roadmapId, nodeId } = useParams();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<string>('introduction');
+  const [content, setContent] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!nodeId) return;
+    
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const fetchedContent = getLearningContent(nodeId) || generateLearningContent({
+        title: nodeId,
+        description: '노드 설명',
+        status: 'in-progress',
+        column: '0'
+      });
+      
+      setContent(fetchedContent);
+      setIsLoading(false);
+    }, 600);
+  }, [nodeId]);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
 
+  if (isLoading) {
+    return <div className="loading">콘텐츠를 불러오는 중...</div>;
+  }
+
   return (
     <div className="learning-content-container">
       {/* 뒤로가기 버튼 추가 */}
       <div className="learning-header">
-        <button className="back-button" onClick={onBack}>
+        <button className="back-button" onClick={() => navigate(`/education/roadmap/${roadmapId}`)}>
           <span className="codicon codicon-arrow-left"></span>
           로드맵으로 돌아가기
         </button>
-        <h2 className="content-title">{content.title}</h2>
+        <h2 className="content-title">{content?.title}</h2>
       </div>
 
       {/* 탭 메뉴 */}
@@ -63,19 +92,19 @@ const LearningContentView: React.FC<LearningContentViewProps> = ({ content, node
       <div className="content-body">
         {activeTab === 'introduction' && (
           <div className="content-section">
-            <p>{content.introduction}</p>
+            <p>{content?.introduction}</p>
           </div>
         )}
         
         {activeTab === 'theory' && (
           <div className="content-section markdown-content">
-            <div dangerouslySetInnerHTML={{ __html: content.theory }}></div>
+            <div dangerouslySetInnerHTML={{ __html: content?.theory }}></div>
           </div>
         )}
         
         {activeTab === 'examples' && (
           <div className="content-section">
-            {content.examples.map((example, index) => (
+            {content?.examples.map((example, index) => (
               <div key={index} className="example-item">
                 <h3>{example.title}</h3>
                 <pre className="code-block">
@@ -90,12 +119,12 @@ const LearningContentView: React.FC<LearningContentViewProps> = ({ content, node
         {activeTab === 'practice' && (
           <div className="content-section">
             <h3>실습 문제</h3>
-            <p>{content.practice.question}</p>
+            <p>{content?.practice.question}</p>
             
             <div className="hints-section">
               <h4>힌트</h4>
               <ul>
-                {content.practice.hints.map((hint, index) => (
+                {content?.practice.hints.map((hint, index) => (
                   <li key={index}>{hint}</li>
                 ))}
               </ul>
@@ -104,7 +133,7 @@ const LearningContentView: React.FC<LearningContentViewProps> = ({ content, node
             <details>
               <summary>정답 보기</summary>
               <pre className="code-block solution">
-                <code>{content.practice.solution}</code>
+                <code>{content?.practice.solution}</code>
               </pre>
             </details>
           </div>
@@ -112,7 +141,7 @@ const LearningContentView: React.FC<LearningContentViewProps> = ({ content, node
         
         {activeTab === 'quiz' && (
           <div className="content-section">
-            {content.quiz.map((quizItem, index) => (
+            {content?.quiz.map((quizItem, index) => (
               <div key={index} className="quiz-item">
                 <h3>문제 {index + 1}</h3>
                 <p>{quizItem.question}</p>
@@ -146,7 +175,7 @@ const LearningContentView: React.FC<LearningContentViewProps> = ({ content, node
           <div className="content-section">
             <h3>참고 자료</h3>
             <ul className="resources-list">
-              {content.resources.map((resource, index) => (
+              {content?.resources.map((resource, index) => (
                 <li key={index} className={`resource-item ${resource.type}`}>
                   <a href={resource.url} target="_blank" rel="noopener noreferrer">
                     {resource.type === 'video' && <span className="resource-icon">🎬</span>}

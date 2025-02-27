@@ -12,8 +12,8 @@ export type RoadmapMode = 'browse' | 'generate' | 'recommended';
 
 // RoadmapView 컴포넌트 속성 타입
 export interface RoadmapViewProps {
-  roadmapId: string;
-  onBack: () => void;
+  roadmapId?: string;
+  onBack?: () => void;
 }
 
 // 학습 콘텐츠 뷰 속성 타입

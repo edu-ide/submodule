@@ -16,6 +16,7 @@ import {
     methodologyRoadmaps,
     projectRoadmaps
 } from '../../data/roadmapData';
+import { useNavigate } from 'react-router-dom';
 
 // API 응답 타입 정의
 interface ApiResponse<T> {
@@ -161,6 +162,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
     const [displayData, setDisplayData] = useState<(RoadmapItem | CurriculumItem | CurriculumDocument)[]>([]);
     const [showRoadmapView, setShowRoadmapView] = useState<boolean>(false);
     const [selectedRoadmap, setSelectedRoadmap] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     // 정적 로드맵 기본 필터 정의
     const staticRoadmapFilters = {
@@ -219,20 +221,13 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
         }
     }, [viewType, items]);
 
-    // 항목 클릭 핸들러
-    const handleItemClick = (id: string, item: any) => {
-        // 파이썬 로드맵의 경우 특별 처리
-        if (id === 'python') {
-            // 파이썬은 준비됐다고 가정
-            setSelectedRoadmap(id);
-            setShowRoadmapView(true);
-            onSelect(id);
-            return;
-        }
+    // 로드맵 선택 처리 - 라우터 내비게이션 사용
+    const handleRoadmapSelect = (roadmapId: string, item?: any) => {
+        // 상태 변경 대신 라우터 내비게이션 사용
+        navigate(`/education/roadmap/${roadmapId}`);
         
-        setSelectedRoadmap(id);
-        setShowRoadmapView(true);
-        onSelect(id);
+        // 선택 콜백도 계속 호출 (필요한 경우)
+        onSelect(roadmapId);
     };
 
     // 탭 전환 함수 개선
@@ -416,6 +411,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
         );
     };
 
+    // 로드맵에서 돌아오기 처리(더 이상 필요 없음)
+    // 라우터가 처리하므로 삭제 가능
+    // const handleRoadmapBack = () => { ... };
+
     // 로딩 UI
     if (loading) {
         return <div className="left-panel-loading">커리큘럼 로딩 중...</div>;
@@ -431,95 +430,94 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
             {viewType === 'roadmap' && !showRoadmapView && renderRoadmapModeToggle()}
             
             {/* 로드맵 뷰 표시 */}
-            {showRoadmapView && selectedRoadmap && (
+            {showRoadmapView && selectedRoadmap ? (
                 <RoadmapView 
                     roadmapId={selectedRoadmap} 
-                    onBack={() => setShowRoadmapView(false)} 
                 />
-            )}
-            
-            {/* 로드맵 둘러보기 모드 - 로드맵 뷰가 표시되지 않을 때만 보여줌 */}
-            {viewType === 'roadmap' && roadmapMode === 'browse' && !showRoadmapView && (
+            ) : (
                 <>
-                    {/* 카테고리 선택기 */}
-                    <div className="roadmap-type-selector">
-                        <div className="group-title">카테고리</div>
-                        <div className="type-buttons-grid">
-                            {/* 첫 번째 줄 */}
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'role' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('role')}
-                            >
-                                역할 기반
-                            </button>
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'skill' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('skill')}
-                            >
-                                기술 기반
-                            </button>
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'foundation' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('foundation')}
-                            >
-                                기초 지식
-                            </button>
+                    {/* 로드맵 둘러보기 모드 - 카테고리 선택기 */}
+                    {viewType === 'roadmap' && roadmapMode === 'browse' && (
+                        <>
+                            {/* 카테고리 선택기 */}
+                            <div className="roadmap-type-selector">
+                                <div className="group-title">카테고리</div>
+                                <div className="type-buttons-grid">
+                                    {/* 첫 번째 줄 */}
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'role' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('role')}
+                                    >
+                                        역할 기반
+                                    </button>
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'skill' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('skill')}
+                                    >
+                                        기술 기반
+                                    </button>
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'foundation' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('foundation')}
+                                    >
+                                        기초 지식
+                                    </button>
+                                    
+                                    {/* 두 번째 줄 */}
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'application-area' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('application-area')}
+                                    >
+                                        응용 영역
+                                    </button>
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'methodology' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('methodology')}
+                                    >
+                                        개발 방법론
+                                    </button>
+                                    <button 
+                                        className={`type-button ${activeRoadmapType === 'project' ? 'active' : ''}`}
+                                        onClick={() => changeRoadmapType('project')}
+                                    >
+                                        프로젝트 유형
+                                    </button>
+                                </div>
+                            </div>
                             
-                            {/* 두 번째 줄 */}
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'application-area' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('application-area')}
-                            >
-                                응용 영역
-                            </button>
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'methodology' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('methodology')}
-                            >
-                                개발 방법론
-                            </button>
-                            <button 
-                                className={`type-button ${activeRoadmapType === 'project' ? 'active' : ''}`}
-                                onClick={() => changeRoadmapType('project')}
-                            >
-                                프로젝트 유형
-                            </button>
-                        </div>
-                    </div>
-                    
-                    {/* 아이템 목록 */}
-                    <div className="items-container">
-                        {displayData && displayData.length > 0 ? (
-                            displayData.map(item => renderItemCard(
-                                item, 
-                                selectedId === item.id, 
-                                () => handleItemClick(item.id, item)  // 아이템 데이터도 전달
-                            ))
-                        ) : (
-                            <div className="empty-list">해당 카테고리에 로드맵이 없습니다.</div>
-                        )}
-                    </div>
-                </>
-            )}
-            
-            {/* 맞춤형 로드맵 생성 모드 */}
-            {viewType === 'roadmap' && roadmapMode === 'generate' && (
-                <RoadmapGenerator onGenerateRoadmap={handleGenerateRoadmap} />
-            )}
-            
-            {/* 커리큘럼 모드 */}
-            {viewType === 'curriculum' && (
-                <div className="items-container">
-                    {displayData && displayData.length > 0 ? (
-                        displayData.map(item => renderItemCard(
-                            item, 
-                            selectedId === item.id, 
-                            () => handleItemClick(item.id, item)
-                        ))
-                    ) : (
-                        <div className="empty-list">커리큘럼이 없습니다.</div>
+                            {/* 선택된 카테고리의 로드맵 목록 */}
+                            <div className="roadmap-items-list">
+                                {displayData.map(item => 
+                                    renderItemCard(
+                                        item, 
+                                        selectedId === item.id, 
+                                        () => handleRoadmapSelect(item.id, item)
+                                    )
+                                )}
+                            </div>
+                        </>
                     )}
-                </div>
+                    
+                    {/* 로드맵 생성 모드 */}
+                    {viewType === 'roadmap' && roadmapMode === 'generate' && (
+                        <RoadmapGenerator 
+                            onGenerateRoadmap={handleGenerateRoadmap}
+                        />
+                    )}
+                    
+                    {/* 커리큘럼 목록 */}
+                    {viewType === 'curriculum' && (
+                        <div className="curriculum-list">
+                            {displayData.map(item => 
+                                renderItemCard(
+                                    item, 
+                                    selectedId === item.id, 
+                                    () => onSelect(item.id)
+                                )
+                            )}
+                        </div>
+                    )}
+                </>
             )}
             
             <style jsx>{`

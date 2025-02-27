@@ -44,9 +44,13 @@ const EducationGUI: React.FC<EducationGUIProps> = ({
 
   // 로드맵 선택 핸들러 수정
   const handleRoadmapSelect = (roadmapId: string) => {
+    // 로드맵 ID 저장
     if (onSelectRoadmap) {
       onSelectRoadmap(roadmapId);
     }
+    
+    // 여기서 로드맵 뷰 표시 상태도 관리하는 것이 좋음
+    // 예: setShowRoadmapView(true);
   };
 
   // 카테고리 선택 핸들러

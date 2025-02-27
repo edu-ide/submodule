@@ -1,12 +1,11 @@
 import React, { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { NodePropsType, NodeData } from './types';
+import { NodeData, NodePropsType } from '../types';
 
 const NodeContent = memo((props: NodePropsType) => {
   const data = props.data as NodeData;
   const { handles = { top: false, left: false, right: false, bottom: false, 'left-out': false, 'right-out': false } } = data;
   
-  // 상태에 따른 배경색과 테두리색 설정
   const getNodeStyle = () => {
     switch (data.status) {
       case 'completed':
@@ -21,55 +20,62 @@ const NodeContent = memo((props: NodePropsType) => {
         };
       default:
         return {
-          background: '#f8fafc',
+          background: '#f3f4f6',
           borderColor: '#94a3b8'
         };
     }
   };
   
-  const { background, borderColor } = getNodeStyle();
+  const styles = getNodeStyle();
+  const isOptional = data.isOptional || false;
   
   return (
-    <div className="roadmap-node" style={{ background, borderColor }}>
-      <Handle type="target" position={Position.Top} />
+    <div style={{
+      border: `2px solid ${styles.borderColor}`,
+      borderRadius: '8px',
+      padding: '0px 10px 10px 10px',
+      backgroundColor: styles.background,
+      color: '#1f2937',
+      width: 160,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+      position: 'relative'
+    }}>
+      {/* 핸들 연결 지점 */}
+      {handles.top && <Handle type="target" position={Position.Top} style={{ background: styles.borderColor }} />}
+      {handles.bottom && <Handle type="source" position={Position.Bottom} style={{ background: styles.borderColor }} />}
+      {handles.left && <Handle type="target" position={Position.Left} style={{ background: styles.borderColor }} />}
+      {handles.right && <Handle type="source" position={Position.Right} style={{ background: styles.borderColor }} />}
+      {handles['left-out'] && <Handle type="source" position={Position.Left} id="left-out" style={{ background: styles.borderColor, top: '70%' }} />}
+      {handles['right-out'] && <Handle type="source" position={Position.Right} id="right-out" style={{ background: styles.borderColor, top: '70%' }} />}
       
-      <div className="node-content">
-        <div className="node-status-indicator" style={{ backgroundColor: borderColor }}></div>
-        <div className="node-title">{data.title}</div>
+      {/* 상태 표시 - 위치 조정 및 마진 감소 */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        marginBottom: '3px',
+        position: 'absolute',
+        top: '6px',
+        right: '10px',
+        left: '10px'
+      }}>
+        <div style={{ 
+          width: '8px', height: '8px', 
+          borderRadius: '50%', 
+          backgroundColor: data.status === 'completed' ? '#10b981' : data.status === 'in-progress' ? '#3b82f6' : '#9ca3af',
+        }} />
+        {isOptional && <span style={{ padding: '0 4px', fontSize: '10px', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>선택</span>}
       </div>
       
-      <Handle type="source" position={Position.Bottom} />
-      
-      <style jsx>{`
-        .roadmap-node {
-          padding: 12px;
-          border-radius: 6px;
-          width: 160px;
-          border: 2px solid;
-          font-size: 12px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .node-content {
-          display: flex;
-          align-items: center;
-        }
-        
-        .node-status-indicator {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          margin-right: 8px;
-          flex-shrink: 0;
-        }
-        
-        .node-title {
-          font-weight: 500;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-      `}</style>
+      {/* 제목만 표시 - 위치 조정 */}
+      <div style={{ 
+        fontWeight: 600, 
+        fontSize: '13px', 
+        textAlign: 'center',
+        marginTop: '12px'
+      }}>
+        {data.title}
+      </div>
     </div>
   );
 });
