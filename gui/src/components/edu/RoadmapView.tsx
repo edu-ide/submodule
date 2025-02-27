@@ -62,48 +62,94 @@ const NodeContent = memo((props: NodePropsType) => {
       boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
     }}>
       <Handle type="target" position={Position.Top} />
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div style={{ 
-          width: '10px', 
-          height: '10px', 
-          borderRadius: '50%', 
-          backgroundColor: borderColor, 
-          marginRight: '8px' 
-        }}></div>
-        <div style={{ 
-          fontWeight: 600, 
-          fontSize: '15px' 
-        }}>{data.title}</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ 
+            width: '10px', 
+            height: '10px', 
+            borderRadius: '50%', 
+            backgroundColor: borderColor, 
+            marginRight: '8px' 
+          }}></div>
+          <div style={{ 
+            fontWeight: 600, 
+            fontSize: '15px' 
+          }}>{data.title}</div>
+        </div>
+        
+        {/* 선택적 학습 표시 */}
+        {data.isOptional && (
+          <div style={{
+            fontSize: '10px',
+            padding: '2px 6px',
+            background: 'rgba(99, 102, 241, 0.1)',
+            color: '#6366f1',
+            borderRadius: '4px',
+            fontWeight: 500
+          }}>
+            선택 학습
+          </div>
+        )}
       </div>
+      
+      {/* 필요한 선수 기술 표시 */}
+      {data.requiresSkill && data.requiresSkill.length > 0 && (
+        <div style={{
+          marginTop: '8px',
+          padding: '4px 6px',
+          background: 'rgba(139, 92, 246, 0.1)',
+          borderRadius: '4px',
+          fontSize: '11px'
+        }}>
+          <div style={{ color: '#8b5cf6', fontWeight: 500, marginBottom: '3px' }}>필요 기술:</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+            {(data.requiresSkill as string[]).map((skillId, idx) => (
+              <span key={idx} style={{
+                padding: '1px 5px',
+                background: '#8b5cf615',
+                borderRadius: '3px',
+                fontSize: '10px',
+                border: '1px solid #8b5cf630'
+              }}>
+                {skillId === '2-1' ? '변수와 기본 자료형' : 
+                 skillId === '3-1' ? '조건문' : skillId}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
       <Handle type="source" position={Position.Bottom} />
     </div>
   );
 });
 
+// 그룹 노드 컴포넌트 개선
 const GroupNode = memo((props: NodePropsType) => {
   const data = props.data as any;
   
   return (
     <div style={{ 
-      border: `2px dashed ${data.color}`, 
-      borderRadius: '8px', 
-      backgroundColor: `${data.color}10`,  // 매우 연한 색상(10% 불투명도)
+      border: `3px dashed ${data.color}`, 
+      borderRadius: '12px', 
+      backgroundColor: `${data.color}10`,
       width: '100%',
       height: '100%',
       position: 'relative',
-      zIndex: -1  // 실제 노드보다 아래에 표시
+      zIndex: -1,
+      boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
     }}>
       <div style={{ 
         position: 'absolute', 
-        top: '-12px', 
-        left: '10px', 
-        padding: '3px 10px',
-        borderRadius: '4px', 
-        fontSize: '12px', 
-        fontWeight: 500, 
+        top: '-15px', 
+        left: '20px', 
+        padding: '5px 15px',
+        borderRadius: '6px', 
+        fontSize: '14px', 
+        fontWeight: 600, 
         color: 'var(--vscode-editor-background, white)', 
         backgroundColor: data.color,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+        boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
       }}>
         {data.title}
       </div>
@@ -118,6 +164,8 @@ interface NodeData extends Record<string, unknown> {
   status: 'completed' | 'in-progress' | 'not-started';
   column: string;
   tooltip?: string;
+  isOptional?: boolean;
+  requiresSkill?: string[];
 }
 
 // RoadmapView 속성
@@ -147,14 +195,14 @@ interface Edge {
   [key: string]: any;
 }
 
-// 파이썬 로드맵 노드 데이터 - 세로 흐름으로 재구성
+// 파이썬 로드맵 노드 데이터 - 단순 수직 흐름으로 복원
 const pythonNodes: Node[] = [
   // 카테고리 그룹 노드 - 수직 배열
   {
     id: 'group-1',
     type: 'groupNode',
-    position: { x: 400, y: 50 },
-    style: { width: 300, height: 180, zIndex: -10 },
+    position: { x: 350, y: 70 },
+    style: { width: 300, height: 120, zIndex: -10 },
     data: { 
       title: '기초',
       color: '#10b981'
@@ -163,8 +211,8 @@ const pythonNodes: Node[] = [
   {
     id: 'group-2',
     type: 'groupNode',
-    position: { x: 400, y: 260 }, 
-    style: { width: 300, height: 180, zIndex: -10 },
+    position: { x: 350, y: 230 }, 
+    style: { width: 300, height: 120, zIndex: -10 },
     data: { 
       title: '변수와 자료형',
       color: '#3b82f6'
@@ -173,19 +221,19 @@ const pythonNodes: Node[] = [
   {
     id: 'group-3',
     type: 'groupNode',
-    position: { x: 400, y: 470 },
-    style: { width: 300, height: 180, zIndex: -10 },
+    position: { x: 350, y: 390 },
+    style: { width: 300, height: 120, zIndex: -10 },
     data: { 
       title: '제어 구조',
       color: '#8b5cf6'
     }
   },
   
-  // 시작점
+  // 시작점 - 최상단 중앙
   {
     id: 'start',
     type: 'roadmapNode',
-    position: { x: 450, y: 10 },
+    position: { x: 400, y: 20 },
     data: { 
       title: '파이썬 학습 시작',
       description: '파이썬 프로그래밍 학습 여정을 시작합니다.',
@@ -194,11 +242,11 @@ const pythonNodes: Node[] = [
     }
   },
   
-  // 기초 단계 - 세로로 배치
+  // 기초 단계 - 위치 지정
   {
     id: '1-1',
     type: 'roadmapNode',
-    position: { x: 450, y: 100 },
+    position: { x: 400, y: 120 },
     data: { 
       title: '파이썬 소개',
       description: '파이썬 프로그래밍 언어의 특징과 활용 분야를 이해합니다.',
@@ -206,34 +254,12 @@ const pythonNodes: Node[] = [
       column: '기초'
     }
   },
-  {
-    id: '1-2',
-    type: 'roadmapNode',
-    position: { x: 450, y: 160 },
-    data: { 
-      title: '개발환경 구성',
-      description: '파이썬 인터프리터 설치 및 개발 환경 구성 방법을 배웁니다.',
-      status: 'completed',
-      column: '기초'
-    }
-  },
-  {
-    id: '1-3',
-    type: 'roadmapNode',
-    position: { x: 450, y: 220 },
-    data: { 
-      title: '첫 번째 프로그램',
-      description: '기본적인 "Hello World" 프로그램 작성 및 실행 방법을 학습합니다.',
-      status: 'completed',
-      column: '기초'
-    }
-  },
   
-  // 변수와 자료형 - 세로로 배치
+  // 변수와 자료형 - 위치 지정
   {
     id: '2-1',
     type: 'roadmapNode',
-    position: { x: 450, y: 310 },
+    position: { x: 400, y: 280 },
     data: { 
       title: '변수와 기본 자료형',
       description: '문자열, 숫자, 불리언 등 기본 자료형과 변수 사용법을 학습합니다.',
@@ -241,34 +267,12 @@ const pythonNodes: Node[] = [
       column: '변수와 자료형'
     }
   },
-  {
-    id: '2-2',
-    type: 'roadmapNode',
-    position: { x: 450, y: 370 },
-    data: { 
-      title: '문자열 처리',
-      description: '문자열 조작, 포맷팅, 메서드 등을 학습합니다.',
-      status: 'not-started',
-      column: '변수와 자료형'
-    }
-  },
-  {
-    id: '2-3',
-    type: 'roadmapNode',
-    position: { x: 450, y: 430 },
-    data: { 
-      title: '형 변환',
-      description: '데이터 타입 간 변환 방법을 배웁니다.',
-      status: 'not-started',
-      column: '변수와 자료형'
-    }
-  },
   
-  // 제어 구조 - 세로로 배치
+  // 제어 구조 - 위치 지정
   {
     id: '3-1',
     type: 'roadmapNode',
-    position: { x: 450, y: 520 },
+    position: { x: 400, y: 440 },
     data: { 
       title: '조건문',
       description: 'if, elif, else를 사용한 조건 분기를 학습합니다.',
@@ -276,52 +280,57 @@ const pythonNodes: Node[] = [
       column: '제어 구조'
     }
   },
+  
+  // 선택적 노드 - 오른쪽에 배치
   {
-    id: '3-2',
+    id: '2-4',
     type: 'roadmapNode',
-    position: { x: 450, y: 580 },
+    position: { x: 700, y: 280 },
     data: { 
-      title: '반복문',
-      description: 'for와 while 반복문을 사용하여 코드를 반복 실행하는 방법을 배웁니다.',
+      title: '컬렉션 자료형',
+      description: '리스트, 딕셔너리, 세트, 튜플 등의 복합 자료형을 학습합니다.',
       status: 'not-started',
-      column: '제어 구조'
+      column: '변수와 자료형',
+      isOptional: true
     }
   },
+  
+  // 고급 노드 - 아래 오른쪽 배치
   {
-    id: '3-3',
+    id: 'adv-1',
     type: 'roadmapNode',
-    position: { x: 450, y: 640 },
+    position: { x: 700, y: 360 },
     data: { 
-      title: '예외 처리',
-      description: 'try, except, finally를 사용한 예외 처리를 학습합니다.',
+      title: '고급 제어 패턴',
+      description: '고급 제어 흐름 패턴과 함수형 접근법을 학습합니다.',
       status: 'not-started',
-      column: '제어 구조'
+      column: '제어 구조',
+      requiresSkill: ['2-1', '3-1']
     }
   }
 ];
 
-// 파이썬 로드맵 엣지(연결선) 데이터 - 단순 세로 연결
+// 엣지 수정 - 단순 수직 흐름
 const pythonEdges: Edge[] = [
-  // 시작점에서 첫 번째 노드
-  { id: 'e-start-1-1', source: 'start', target: '1-1', type: 'smoothstep', animated: true },
+  // 시작점에서 첫 노드로
+  { id: 'e-start-1-1', source: 'start', target: '1-1', type: 'smoothstep', animated: true,
+    style: { stroke: '#10b981', strokeWidth: 3 } },
   
-  // 기초 단계 내 연결
-  { id: 'e-1-1-1-2', source: '1-1', target: '1-2', type: 'smoothstep' },
-  { id: 'e-1-2-1-3', source: '1-2', target: '1-3', type: 'smoothstep' },
+  // 기초에서 변수로
+  { id: 'e-1-1-2-1', source: '1-1', target: '2-1', type: 'smoothstep', 
+    style: { stroke: '#3b82f6', strokeWidth: 3 } },
   
-  // 기초에서 변수와 자료형으로
-  { id: 'e-1-3-2-1', source: '1-3', target: '2-1', type: 'smoothstep' },
+  // 변수에서 제어로
+  { id: 'e-2-1-3-1', source: '2-1', target: '3-1', type: 'smoothstep', 
+    style: { stroke: '#8b5cf6', strokeWidth: 3 } },
   
-  // 변수와 자료형 내부 연결
-  { id: 'e-2-1-2-2', source: '2-1', target: '2-2', type: 'smoothstep' },
-  { id: 'e-2-2-2-3', source: '2-2', target: '2-3', type: 'smoothstep' },
-  
-  // 변수와 자료형에서 제어 구조로
-  { id: 'e-2-3-3-1', source: '2-3', target: '3-1', type: 'smoothstep' },
-  
-  // 제어 구조 내부 연결
-  { id: 'e-3-1-3-2', source: '3-1', target: '3-2', type: 'smoothstep' },
-  { id: 'e-3-2-3-3', source: '3-2', target: '3-3', type: 'smoothstep' }
+  // 특수 경로 연결
+  { id: 'e-2-1-2-4', source: '2-1', target: '2-4', type: 'step', 
+    style: { stroke: '#3b82f6', strokeWidth: 2, strokeDasharray: '5,5' } },
+  { id: 'e-2-1-adv-1', source: '2-1', target: 'adv-1', type: 'step', 
+    style: { stroke: '#8b5cf6', strokeWidth: 2 } },
+  { id: 'e-3-1-adv-1', source: '3-1', target: 'adv-1', type: 'step', 
+    style: { stroke: '#8b5cf6', strokeWidth: 2 } }
 ];
 
 const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
@@ -375,44 +384,36 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
             },
           }}
           fitView
-          fitViewOptions={{ padding: 0.3 }}
-          minZoom={0.4}
+          fitViewOptions={{ padding: 0.5, includeHiddenNodes: true }}
+          minZoom={0.3}
           maxZoom={2}
           zoomOnScroll={true}
           panOnScroll={true}
           proOptions={{ hideAttribution: true }}
+          nodesFocusable={true}
+          elementsSelectable={true}
+          selectNodesOnDrag={false}
+          preventScrolling={false}
+          snapToGrid={true}
+          snapGrid={[10, 10]}
         >
-          <Controls showInteractive={false} />
+          <Controls 
+            position="top-right" 
+            showInteractive={false} 
+            style={{
+              background: 'var(--vscode-editor-background)',
+              border: '1px solid var(--vscode-panel-border)',
+              borderRadius: '6px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              padding: '4px'
+            }}
+            className="custom-controls"
+          />
           <Background 
             gap={16} 
             size={1} 
             color="var(--vscode-editor-lineHighlightBorder, #e2e8f0)" 
           />
-          <Panel position="top-left" style={{
-            background: 'var(--vscode-editor-background)',
-            border: '1px solid var(--vscode-panel-border)',
-            borderRadius: '4px',
-            padding: '8px',
-            fontSize: '11px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            maxWidth: '150px'
-          }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px', fontSize: '11px' }}>학습 단계</div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', marginRight: '6px' }}></div>
-                <span style={{ fontSize: '11px' }}>기초 단계</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6', marginRight: '6px' }}></div>
-                <span style={{ fontSize: '11px' }}>중급 단계</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8b5cf6', marginRight: '6px' }}></div>
-                <span style={{ fontSize: '11px' }}>고급 단계</span>
-              </div>
-            </div>
-          </Panel>
         </ReactFlow>
       </div>
       
@@ -541,6 +542,33 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
           background: var(--vscode-button-secondaryBackground);
           color: var(--vscode-button-secondaryForeground);
           border: 1px solid var(--vscode-button-border);
+        }
+      `}</style>
+
+      <style jsx global>{`
+        /* 기존 스타일 ... */
+        
+        /* 컨트롤러 버튼 스타일 커스터마이징 */
+        .custom-controls button {
+          background-color: var(--vscode-button-secondaryBackground) !important;
+          color: var(--vscode-button-secondaryForeground) !important;
+          border: 1px solid var(--vscode-button-border) !important;
+          border-radius: 4px !important;
+          margin: 2px !important;
+          width: 24px !important;
+          height: 24px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          transition: background-color 0.2s ease !important;
+        }
+        
+        .custom-controls button:hover {
+          background-color: var(--vscode-button-hoverBackground) !important;
+        }
+        
+        .custom-controls {
+          opacity: 0.85;
         }
       `}</style>
     </div>

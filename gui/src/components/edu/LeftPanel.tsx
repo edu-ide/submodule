@@ -1535,7 +1535,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
                     font-weight: 600;
                     color: var(--vscode-editor-foreground);
                     margin: 0;
-                }
+                            }
                         `}</style>
         </div>
     );
