@@ -39,7 +39,7 @@ export interface CurriculumStep {
     code: string;
     language?: string;
   }>;
-  duration: string; // 각 단계별 소요 시간
+  duration?: string; // 선택적 속성으로 변경
 }
 
 export interface CurriculumState {

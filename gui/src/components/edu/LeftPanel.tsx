@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CurriculumItem } from '../../types/curriculum';
 import RoadmapGenerator from './RoadmapGenerator';
+import RoadmapView from './RoadmapView';
 
 // API 응답 타입 정의
 interface ApiResponse<T> {
@@ -619,7 +620,7 @@ const foundationRoadmaps: RoadmapItem[] = [
 // 로드맵 모드 타입 수정
 type RoadmapMode = 'browse' | 'generate';
 
-const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, viewType = 'curriculum' }) => {
+const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [], viewType = 'curriculum' }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [curriculumData, setCurriculumData] = useState<CurriculumDocument[]>([]);
@@ -627,7 +628,9 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
     const [roadmapMode, setRoadmapMode] = useState<RoadmapMode>('browse');
     const [roadmapFilters, setRoadmapFilters] = useState<any>(null);
     const [roleSelection, setRoleSelection] = useState<string | null>(null);
-    const [displayData, setDisplayData] = useState<RoadmapItem[]>([]);
+    const [displayData, setDisplayData] = useState<(RoadmapItem | CurriculumItem | CurriculumDocument)[]>([]);
+    const [showRoadmapView, setShowRoadmapView] = useState<boolean>(false);
+    const [selectedRoadmap, setSelectedRoadmap] = useState<string | null>(null);
 
     // 정적 로드맵 기본 필터 정의
     const staticRoadmapFilters = {
@@ -664,30 +667,38 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
     useEffect(() => {
         if (viewType === 'curriculum' && !items) {
             const fetchCurriculum = async () => {
-                setLoading(true);
-                setError(null);
-                
-                try {
+            setLoading(true);
+            setError(null);
+
+            try {
                     const response = await axios.get('/api/curriculum');
                     if (response.data.success) {
                         setCurriculumData(response.data.data);
-                    } else {
+                } else {
                         setError(response.data.message || '데이터 로드 실패');
-                    }
-                } catch (err) {
-                    console.error('커리큘럼 로드 오류:', err);
-                    setError('커리큘럼 목록을 불러오는데 실패했습니다.');
-                } finally {
-                    setLoading(false);
                 }
-            };
-            
+            } catch (err) {
+                    console.error('커리큘럼 로드 오류:', err);
+                setError('커리큘럼 목록을 불러오는데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
             fetchCurriculum();
         }
     }, [viewType, items]);
 
     // 항목 클릭 핸들러
-    const handleItemClick = (id: string) => {
+    const handleItemClick = (id: string, item: any) => {
+        // 파이썬 로드맵의 경우 특별 처리
+        if (id === 'python') {
+            alert('파이썬 로드맵은 준비 중입니다. 다른 로드맵을 선택해주세요.');
+            return;
+        }
+        
+        setSelectedRoadmap(id);
+        setShowRoadmapView(true);
         onSelect(id);
     };
 
@@ -704,71 +715,32 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
         }
     };
 
-    // 초기 데이터 로드
-    useEffect(() => {
-        setDisplayData(getRoadmapDataByType(activeRoadmapType));
-    }, [activeRoadmapType]);
-
-    // 로드맵 타입 선택기 UI 수정
-    const renderRoadmapTypeSelector = () => {
-        return (
-            <div className="roadmap-type-selector">
-                <div className="roadmap-type-group">
-                    <div className="group-title">기본 관점</div>
-                    <div className="group-buttons">
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'role' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('role')}
-                        >
-                            역할 기반
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'skill' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('skill')}
-                        >
-                            기술 기반
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'foundation' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('foundation')}
-                        >
-                            기초 지식
-                        </button>
-                    </div>
-                </div>
-                
-                <div className="roadmap-type-group">
-                    <div className="group-title">응용 관점</div>
-                    <div className="group-buttons">
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'application-area' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('application-area')}
-                        >
-                            응용 영역
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'methodology' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('methodology')}
-                        >
-                            개발 방법론
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'project' ? 'active' : ''}`}
-                            onClick={() => changeRoadmapType('project')}
-                        >
-                            프로젝트 유형
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
+    // 뷰 타입에 따라 적절한 데이터를 로드하는 함수 추가
+    const loadDisplayData = () => {
+        if (viewType === 'roadmap') {
+            return getRoadmapDataByType(activeRoadmapType);
+        } else if (viewType === 'curriculum') {
+            // 커리큘럼 데이터 처리
+            if (items && items.length > 0) {
+                return items;
+            }
+            return curriculumData;
+        }
+        return [];
     };
+
+    // 뷰 타입이나 로드맵 타입 변경 시 데이터 업데이트
+    useEffect(() => {
+        const data = loadDisplayData();
+        console.log(`데이터 로드: ${viewType}, 항목 수: ${data.length}`);
+        setDisplayData(data as unknown as (RoadmapItem | CurriculumItem | CurriculumDocument)[]);
+    }, [viewType, activeRoadmapType, items, curriculumData]);
 
     // 로드맵 모드 토글 버튼 UI 수정 - 2개 모드로 통합
     const renderRoadmapModeToggle = () => {
         if (viewType !== 'roadmap') return null;
-        
-        return (
+
+    return (
             <div className="roadmap-mode-toggle">
                 <button 
                     className={`mode-button ${roadmapMode === 'browse' ? 'active' : ''}`}
@@ -836,10 +808,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
     // 아이템 렌더링 함수 개선
     const renderItemCard = (item: any, isSelected: boolean, onClick: () => void) => {
         const icon = getIconForItem(item);
-        
-        return (
-            <div 
-                key={item.id}
+
+                return (
+                    <div
+                        key={item.id}
                 className={`item-card ${isSelected ? 'selected' : ''}`}
                 onClick={onClick}
             >
@@ -847,7 +819,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     <div className="item-header">
                         <div className="icon-container">
                             <i className={`codicon codicon-${icon}`}></i>
-                        </div>
+                                </div>
                         <div className="item-title-container">
                             <div className="item-title">
                                 {item.title}
@@ -900,12 +872,12 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                             <div className="progress-bar-bg">
                                 <div 
                                     className="progress-bar-fill" 
-                                    style={{
+                                    style={{ 
                                         width: `${item.progress}%`
                                     }}
                                 ></div>
+                                </div>
                             </div>
-                        </div>
                     )}
                     
                     {item.reviewScore !== undefined && (
@@ -917,7 +889,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                                         className={`codicon ${star <= Math.round(item.reviewScore || 0) ? 'codicon-star-full' : 'codicon-star-empty'}`}
                                     ></i>
                                 ))}
-                            </div>
+                        </div>
                             <span className="review-score">
                                 {item.reviewScore.toFixed(1)}
                             </span>
@@ -940,13 +912,72 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
 
     return (
         <div className="left-panel">
-            {viewType === 'roadmap' && renderRoadmapModeToggle()}
+            {viewType === 'roadmap' && !showRoadmapView && renderRoadmapModeToggle()}
             
-            {/* 로드맵 둘러보기 모드 */}
-            {viewType === 'roadmap' && roadmapMode === 'browse' && (
+            {/* 로드맵 뷰 표시 */}
+            {showRoadmapView && selectedRoadmap && (
+                <div className="roadmap-view-wrapper">
+                    <div className="roadmap-header">
+                        <button onClick={() => setShowRoadmapView(false)} className="back-button">
+                            <i className="codicon codicon-arrow-left"></i> 돌아가기
+                        </button>
+                        <h2 className="roadmap-title">{selectedRoadmap} 로드맵</h2>
+                    </div>
+                    <div className="roadmap-content">
+                        <p>로드맵 내용은 곧 제공될 예정입니다.</p>
+                        <p>선택된 로드맵: {selectedRoadmap}</p>
+                    </div>
+                </div>
+            )}
+            
+            {/* 로드맵 둘러보기 모드 - 로드맵 뷰가 표시되지 않을 때만 보여줌 */}
+            {viewType === 'roadmap' && roadmapMode === 'browse' && !showRoadmapView && (
                 <>
                     {/* 카테고리 선택기 */}
-                    {renderRoadmapTypeSelector()}
+                    <div className="roadmap-type-selector">
+                        <div className="group-title">카테고리</div>
+                        <div className="type-buttons-grid">
+                            {/* 첫 번째 줄 */}
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'role' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('role')}
+                            >
+                                역할 기반
+                            </button>
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'skill' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('skill')}
+                            >
+                                기술 기반
+                            </button>
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'foundation' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('foundation')}
+                            >
+                                기초 지식
+                            </button>
+                            
+                            {/* 두 번째 줄 */}
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'application-area' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('application-area')}
+                            >
+                                응용 영역
+                            </button>
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'methodology' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('methodology')}
+                            >
+                                개발 방법론
+                            </button>
+                            <button 
+                                className={`type-button ${activeRoadmapType === 'project' ? 'active' : ''}`}
+                                onClick={() => changeRoadmapType('project')}
+                            >
+                                프로젝트 유형
+                            </button>
+                        </div>
+                    </div>
                     
                     {/* 아이템 목록 */}
                     <div className="items-container">
@@ -954,7 +985,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                             displayData.map(item => renderItemCard(
                                 item, 
                                 selectedId === item.id, 
-                                () => onSelect(item.id)
+                                () => handleItemClick(item.id, item)  // 아이템 데이터도 전달
                             ))
                         ) : (
                             <div className="empty-list">해당 카테고리에 로드맵이 없습니다.</div>
@@ -975,7 +1006,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                         displayData.map(item => renderItemCard(
                             item, 
                             selectedId === item.id, 
-                            () => onSelect(item.id)
+                            () => handleItemClick(item.id, item)
                         ))
                     ) : (
                         <div className="empty-list">커리큘럼이 없습니다.</div>
@@ -985,7 +1016,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
             
             <style jsx>{`
                 .left-panel {
-                    display: flex;
+                                display: flex;
                     flex-direction: column;
                     height: 100%;
                     overflow-y: auto;
@@ -1004,12 +1035,12 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     font-size: 11px;
                     font-weight: 500;
                     color: var(--vscode-descriptionForeground);
-                    margin-bottom: 4px;
+                                margin-bottom: 4px;
                     padding-left: 4px;
-                }
-                
+                            }
+
                 .group-buttons {
-                    display: flex;
+                                display: flex;
                     flex-wrap: wrap;
                     background-color: var(--vscode-editor-background);
                     border-radius: 4px;
@@ -1026,7 +1057,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     font-size: 12px;
                     cursor: pointer;
                     border-radius: 3px;
-                    color: var(--vscode-foreground);
+                                color: var(--vscode-foreground);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -1057,13 +1088,13 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     font-size: 10px;
                     background-color: var(--vscode-editorInfo-foreground, #2196f3);
                     color: white;
-                    padding: 2px 6px;
-                    border-radius: 10px;
+                                padding: 2px 6px;
+                                border-radius: 10px;
                     font-weight: bold;
                 }
 
                 .progress-wrapper {
-                    margin-top: 8px;
+                                margin-top: 8px;
                 }
                 
                 .progress-info {
@@ -1077,95 +1108,95 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     height: 4px;
                     background-color: var(--vscode-editorWidget-background, rgba(0,0,0,0.1));
                     border-radius: 2px;
-                    overflow: hidden;
+                                overflow: hidden;
                     position: relative;
-                }
-                
-                .progress-bar {
-                    position: absolute;
-                    height: 100%;
-                    left: 0;
-                    top: 0;
-                    border-radius: 2px;
-                    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
-                    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-                }
-                
-                .progress-glow {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: linear-gradient(
-                        90deg,
-                        transparent,
-                        rgba(255, 255, 255, 0.1),
-                        transparent
-                    );
-                    animation: progress-glow 2s ease-in-out infinite;
-                }
-                
-                @keyframes progress-glow {
-                    0% {
-                        transform: translateX(-100%);
-                        opacity: 0;
-                    }
-                    50% {
-                        opacity: 1;
-                    }
-                    100% {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                }
-                
-                .curriculum-item {
-                    position: relative;
-                    padding: 12px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    margin-bottom: 8px;
-                    border: 1px solid transparent;
-                    background-color: var(--vscode-editor-background);
-                }
-                
-                .curriculum-item:hover {
-                    background-color: var(--vscode-list-hoverBackground);
-                    border-color: var(--vscode-list-focusOutline);
-                }
-                
-                .curriculum-item.selected {
-                    background-color: var(--vscode-list-activeSelectionBackground);
-                    border-color: var(--vscode-focusBorder);
-                }
-                
-                .curriculum-item h3 {
-                    margin: 0;
-                    font-size: 14px;
-                    color: var(--vscode-foreground);
-                    font-weight: 500;
-                }
-                
-                .curriculum-item p {
-                    margin: 4px 0 0 0;
-                    font-size: 12px;
-                    color: var(--vscode-foreground);
-                    opacity: 0.8;
-                }
-                
-                .left-panel-loading,
-                .left-panel-error {
-                    padding: 15px;
-                    text-align: center;
-                    color: var(--vscode-foreground);
-                    font-size: 13px;
-                }
-                
-                .left-panel-error {
-                    color: var(--vscode-errorForeground);
-                }
+                            }
+
+                            .progress-bar {
+                                position: absolute;
+                                height: 100%;
+                                left: 0;
+                                top: 0;
+                                border-radius: 2px;
+                                transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+                                box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+                            }
+
+                            .progress-glow {
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: linear-gradient(
+                                    90deg,
+                                    transparent,
+                                    rgba(255, 255, 255, 0.1),
+                                    transparent
+                                );
+                                animation: progress-glow 2s ease-in-out infinite;
+                            }
+
+                            @keyframes progress-glow {
+                                0% {
+                                    transform: translateX(-100%);
+                                    opacity: 0;
+                                }
+                                50% {
+                                    opacity: 1;
+                                }
+                                100% {
+                                    transform: translateX(100%);
+                                    opacity: 0;
+                                }
+                            }
+
+                            .curriculum-item {
+                                position: relative;
+                                padding: 12px;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                margin-bottom: 8px;
+                                border: 1px solid transparent;
+                                background-color: var(--vscode-editor-background);
+                            }
+
+                            .curriculum-item:hover {
+                                background-color: var(--vscode-list-hoverBackground);
+                                border-color: var(--vscode-list-focusOutline);
+                            }
+
+                            .curriculum-item.selected {
+                                background-color: var(--vscode-list-activeSelectionBackground);
+                                border-color: var(--vscode-focusBorder);
+                            }
+
+                            .curriculum-item h3 {
+                                margin: 0;
+                                font-size: 14px;
+                                color: var(--vscode-foreground);
+                                font-weight: 500;
+                            }
+
+                            .curriculum-item p {
+                                margin: 4px 0 0 0;
+                                font-size: 12px;
+                                color: var(--vscode-foreground);
+                                opacity: 0.8;
+                            }
+
+                            .left-panel-loading,
+                            .left-panel-error {
+                                padding: 15px;
+                                text-align: center;
+                                color: var(--vscode-foreground);
+                                font-size: 13px;
+                            }
+
+                            .left-panel-error {
+                                color: var(--vscode-errorForeground);
+                            }
 
                 .difficulty-badge {
                     background-color: var(--vscode-badge-background);
@@ -1426,7 +1457,86 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     font-size: 14px;
                     color: var(--vscode-editor-foreground);
                 }
-            `}</style>
+
+                .roadmap-type-selector {
+                    padding: 12px;
+                    background: var(--vscode-sideBar-background);
+                    border-bottom: 1px solid var(--vscode-panel-border);
+                }
+
+                .group-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    margin-bottom: 8px;
+                    color: var(--vscode-panelTitle-activeForeground);
+                }
+
+                .type-buttons-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                }
+
+                .type-button {
+                    padding: 6px 8px;
+                    font-size: 12px;
+                    border: 1px solid var(--vscode-button-border);
+                    background: var(--vscode-button-secondaryBackground);
+                    color: var(--vscode-button-secondaryForeground);
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+
+                .type-button:hover {
+                    background: var(--vscode-button-secondaryHoverBackground);
+                }
+
+                .type-button.active {
+                    background: var(--vscode-button-background);
+                    color: var(--vscode-button-foreground);
+                    border-color: var(--vscode-focusBorder);
+                }
+
+                .roadmap-view-container {
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                }
+
+                .roadmap-view-header {
+                    display: flex;
+                    align-items: center;
+                    padding: 12px;
+                    border-bottom: 1px solid var(--vscode-panel-border);
+                    background: var(--vscode-sideBar-background);
+                }
+
+                .back-button {
+                    display: flex;
+                    align-items: center;
+                    background: none;
+                    border: none;
+                    color: var(--vscode-button-foreground);
+                    cursor: pointer;
+                    padding: 4px 8px;
+                    margin-right: 8px;
+                    border-radius: 4px;
+                }
+
+                .back-button:hover {
+                    background: var(--vscode-button-hoverBackground);
+                }
+
+                .roadmap-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: var(--vscode-editor-foreground);
+                    margin: 0;
+                }
+                        `}</style>
         </div>
     );
 };
