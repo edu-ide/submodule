@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RoadmapItem } from './types';
 
 // 카테고리 그룹
 interface OptionGroup {
@@ -538,10 +537,6 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onGenerateRoadmap }
   return (
     <div className="roadmap-generator">
       <h2 className="generator-title">맞춤형 로드맵 생성</h2>
-      
-      {/* 디버그 정보 (문제 해결 후 제거) */}
-      {renderDebugInfo()}
-      
       <div className="tab-container">
         {Object.keys(filterCategories).map(group => (
           <button 

@@ -69,6 +69,11 @@ interface RoadmapItem {
     description?: string;
     difficulty?: string;
     icon?: string;
+    progress?: number;      // 진행률
+    reviewScore?: number;   // 리뷰 점수 (5점 만점)
+    duration?: string;      // 예상 소요 시간
+    students?: number;      // 수강 학생 수
+    lastUpdated?: string;   // 마지막 업데이트 날짜
     steps?: {
         title: string;
         content: string;
@@ -121,6 +126,20 @@ const getDifficultyText = (difficulty?: string): string => {
     }
 };
 
+// 역할 ID를 이름으로 변환하는 도우미 함수
+const getRoleName = (roleId: string): string => {
+    const roleNames: Record<string, string> = {
+        'frontend': '프론트엔드',
+        'backend': '백엔드',
+        'fullstack': '풀스택',
+        'devops': '데브옵스', 
+        'ai-engineer': 'AI 엔지니어',
+        'data-analyst': '데이터 분석가'
+    };
+    
+    return roleNames[roleId] || roleId;
+};
+
 // 역할 기반 로드맵 데이터
 const roleBadedRoadmaps: RoadmapItem[] = [
     { 
@@ -130,6 +149,11 @@ const roleBadedRoadmaps: RoadmapItem[] = [
         description: '웹 애플리케이션의 사용자 인터페이스와 상호작용을 개발하는 역할입니다.',
         difficulty: 'intermediate',
         icon: 'browser',
+        progress: 65,
+        reviewScore: 4.5,
+        duration: '3개월',
+        students: 1528,
+        lastUpdated: '2023-11-15',
         steps: [
             { title: 'HTML/CSS 기초', content: '', completed: true },
             { title: 'JavaScript 기초', content: '', completed: true },
@@ -144,6 +168,11 @@ const roleBadedRoadmaps: RoadmapItem[] = [
         description: '서버 측 로직과 데이터베이스 관리를 담당하는 역할입니다.',
         difficulty: 'advanced',
         icon: 'server',
+        progress: 40,
+        reviewScore: 4.2,
+        duration: '4개월',
+        students: 1245,
+        lastUpdated: '2023-10-20',
         steps: [
             { title: '서버 기초', content: '', completed: true },
             { title: '데이터베이스', content: '', completed: false },
@@ -169,6 +198,14 @@ const roleBadedRoadmaps: RoadmapItem[] = [
     { id: 'product-manager', title: '제품 관리자', category: 'role' },
     { id: 'engineering-manager', title: '엔지니어링 관리자', category: 'role' },
     { id: 'developer-relations', title: '개발자 관계', isNew: true, category: 'role' },
+    { 
+        id: 'automation-engineer', 
+        title: '자동화 엔지니어', 
+        category: 'role',
+        description: '업무 프로세스와 시스템을 자동화하는 솔루션을 개발하는 전문가',
+        icon: 'debug-step-over',
+        isNew: true
+    },
 ];
 
 // 기술 기반 로드맵 데이터
@@ -208,11 +245,62 @@ const skillBasedRoadmaps: RoadmapItem[] = [
     { id: 'redis', title: '레디스', category: 'skill' },
     { id: 'php', title: 'PHP', isNew: true, category: 'skill' },
     { id: 'cloudflare', title: '클라우드플레어', isNew: true, category: 'skill' },
+    { 
+        id: 'unity', 
+        title: '유니티', 
+        category: 'skill',
+        description: '인기 있는 크로스 플랫폼 게임 엔진 및 개발 환경',
+        icon: 'cube'
+    },
+    { 
+        id: 'unreal-engine', 
+        title: '언리얼 엔진', 
+        category: 'skill',
+        description: '고품질 3D 게임 및 시뮬레이션을 위한 전문 게임 엔진',
+        icon: 'lightbulb'
+    },
+    { 
+        id: 'rpa', 
+        title: 'RPA (로봇 프로세스 자동화)', 
+        category: 'skill',
+        description: '반복적인 업무를 자동화하는 소프트웨어 로봇 기술',
+        icon: 'run-all',
+        isNew: true
+    },
 ];
 
-// 응용 영역(domain + industry 통합) 로드맵 데이터
+// 응용 영역(domain + industry 통합) 로드맵 데이터 수정 - 중복 항목 제거
 const applicationAreaRoadmaps: RoadmapItem[] = [
-    // 기존 도메인 기반 항목
+    { 
+        id: 'automation', 
+        title: '자동화', 
+        category: 'application-area',
+        description: '소프트웨어를 활용한 업무 프로세스 자동화와 로봇 프로세스 자동화(RPA) 기술',
+        icon: 'debug-restart',
+        difficulty: 'intermediate',
+        duration: '2개월',
+        reviewScore: 4.6,
+        isNew: true
+    },
+    { 
+        id: 'game-development', 
+        title: '게임 개발', 
+        category: 'application-area',
+        description: '다양한 플랫폼용 게임 개발 및 게임 엔진 활용 기술',
+        icon: 'layout-centered',
+        difficulty: 'advanced',
+        duration: '6개월',
+        reviewScore: 4.8
+    },
+    {
+        id: 'game-design', 
+        title: '게임 디자인', 
+        category: 'application-area',
+        description: '게임 메커니즘, 레벨 디자인, 사용자 경험 설계에 관한 학습',
+        icon: 'preview',
+        difficulty: 'intermediate',
+        duration: '3개월'
+    },
     { 
         id: 'web-dev', 
         title: '웹 개발', 
@@ -243,49 +331,12 @@ const applicationAreaRoadmaps: RoadmapItem[] = [
         icon: 'brain'
     },
     { 
-        id: 'game-dev', 
-        title: '게임 개발', 
-        category: 'application-area',
-        icon: 'game',
-        isNew: true
-    },
-    { 
         id: 'data-science', 
         title: '데이터 사이언스', 
         category: 'application-area',
         icon: 'dashboard'
     },
-    
-    // 기존 산업 분야 항목
-    { 
-        id: 'fintech', 
-        title: '핀테크', 
-        category: 'application-area',
-        description: '금융 기술 분야의 개발자 로드맵',
-        difficulty: 'intermediate',
-        icon: 'credit-card',
-        steps: [
-            { title: '금융 시스템 기초', content: '', completed: false },
-            { title: '보안 및 규제 준수', content: '', completed: false },
-            { title: '결제 시스템 통합', content: '', completed: false }
-        ]
-    },
-    { 
-        id: 'healthtech', 
-        title: '헬스테크', 
-        category: 'application-area',
-        description: '의료 및 건강 관리 기술 분야의 개발자 로드맵',
-        difficulty: 'advanced',
-        icon: 'heart'
-    },
-    { 
-        id: 'edtech', 
-        title: '에듀테크', 
-        category: 'application-area',
-        description: '교육 기술 분야의 개발자 로드맵',
-        difficulty: 'intermediate',
-        icon: 'mortar-board'
-    }
+    { id: 'e-commerce', title: '이커머스', category: 'application-area' },
 ];
 
 // 학습자 수준(career-level + difficulty 통합) 로드맵 데이터
@@ -565,56 +616,48 @@ const foundationRoadmaps: RoadmapItem[] = [
     }
 ];
 
+// 로드맵 모드 타입 수정
+type RoadmapMode = 'browse' | 'generate';
+
 const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, viewType = 'curriculum' }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [curriculumData, setCurriculumData] = useState<CurriculumDocument[]>([]);
     const [activeRoadmapType, setActiveRoadmapType] = useState<RoadmapCategory>('role');
-    const [roadmapMode, setRoadmapMode] = useState<'browse' | 'generate'>('browse');
+    const [roadmapMode, setRoadmapMode] = useState<RoadmapMode>('browse');
+    const [roadmapFilters, setRoadmapFilters] = useState<any>(null);
+    const [roleSelection, setRoleSelection] = useState<string | null>(null);
+    const [displayData, setDisplayData] = useState<RoadmapItem[]>([]);
 
-    // 현재 표시할 데이터 선택
-    const getDisplayData = () => {
-        // 로드맵 모드
-        if (viewType === 'roadmap') {
-            switch (activeRoadmapType) {
-                // 기본 관점
-                case 'role':
-                    return roleBadedRoadmaps;
-                case 'skill':
-                    return skillBasedRoadmaps;
-                case 'foundation':
-                    return foundationRoadmaps;
-                    
-                // 응용 관점
-                case 'application-area':
-                    return applicationAreaRoadmaps;
-                case 'methodology':
-                    return methodologyRoadmaps;
-                case 'project':
-                    return projectRoadmaps;
-                    
-                // 학습자 관점
-                case 'learner-level':
-                    return learnerLevelRoadmaps;
-                case 'goal':
-                    return goalBasedRoadmaps;
-                case 'learning-style':
-                    return learningStyleRoadmaps;
-                case 'time-investment':
-                    return timeInvestmentRoadmaps;
-                    
-                default:
-                    return roleBadedRoadmaps;
-            }
-        }
+    // 정적 로드맵 기본 필터 정의
+    const staticRoadmapFilters = {
+        'learner-level': ['beginner'],       // 입문자
+        'learning-goal': ['skill-upgrade'],  // 역량 강화
+        'learning-style': ['hands-on'],      // 실습 중심
+        'time-investment': ['quick-path']    // 빠른 경로(3개월)
+    };
+
+    // 현재 표시할 데이터 명확하게 선택
+    const getRoadmapDataByType = (type: RoadmapCategory): RoadmapItem[] => {
+        console.log(`카테고리 데이터 로드: ${type}`);
         
-        // 커리큘럼 모드
-        if (items) {
-            return items;
+        switch (type) {
+            case 'role':
+                return roleBadedRoadmaps;
+            case 'skill':
+                return skillBasedRoadmaps;
+            case 'foundation':
+                return foundationRoadmaps;
+            case 'application-area':
+                return applicationAreaRoadmaps;
+            case 'methodology':
+                return methodologyRoadmaps;
+            case 'project':
+                return projectRoadmaps;
+            default:
+                console.warn(`지원되지 않는 로드맵 유형: ${type}`);
+                return [];
         }
-        
-        // API에서 가져온 데이터
-        return curriculumData;
     };
 
     // API를 통해 커리큘럼 데이터 로드 (viewType이 curriculum이고 items가 없을 때만)
@@ -648,30 +691,46 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
         onSelect(id);
     };
 
-    // 로드맵 분류 선택 UI 업데이트 - 최적화된 그룹 구조
-    const renderRoadmapTypeSelector = () => {
-        if (viewType !== 'roadmap') return null;
+    // 탭 전환 함수 개선
+    const changeRoadmapType = (type: RoadmapCategory) => {
+        console.log(`카테고리 변경: ${type}`);
+        setActiveRoadmapType(type);
         
+        // 이전 선택 항목 초기화 (선택적)
+        if (selectedId) {
+            setTimeout(() => {
+                onSelect('');
+            }, 50);
+        }
+    };
+
+    // 초기 데이터 로드
+    useEffect(() => {
+        setDisplayData(getRoadmapDataByType(activeRoadmapType));
+    }, [activeRoadmapType]);
+
+    // 로드맵 타입 선택기 UI 수정
+    const renderRoadmapTypeSelector = () => {
         return (
-            <div className="roadmap-selector-container">
+            <div className="roadmap-type-selector">
                 <div className="roadmap-type-group">
                     <div className="group-title">기본 관점</div>
                     <div className="group-buttons">
                         <button 
                             className={`type-button ${activeRoadmapType === 'role' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('role')}
+                            onClick={() => changeRoadmapType('role')}
                         >
                             역할 기반
                         </button>
                         <button 
                             className={`type-button ${activeRoadmapType === 'skill' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('skill')}
+                            onClick={() => changeRoadmapType('skill')}
                         >
                             기술 기반
                         </button>
                         <button 
                             className={`type-button ${activeRoadmapType === 'foundation' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('foundation')}
+                            onClick={() => changeRoadmapType('foundation')}
                         >
                             기초 지식
                         </button>
@@ -683,51 +742,21 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
                     <div className="group-buttons">
                         <button 
                             className={`type-button ${activeRoadmapType === 'application-area' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('application-area')}
+                            onClick={() => changeRoadmapType('application-area')}
                         >
                             응용 영역
                         </button>
                         <button 
                             className={`type-button ${activeRoadmapType === 'methodology' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('methodology')}
+                            onClick={() => changeRoadmapType('methodology')}
                         >
                             개발 방법론
                         </button>
                         <button 
                             className={`type-button ${activeRoadmapType === 'project' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('project')}
+                            onClick={() => changeRoadmapType('project')}
                         >
                             프로젝트 유형
-                        </button>
-                    </div>
-                </div>
-                
-                <div className="roadmap-type-group">
-                    <div className="group-title">학습자 관점</div>
-                    <div className="group-buttons">
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'learner-level' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('learner-level')}
-                        >
-                            학습자 수준
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'goal' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('goal')}
-                        >
-                            학습 목표
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'learning-style' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('learning-style')}
-                        >
-                            학습 방식
-                        </button>
-                        <button 
-                            className={`type-button ${activeRoadmapType === 'time-investment' ? 'active' : ''}`}
-                            onClick={() => setActiveRoadmapType('time-investment')}
-                        >
-                            시간 투자
                         </button>
                     </div>
                 </div>
@@ -735,7 +764,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
         );
     };
 
-    // 로드맵 모드 토글 버튼 UI
+    // 로드맵 모드 토글 버튼 UI 수정 - 2개 모드로 통합
     const renderRoadmapModeToggle = () => {
         if (viewType !== 'roadmap') return null;
         
@@ -756,7 +785,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
             </div>
         );
     };
-
+    
     // 로드맵 생성기 처리 함수
     const handleGenerateRoadmap = (filters: any) => {
         // 필터 기반으로 맞춤형 로드맵 생성 로직
@@ -772,6 +801,133 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
         setRoadmapMode('browse');
     };
 
+    // 추가 아이콘 매핑 정의 (아이콘이 없는 항목용)
+    const getIconForItem = (item: any): string => {
+        // 이미 아이콘이 있는 경우 그대로 사용
+        if (item.icon) return item.icon;
+        
+        // 카테고리별 기본 아이콘
+        const categoryIcons: Record<string, string> = {
+            'role': 'person',
+            'skill': 'tools',
+            'foundation': 'book',
+            'application-area': 'globe',
+            'methodology': 'organization',
+            'project': 'folder-type',
+            'learner-level': 'graph',
+            'goal': 'target',
+            'learning-style': 'pencil',
+            'time-investment': 'watch'
+        };
+        
+        // 제목에 따른 특정 기술 아이콘
+        if (item.title.includes('Python') || item.title.includes('파이썬')) return 'symbol-namespace';
+        if (item.title.includes('Java') || item.title.includes('자바')) return 'coffee';
+        if (item.title.includes('React') || item.title.includes('리액트')) return 'react';
+        if (item.title.includes('Angular') || item.title.includes('앵귤러')) return 'symbol-event';
+        if (item.title.includes('Vue') || item.title.includes('뷰')) return 'symbol-color';
+        if (item.title.includes('Node') || item.title.includes('노드')) return 'nodejs';
+        if (item.title.includes('Database') || item.title.includes('데이터베이스')) return 'database';
+        
+        // 카테고리별 기본 아이콘 반환
+        return categoryIcons[item.category] || 'symbol-misc';
+    };
+
+    // 아이템 렌더링 함수 개선
+    const renderItemCard = (item: any, isSelected: boolean, onClick: () => void) => {
+        const icon = getIconForItem(item);
+        
+        return (
+            <div 
+                key={item.id}
+                className={`item-card ${isSelected ? 'selected' : ''}`}
+                onClick={onClick}
+            >
+                <div className="card-content">
+                    <div className="item-header">
+                        <div className="icon-container">
+                            <i className={`codicon codicon-${icon}`}></i>
+                        </div>
+                        <div className="item-title-container">
+                            <div className="item-title">
+                                {item.title}
+                                {item.isNew && <span className="new-badge">신규</span>}
+                            </div>
+                            {item.lastUpdated && (
+                                <div className="item-updated">
+                                    <i className="codicon codicon-history"></i>
+                                    {new Date(item.lastUpdated).toLocaleDateString('ko-KR', {year: 'numeric', month: 'short', day: 'numeric'})} 업데이트
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {item.description && (
+                        <div className="item-description">{item.description}</div>
+                    )}
+                    
+                    <div className="item-meta">
+                        {item.difficulty && (
+                            <div className="item-badge difficulty">
+                                <i className="codicon codicon-dashboard"></i>
+                                {getDifficultyText(item.difficulty)}
+                            </div>
+                        )}
+                        
+                        {item.duration && (
+                            <div className="item-badge duration">
+                                <i className="codicon codicon-clock"></i>
+                                {item.duration}
+                            </div>
+                        )}
+                        
+                        {item.students && (
+                            <div className="item-badge students">
+                                <i className="codicon codicon-account"></i>
+                                {item.students.toLocaleString()}명
+                            </div>
+                        )}
+                    </div>
+                </div>
+                
+                <div className="card-footer">
+                    {item.progress !== undefined && (
+                        <div className="item-progress-container">
+                            <div className="progress-label">
+                                <span>진행률</span>
+                                <span className="progress-value">{item.progress}%</span>
+                            </div>
+                            <div className="progress-bar-bg">
+                                <div 
+                                    className="progress-bar-fill" 
+                                    style={{
+                                        width: `${item.progress}%`
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {item.reviewScore !== undefined && (
+                        <div className="item-review">
+                            <div className="stars">
+                                {[1, 2, 3, 4, 5].map(star => (
+                                    <i 
+                                        key={star}
+                                        className={`codicon ${star <= Math.round(item.reviewScore || 0) ? 'codicon-star-full' : 'codicon-star-empty'}`}
+                                    ></i>
+                                ))}
+                            </div>
+                            <span className="review-score">
+                                {item.reviewScore.toFixed(1)}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     // 로딩 UI
     if (loading) {
         return <div className="left-panel-loading">커리큘럼 로딩 중...</div>;
@@ -782,36 +938,51 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
         return <div className="left-panel-error">{error}</div>;
     }
 
-    // 표시할 데이터 가져오기
-    const displayData = getDisplayData();
-
     return (
         <div className="left-panel">
             {viewType === 'roadmap' && renderRoadmapModeToggle()}
             
-            {/* 기존 로드맵 브라우즈 모드 */}
+            {/* 로드맵 둘러보기 모드 */}
             {viewType === 'roadmap' && roadmapMode === 'browse' && (
                 <>
+                    {/* 카테고리 선택기 */}
                     {renderRoadmapTypeSelector()}
+                    
+                    {/* 아이템 목록 */}
                     <div className="items-container">
-                        {/* 로드맵 아이템 렌더링 (기존 코드) */}
+                        {displayData && displayData.length > 0 ? (
+                            displayData.map(item => renderItemCard(
+                                item, 
+                                selectedId === item.id, 
+                                () => onSelect(item.id)
+                            ))
+                        ) : (
+                            <div className="empty-list">해당 카테고리에 로드맵이 없습니다.</div>
+                        )}
                     </div>
                 </>
             )}
             
-            {/* 로드맵 생성 모드 */}
+            {/* 맞춤형 로드맵 생성 모드 */}
             {viewType === 'roadmap' && roadmapMode === 'generate' && (
                 <RoadmapGenerator onGenerateRoadmap={handleGenerateRoadmap} />
-                // 또는 <RoadmapWizard onComplete={handleGenerateRoadmap} />
             )}
             
-            {/* 커리큘럼 모드 (기존 코드) */}
+            {/* 커리큘럼 모드 */}
             {viewType === 'curriculum' && (
                 <div className="items-container">
-                    {/* 커리큘럼 아이템 렌더링 (기존 코드) */}
+                    {displayData && displayData.length > 0 ? (
+                        displayData.map(item => renderItemCard(
+                            item, 
+                            selectedId === item.id, 
+                            () => onSelect(item.id)
+                        ))
+                    ) : (
+                        <div className="empty-list">커리큘럼이 없습니다.</div>
+                    )}
                 </div>
             )}
-
+            
             <style jsx>{`
                 .left-panel {
                     display: flex;
@@ -1035,6 +1206,225 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items, view
 
                 .mode-button:hover:not(.active) {
                     background-color: var(--vscode-list-hoverBackground);
+                }
+
+                .static-roadmap-container {
+                    padding: 16px;
+                }
+
+                .static-roadmap-title {
+                    font-size: 18px;
+                    margin-top: 0;
+                    margin-bottom: 8px;
+                }
+
+                .static-roadmap-description {
+                    font-size: 14px;
+                    margin-bottom: 16px;
+                    color: var(--vscode-descriptionForeground);
+                }
+
+                .empty-list {
+                    padding: 16px;
+                    text-align: center;
+                    color: var(--vscode-descriptionForeground);
+                }
+
+                /* 아이템 카드 스타일 개선 */
+                .item-card {
+                    margin: 0 0 16px 0;
+                    border-radius: 8px;
+                    background-color: var(--vscode-editor-background);
+                    border: 1px solid var(--vscode-panel-border);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    overflow: hidden;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                .item-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                    border-color: var(--vscode-focusBorder);
+                }
+                
+                .item-card.selected {
+                    background-color: var(--vscode-list-activeSelectionBackground);
+                    color: var(--vscode-list-activeSelectionForeground);
+                    border-color: var(--vscode-focusBorder);
+                    box-shadow: 0 0 0 2px var(--vscode-focusBorder);
+                }
+                
+                .card-content {
+                    padding: 16px;
+                    flex: 1;
+                }
+                
+                .item-header {
+                    display: flex;
+                    align-items: flex-start;
+                    margin-bottom: 10px;
+                }
+                
+                .icon-container {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    background-color: var(--vscode-badge-background);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 12px;
+                    flex-shrink: 0;
+                }
+                
+                .icon-container i {
+                    font-size: 20px;
+                    color: var(--vscode-badge-foreground);
+                }
+                
+                .item-title-container {
+                    flex: 1;
+                }
+                
+                .item-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    margin-bottom: 4px;
+                    line-height: 1.3;
+                    color: var(--vscode-editor-foreground);
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .new-badge {
+                    font-size: 10px;
+                    font-weight: normal;
+                    background-color: var(--vscode-notificationsInfoIcon-foreground);
+                    color: white;
+                    padding: 1px 6px;
+                    border-radius: 10px;
+                    margin-left: 8px;
+                    text-transform: uppercase;
+                }
+                
+                .item-updated {
+                    font-size: 11px;
+                    color: var(--vscode-descriptionForeground);
+                    display: flex;
+                    align-items: center;
+                }
+                
+                .item-updated i {
+                    font-size: 12px;
+                    margin-right: 4px;
+                }
+                
+                .item-description {
+                    margin-bottom: 12px;
+                    font-size: 13px;
+                    line-height: 1.5;
+                    color: var(--vscode-foreground);
+                    opacity: 0.9;
+                }
+                
+                .item-meta {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin-bottom: 12px;
+                }
+                
+                .item-badge {
+                    display: flex;
+                    align-items: center;
+                    font-size: 11px;
+                    padding: 3px 8px;
+                    border-radius: 12px;
+                    background-color: var(--vscode-editor-lineHighlightBackground);
+                    color: var(--vscode-editor-foreground);
+                }
+                
+                .item-badge i {
+                    font-size: 12px;
+                    margin-right: 4px;
+                }
+                
+                .item-badge.difficulty {
+                    background-color: var(--vscode-activityBarBadge-background);
+                    color: var(--vscode-activityBarBadge-foreground);
+                }
+                
+                .item-badge.duration {
+                    background-color: var(--vscode-statusBarItem-warningBackground);
+                    color: var(--vscode-statusBarItem-warningForeground);
+                }
+                
+                .item-badge.students {
+                    background-color: var(--vscode-statusBarItem-remoteBackground);
+                    color: var(--vscode-statusBarItem-remoteForeground);
+                }
+                
+                .card-footer {
+                    padding: 12px 16px;
+                    background-color: var(--vscode-editor-lineHighlightBackground);
+                    border-top: 1px solid var(--vscode-panel-border);
+                }
+                
+                .item-progress-container {
+                    margin-bottom: 10px;
+                }
+                
+                .progress-label {
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    margin-bottom: 6px;
+                    color: var(--vscode-editor-foreground);
+                }
+                
+                .progress-value {
+                    font-weight: 600;
+                }
+                
+                .progress-bar-bg {
+                    height: 6px;
+                    background-color: var(--vscode-button-secondaryBackground);
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+                
+                .progress-bar-fill {
+                    height: 100%;
+                    border-radius: 3px;
+                    background: linear-gradient(90deg, 
+                      var(--vscode-debugIcon-startForeground) 0%, 
+                      var(--vscode-charts-blue) 100%);
+                }
+                
+                .item-review {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 12px;
+                }
+                
+                .stars {
+                    display: flex;
+                }
+                
+                .stars i {
+                    color: #E3B341;
+                    margin-right: 2px;
+                    font-size: 14px;
+                }
+                
+                .review-score {
+                    font-weight: 600;
+                    font-size: 14px;
+                    color: var(--vscode-editor-foreground);
                 }
             `}</style>
         </div>
