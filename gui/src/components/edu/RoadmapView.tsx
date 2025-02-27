@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { 
   ReactFlow,
   Controls,
@@ -16,6 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setViewport, setNodePosition } from '../../redux/roadmapSlice';
+import { setBottomMessage } from "../../redux/slices/uiStateSlice";
 
 // 로컬 컴포넌트 및 유틸 임포트
 import NodeContent from './roadmap/NodeContent';
@@ -23,7 +24,6 @@ import { layoutElements } from './roadmap/layout-elements';
 import { pythonNodes, pythonEdges } from './roadmap/constants';
 import { RoadmapViewProps } from './types';
 import pythonRoadmapContent from './roadmap/data/pythonRoadmapContent.json';
-import { useRoadmap } from './roadmap/RoadmapContext';
 
 // 노드 타입 정의
 const nodeTypes = {
@@ -45,8 +45,11 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   const routerRoadmapId = roadmapId || urlRoadmapId || 'python';
   
   // 상태 관리 코드 유지
-  const { viewportState, nodePositions, setFlowInstance } = useRoadmap();
+  const viewportState = useSelector((state: RootState) => state.roadmap.viewportState);
+  const nodePositions = useSelector((state: RootState) => state.roadmap.nodePositions);
   const dispatch = useDispatch();
+  
+  const prevViewport = useRef<Viewport>({ x: 0, y: 0, zoom: 1 });
   
   // 컴포넌트 마운트 시 데이터 로드
   React.useEffect(() => {
@@ -121,8 +124,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   
   // 뷰포트 변경 핸들러
   const onViewportChange = useCallback((viewport: Viewport) => {
-    const { x, y, zoom } = viewport;
-    dispatch(setViewport({ x, y, zoom }));
+    // 옵셔널 체이닝 추가
+    const prevZoom = prevViewport.current?.zoom || 1;
+    const isSignificantChange = 
+      Math.abs(viewport.zoom - prevZoom) > 0.005;
+
+    if (isSignificantChange) {
+      dispatch(setViewport(viewport));
+      prevViewport.current = viewport;
+    }
   }, [dispatch]);
   
   // 노드 위치 변경 핸들러
@@ -134,28 +144,35 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   }, [dispatch]);
   
   // onInit 핸들러
-  const onInit = useCallback((reactFlowInstance: ReactFlowInstance) => {
-    setFlowInstance(reactFlowInstance);
-    
-    // 저장된 뷰포트 상태가 있으면 복원
-    if (viewportState) {
-      reactFlowInstance.setViewport(viewportState);
+  const reactFlowInstance = useRef<ReactFlowInstance>(null);
+
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    reactFlowInstance.current = instance;
+    if (viewportState && instance) {
+      // 복원 전 위치 유효성 검사
+      const isValidViewport = 
+        !isNaN(viewportState.x) && 
+        !isNaN(viewportState.y) && 
+        viewportState.zoom >= 0.1 && 
+        viewportState.zoom <= 1.5;
+        
+      if (isValidViewport) {
+        instance.setViewport(viewportState);
+      } else {
+        console.warn('유효하지 않은 뷰포트 상태:', viewportState);
+        instance.fitView({ padding: 0.1 });
+      }
     }
-    
-    // 저장된 노드 위치가 있으면 복원
-    if (Object.keys(nodePositions).length > 0) {
-      const updatedNodes = nodes.map(node => {
-        if (nodePositions[node.id]) {
-          return {
-            ...node,
-            position: nodePositions[node.id]
-          };
-        }
-        return node;
-      });
-      setNodes(updatedNodes);
-    }
-  }, [viewportState, nodePositions, setFlowInstance, setNodes]);
+  }, [viewportState]);
+  
+  useEffect(() => {
+    return () => {
+      const currentViewport = reactFlowInstance.current?.getViewport();
+      if (currentViewport) {
+        dispatch(setViewport(currentViewport));
+      }
+    };
+  }, [dispatch]);
   
   return (
     <div className="roadmap-container">
@@ -179,7 +196,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
           onInit={onInit}
           onViewportChange={onViewportChange}
           onNodeDragStop={onNodeDragStop}
-          fitView
+          fitView={false}
           minZoom={0.1}
           maxZoom={1.5}
         >

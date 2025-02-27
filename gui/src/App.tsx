@@ -36,6 +36,7 @@ import CurriculumList from './components/edu/CurriculumList';
 import CurriculumCategories from './pages/curriculumCategories';
 import GuideContent from './pages/guideContent';
 import RoadmapList from './pages/roadmapList';
+import { educationRoutes } from './routes/educationRoutes';
 
 declare global {
   interface Window {
@@ -73,44 +74,7 @@ const router = createMemoryRouter(
                    window.viewType === 'pearai.mem0View' ? <Mem0SidebarGUI /> :
                   <GUI />, // default to GUI if viewType is undefined or different
         },
-        {
-          path: "/education",
-          element: <EducationLayout />,
-          children: [
-            {
-              path: "",
-              element: <Navigate to="/education/home" replace />
-            },
-            {
-              path: "home",
-              element: <EducationHome />
-            },
-            {
-              path: "curriculum",
-              element: <CurriculumList />
-            },
-            {
-              path: "curriculum/:curriculumId",
-              element: <CurriculumCategories />
-            },
-            {
-              path: "curriculum/:curriculumId/category/:categoryIndex",
-              element: <GuideContent />
-            },
-            {
-              path: "roadmap",
-              element: <RoadmapList />
-            },
-            {
-              path: "roadmap/:roadmapId",
-              element: <RoadmapViewWrapper />
-            },
-            {
-              path: "roadmap/:roadmapId/content/:contentId",
-              element: <RoadmapContentView />
-            }
-          ]
-        },
+        ...educationRoutes,
         {
           path: "/perplexityMode",
           element: <PerplexityGUI />,

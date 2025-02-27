@@ -5,6 +5,7 @@ import serverStateReducer from "./slices/serverStateReducer";
 import stateReducer from "./slices/stateSlice";
 import uiStateReducer from "./slices/uiStateSlice";
 import roadmapReducer from './roadmapSlice';
+import { initialState as roadmapInitialState } from './roadmapSlice';
 
 import { createTransform, persistReducer, persistStore } from "redux-persist";
 import { createFilter } from "redux-persist-transform-filter";
@@ -53,11 +54,20 @@ const persistConfig = {
   key: "root",
   storage,
   blacklist: ['uiState'],
+  whitelist: ['roadmap'],
   transforms: [
     ...saveSubsetFilters,
     // windowIDTransform((window as any).windowId || "undefinedWindowId"),
   ],
   stateReconciler: autoMergeLevel2,
+  version: 1,
+  migrate: (state, version) => {
+    if (state && version !== 1) {
+      // 이전 버전 데이터 변환 로직
+      return { ...state, roadmap: roadmapInitialState };
+    }
+    return state;
+  }
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -72,5 +82,3 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
-export type AppDispatch = typeof store.dispatch;
