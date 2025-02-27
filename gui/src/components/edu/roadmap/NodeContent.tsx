@@ -1,16 +1,10 @@
 import React, { memo } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
+import { NodePropsType, NodeData } from './types';
 
-interface NodeData extends Record<string, unknown> {
-  title: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  column: string;
-}
-
-const NodeContent = (props: NodeProps) => {
-  // 타입 캐스팅으로 data에 안전하게 접근
+const NodeContent = memo((props: NodePropsType) => {
   const data = props.data as NodeData;
+  const { handles = { top: false, left: false, right: false, bottom: false, 'left-out': false, 'right-out': false } } = data;
   
   // 상태에 따른 배경색과 테두리색 설정
   const getNodeStyle = () => {
@@ -78,6 +72,6 @@ const NodeContent = (props: NodeProps) => {
       `}</style>
     </div>
   );
-};
+});
 
-export default memo(NodeContent); 
+export default NodeContent; 

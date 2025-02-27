@@ -1,0 +1,262 @@
+{
+  "nodes": [
+    {
+      "id": "group-1",
+      "type": "groupNode",
+      "position": {
+        "x": 350,
+        "y": 70
+      },
+      "style": {
+        "width": 300,
+        "height": 120,
+        "zIndex": -10
+      },
+      "data": {
+        "title": "기초",
+        "color": "#10b981"
+      }
+    },
+    {
+      "id": "group-2",
+      "type": "groupNode",
+      "position": {
+        "x": 350,
+        "y": 230
+      },
+      "style": {
+        "width": 300,
+        "height": 120,
+        "zIndex": -10
+      },
+      "data": {
+        "title": "변수와 자료형",
+        "color": "#3b82f6"
+      }
+    },
+    {
+      "id": "group-3",
+      "type": "groupNode",
+      "position": {
+        "x": 90,
+        "y": 400
+      },
+      "style": {
+        "width": 300,
+        "height": 120,
+        "zIndex": -10
+      },
+      "data": {
+        "title": "제어 구조",
+        "color": "#8b5cf6"
+      }
+    },
+    {
+      "id": "start",
+      "type": "roadmapNode",
+      "position": {
+        "x": 400,
+        "y": 20
+      },
+      "data": {
+        "title": "파이썬 학습 시작",
+        "description": "파이썬 프로그래밍 학습 여정을 시작합니다.",
+        "status": "completed",
+        "column": "시작",
+        "handles": {
+          "top": false,
+          "bottom": true,
+          "left": false,
+          "right": false,
+          "left-out": false,
+          "right-out": false
+        }
+      }
+    },
+    {
+      "id": "1-1",
+      "type": "roadmapNode",
+      "position": {
+        "x": 400,
+        "y": 120
+      },
+      "data": {
+        "title": "파이썬 소개",
+        "description": "파이썬 프로그래밍 언어의 특징과 활용 분야를 이해합니다.",
+        "status": "completed",
+        "column": "기초",
+        "handles": {
+          "top": true,
+          "bottom": true,
+          "left": false,
+          "right": false,
+          "left-out": false,
+          "right-out": false
+        }
+      }
+    },
+    {
+      "id": "2-1",
+      "type": "roadmapNode",
+      "position": {
+        "x": 400,
+        "y": 280
+      },
+      "data": {
+        "title": "변수와 기본 자료형",
+        "description": "문자열, 숫자, 불리언 등 기본 자료형과 변수 사용법을 학습합니다.",
+        "status": "in-progress",
+        "column": "변수와 자료형",
+        "handles": {
+          "top": true,
+          "bottom": true,
+          "left": false,
+          "right": false,
+          "left-out": true,
+          "right-out": false
+        }
+      }
+    },
+    {
+      "id": "3-1",
+      "type": "roadmapNode",
+      "position": {
+        "x": 110,
+        "y": 440
+      },
+      "data": {
+        "title": "조건문",
+        "description": "if, elif, else를 사용한 조건 분기를 학습합니다.",
+        "status": "not-started",
+        "column": "제어 구조",
+        "handles": {
+          "top": false,
+          "bottom": true,
+          "left": false,
+          "right": true,
+          "left-out": false,
+          "right-out": false
+        }
+      }
+    },
+    {
+      "id": "2-4",
+      "type": "roadmapNode",
+      "position": {
+        "x": 110,
+        "y": 280
+      },
+      "data": {
+        "title": "컬렉션 자료형",
+        "description": "리스트, 딕셔너리, 세트, 튜플 등의 복합 자료형을 학습합니다.",
+        "status": "not-started",
+        "column": "변수와 자료형",
+        "isOptional": true,
+        "handles": {
+          "top": false,
+          "bottom": false,
+          "left": false,
+          "right": true,
+          "left-out": false,
+          "right-out": false
+        }
+      }
+    },
+    {
+      "id": "adv-1",
+      "type": "roadmapNode",
+      "position": {
+        "x": 400,
+        "y": 610
+      },
+      "data": {
+        "title": "고급 제어 패턴",
+        "description": "고급 제어 흐름 패턴과 함수형 접근법을 학습합니다.",
+        "status": "not-started",
+        "column": "제어 구조",
+        "requiresSkill": [
+          "2-1",
+          "3-1"
+        ],
+        "handles": {
+          "top": true,
+          "bottom": false,
+          "left": true,
+          "right": false,
+          "left-out": false,
+          "right-out": false
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-start-1-1",
+      "source": "start",
+      "target": "1-1",
+      "type": "smoothstep",
+      "animated": true,
+      "style": {
+        "stroke": "#10b981",
+        "strokeWidth": 3
+      }
+    },
+    {
+      "id": "e-1-1-2-1",
+      "source": "1-1",
+      "target": "2-1",
+      "type": "smoothstep",
+      "style": {
+        "stroke": "#3b82f6",
+        "strokeWidth": 3
+      }
+    },
+    {
+      "id": "e-2-1-3-1",
+      "source": "2-1",
+      "target": "3-1",
+      "type": "default",
+      "sourceHandle": "left-out",
+      "targetHandle": "right",
+      "style": {
+        "stroke": "#8b5cf6",
+        "strokeWidth": 3
+      }
+    },
+    {
+      "id": "e-2-1-2-4",
+      "source": "2-1",
+      "target": "2-4",
+      "type": "default",
+      "sourceHandle": "left-out",
+      "targetHandle": "right",
+      "style": {
+        "stroke": "#3b82f6",
+        "strokeWidth": 2,
+        "strokeDasharray": "5,5"
+      }
+    },
+    {
+      "id": "e-2-1-adv-1",
+      "source": "2-1",
+      "target": "adv-1",
+      "type": "default",
+      "style": {
+        "stroke": "#8b5cf6",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e-3-1-adv-1",
+      "source": "3-1",
+      "target": "adv-1",
+      "type": "default",
+      "sourceHandle": "bottom",
+      "targetHandle": "left",
+      "style": {
+        "stroke": "#8b5cf6",
+        "strokeWidth": 2
+      }
+    }
+  ]
+} 

@@ -4,6 +4,18 @@ import axios from 'axios';
 import { CurriculumItem } from '../../types/curriculum';
 import RoadmapGenerator from './RoadmapGenerator';
 import RoadmapView from './RoadmapView';
+import { 
+    RoadmapCategory,
+    RoadmapMode
+} from './types';
+import { 
+    roleBadedRoadmaps, 
+    skillBasedRoadmaps, 
+    foundationRoadmaps, 
+    applicationAreaRoadmaps,
+    methodologyRoadmaps,
+    projectRoadmaps
+} from '../../data/roadmapData';
 
 // API 응답 타입 정의
 interface ApiResponse<T> {
@@ -51,15 +63,6 @@ interface CurriculumDocument {
         duration?: string;
     }[];
 }
-
-// 로드맵 카테고리 타입 정의 수정 - 최적화된 구조
-type RoadmapCategory = 
-  // 기본 관점
-  'role' | 'skill' | 'foundation' |
-  // 응용 관점
-  'application-area' | 'methodology' | 'project' |
-  // 학습자 관점
-  'learner-level' | 'goal' | 'learning-style' | 'time-investment';
 
 // 로드맵 아이템 타입 정의
 interface RoadmapItem {
@@ -141,484 +144,11 @@ const getRoleName = (roleId: string): string => {
     return roleNames[roleId] || roleId;
 };
 
-// 역할 기반 로드맵 데이터
-const roleBadedRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'frontend', 
-        title: '프론트엔드', 
-        category: 'role',
-        description: '웹 애플리케이션의 사용자 인터페이스와 상호작용을 개발하는 역할입니다.',
-        difficulty: 'intermediate',
-        icon: 'browser',
-        progress: 65,
-        reviewScore: 4.5,
-        duration: '3개월',
-        students: 1528,
-        lastUpdated: '2023-11-15',
-        steps: [
-            { title: 'HTML/CSS 기초', content: '', completed: true },
-            { title: 'JavaScript 기초', content: '', completed: true },
-            { title: '프레임워크 학습', content: '', completed: false },
-            { title: '상태 관리', content: '', completed: false }
-        ]
-    },
-    { 
-        id: 'backend', 
-        title: '백엔드', 
-        category: 'role',
-        description: '서버 측 로직과 데이터베이스 관리를 담당하는 역할입니다.',
-        difficulty: 'advanced',
-        icon: 'server',
-        progress: 40,
-        reviewScore: 4.2,
-        duration: '4개월',
-        students: 1245,
-        lastUpdated: '2023-10-20',
-        steps: [
-            { title: '서버 기초', content: '', completed: true },
-            { title: '데이터베이스', content: '', completed: false },
-            { title: 'API 개발', content: '', completed: false }
-        ]
-    },
-    { id: 'devops', title: '데브옵스', category: 'role', icon: 'gear' },
-    { id: 'fullstack', title: '풀스택', category: 'role', icon: 'layers' },
-    { id: 'ai-engineer', title: 'AI 엔지니어', category: 'role', icon: 'circuit-board' },
-    { id: 'data-analyst', title: '데이터 분석가', isNew: true, category: 'role', icon: 'graph' },
-    { id: 'ai-data-scientist', title: 'AI/데이터 사이언티스트', category: 'role' },
-    { id: 'android', title: '안드로이드', category: 'role' },
-    { id: 'ios', title: 'iOS', category: 'role' },
-    { id: 'postgresql', title: '포스트그레SQL', category: 'role' },
-    { id: 'blockchain', title: '블록체인', category: 'role' },
-    { id: 'qa', title: '품질 관리', category: 'role' },
-    { id: 'software-architect', title: '소프트웨어 아키텍트', category: 'role' },
-    { id: 'cyber-security', title: '사이버 보안', category: 'role' },
-    { id: 'ux-design', title: 'UX 디자인', category: 'role' },
-    { id: 'game-developer', title: '게임 개발자', category: 'role' },
-    { id: 'technical-writer', title: '기술 문서 작성자', category: 'role' },
-    { id: 'mlops', title: 'MLOps', category: 'role' },
-    { id: 'product-manager', title: '제품 관리자', category: 'role' },
-    { id: 'engineering-manager', title: '엔지니어링 관리자', category: 'role' },
-    { id: 'developer-relations', title: '개발자 관계', isNew: true, category: 'role' },
-    { 
-        id: 'automation-engineer', 
-        title: '자동화 엔지니어', 
-        category: 'role',
-        description: '업무 프로세스와 시스템을 자동화하는 솔루션을 개발하는 전문가',
-        icon: 'debug-step-over',
-        isNew: true
-    },
-];
-
-// 기술 기반 로드맵 데이터
-const skillBasedRoadmaps: RoadmapItem[] = [
-    { id: 'computer-science', title: '컴퓨터 과학', category: 'skill', icon: 'symbol-class' },
-    { id: 'react', title: '리액트', category: 'skill', icon: 'symbol-event' },
-    { id: 'vue', title: '뷰', category: 'skill', icon: 'symbol-color' },
-    { id: 'angular', title: '앵귤러', category: 'skill', icon: 'symbol-namespace' },
-    { id: 'javascript', title: '자바스크립트', category: 'skill' },
-    { id: 'nodejs', title: '노드JS', category: 'skill' },
-    { id: 'typescript', title: '타입스크립트', category: 'skill' },
-    { id: 'python', title: '파이썬', category: 'skill' },
-    { id: 'sql', title: 'SQL', category: 'skill' },
-    { id: 'system-design', title: '시스템 설계', category: 'skill' },
-    { id: 'api-design', title: 'API 설계', category: 'skill' },
-    { id: 'aspnet-core', title: 'ASP.NET Core', category: 'skill' },
-    { id: 'java', title: '자바', category: 'skill' },
-    { id: 'cpp', title: 'C++', category: 'skill' },
-    { id: 'flutter', title: '플러터', category: 'skill' },
-    { id: 'spring-boot', title: '스프링 부트', category: 'skill' },
-    { id: 'go', title: 'Go 로드맵', category: 'skill' },
-    { id: 'rust', title: '러스트', category: 'skill' },
-    { id: 'graphql', title: 'GraphQL', category: 'skill' },
-    { id: 'design-architecture', title: '설계와 아키텍처', category: 'skill' },
-    { id: 'design-system', title: '디자인 시스템', category: 'skill' },
-    { id: 'react-native', title: '리액트 네이티브', category: 'skill' },
-    { id: 'aws', title: 'AWS', category: 'skill' },
-    { id: 'code-review', title: '코드 리뷰', category: 'skill' },
-    { id: 'docker', title: '도커', category: 'skill' },
-    { id: 'kubernetes', title: '쿠버네티스', category: 'skill' },
-    { id: 'linux', title: '리눅스', category: 'skill' },
-    { id: 'mongodb', title: '몽고DB', category: 'skill' },
-    { id: 'prompt-engineering', title: '프롬프트 엔지니어링', category: 'skill' },
-    { id: 'terraform', title: '테라폼', category: 'skill' },
-    { id: 'data-structures', title: '자료구조와 알고리즘', category: 'skill' },
-    { id: 'git-github', title: 'Git과 GitHub', category: 'skill' },
-    { id: 'redis', title: '레디스', category: 'skill' },
-    { id: 'php', title: 'PHP', isNew: true, category: 'skill' },
-    { id: 'cloudflare', title: '클라우드플레어', isNew: true, category: 'skill' },
-    { 
-        id: 'unity', 
-        title: '유니티', 
-        category: 'skill',
-        description: '인기 있는 크로스 플랫폼 게임 엔진 및 개발 환경',
-        icon: 'cube'
-    },
-    { 
-        id: 'unreal-engine', 
-        title: '언리얼 엔진', 
-        category: 'skill',
-        description: '고품질 3D 게임 및 시뮬레이션을 위한 전문 게임 엔진',
-        icon: 'lightbulb'
-    },
-    { 
-        id: 'rpa', 
-        title: 'RPA (로봇 프로세스 자동화)', 
-        category: 'skill',
-        description: '반복적인 업무를 자동화하는 소프트웨어 로봇 기술',
-        icon: 'run-all',
-        isNew: true
-    },
-];
-
-// 응용 영역(domain + industry 통합) 로드맵 데이터 수정 - 중복 항목 제거
-const applicationAreaRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'automation', 
-        title: '자동화', 
-        category: 'application-area',
-        description: '소프트웨어를 활용한 업무 프로세스 자동화와 로봇 프로세스 자동화(RPA) 기술',
-        icon: 'debug-restart',
-        difficulty: 'intermediate',
-        duration: '2개월',
-        reviewScore: 4.6,
-        isNew: true
-    },
-    { 
-        id: 'game-development', 
-        title: '게임 개발', 
-        category: 'application-area',
-        description: '다양한 플랫폼용 게임 개발 및 게임 엔진 활용 기술',
-        icon: 'layout-centered',
-        difficulty: 'advanced',
-        duration: '6개월',
-        reviewScore: 4.8
-    },
-    {
-        id: 'game-design', 
-        title: '게임 디자인', 
-        category: 'application-area',
-        description: '게임 메커니즘, 레벨 디자인, 사용자 경험 설계에 관한 학습',
-        icon: 'preview',
-        difficulty: 'intermediate',
-        duration: '3개월'
-    },
-    { 
-        id: 'web-dev', 
-        title: '웹 개발', 
-        category: 'application-area',
-        description: '웹 애플리케이션 및 웹사이트 개발을 위한 기술과 도구',
-        difficulty: 'intermediate',
-        icon: 'globe', 
-        steps: [
-            { title: '프론트엔드 기초', content: '', completed: true },
-            { title: '백엔드 기초', content: '', completed: true },
-            { title: '웹 보안', content: '', completed: false }
-        ]
-    },
-    { 
-        id: 'mobile-dev', 
-        title: '모바일 개발', 
-        category: 'application-area',
-        description: 'iOS와 Android 앱 개발을 위한 기술과 프레임워크',
-        difficulty: 'intermediate',
-        icon: 'device-mobile'
-    },
-    { 
-        id: 'ai-ml', 
-        title: 'AI & 머신러닝', 
-        category: 'application-area',
-        description: '인공지능, 머신러닝, 딥러닝 기술 학습',
-        difficulty: 'advanced',
-        icon: 'brain'
-    },
-    { 
-        id: 'data-science', 
-        title: '데이터 사이언스', 
-        category: 'application-area',
-        icon: 'dashboard'
-    },
-    { id: 'e-commerce', title: '이커머스', category: 'application-area' },
-];
-
-// 학습자 수준(career-level + difficulty 통합) 로드맵 데이터
-const learnerLevelRoadmaps: RoadmapItem[] = [
-    // 기존 난이도 기반 항목
-    { 
-        id: 'beginner-friendly', 
-        title: '입문자 과정', 
-        category: 'learner-level',
-        description: '프로그래밍 경험이 없는 사람도 시작할 수 있는 로드맵',
-        difficulty: 'beginner',
-        icon: 'smiley',
-        steps: [
-            { title: '프로그래밍 기초 개념', content: '', completed: false },
-            { title: '첫 프로그램 작성하기', content: '', completed: false },
-            { title: '간단한 프로젝트', content: '', completed: false }
-        ]
-    },
-    { 
-        id: 'intermediate-challenge', 
-        title: '중급자 과정', 
-        category: 'learner-level',
-        description: '기본기를 가진 개발자를 위한 심화 과정',
-        difficulty: 'intermediate',
-        icon: 'thumbsup'
-    },
-    { 
-        id: 'expert-mastery', 
-        title: '전문가 과정', 
-        category: 'learner-level',
-        description: '고급 개념과 복잡한 시스템을 다루는 로드맵',
-        difficulty: 'advanced',
-        icon: 'star-full'
-    },
-    
-    // 기존 경력 수준 항목
-    { 
-        id: 'junior-dev', 
-        title: '주니어 개발자', 
-        category: 'learner-level',
-        description: '0-2년 경력 개발자를 위한 로드맵',
-        difficulty: 'beginner',
-        icon: 'rocket'
-    },
-    { 
-        id: 'mid-level-dev', 
-        title: '미드레벨 개발자', 
-        category: 'learner-level',
-        description: '2-5년 경력 개발자를 위한 로드맵',
-        difficulty: 'intermediate',
-        icon: 'graph'
-    },
-    { 
-        id: 'senior-dev', 
-        title: '시니어 개발자', 
-        category: 'learner-level',
-        description: '5년 이상 경력 개발자를 위한 로드맵',
-        difficulty: 'advanced',
-        icon: 'verified'
-    }
-];
-
-// 프로젝트 유형 기반 로드맵
-const projectRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'ecommerce', 
-        title: '이커머스 플랫폼', 
-        category: 'project',
-        description: '온라인 쇼핑몰 및 마켓플레이스 개발 로드맵',
-        difficulty: 'intermediate',
-        icon: 'cart'
-    },
-    { 
-        id: 'saas-app', 
-        title: 'SaaS 애플리케이션', 
-        category: 'project',
-        description: '구독 기반 소프트웨어 서비스 개발 로드맵',
-        difficulty: 'advanced',
-        icon: 'multiple-windows'
-    },
-    { 
-        id: 'social-network', 
-        title: '소셜 네트워크', 
-        category: 'project',
-        description: '소셜 미디어 플랫폼 개발 로드맵',
-        difficulty: 'intermediate',
-        icon: 'organization'
-    },
-    { 
-        id: 'content-platform', 
-        title: '콘텐츠 플랫폼', 
-        category: 'project',
-        description: '비디오/오디오 스트리밍 플랫폼 개발 로드맵',
-        difficulty: 'advanced',
-        icon: 'play'
-    }
-];
-
-// 개발 방법론 기반 로드맵
-const methodologyRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'agile', 
-        title: '애자일 개발', 
-        category: 'methodology',
-        description: '애자일 방법론을 활용한 개발 프로세스 학습',
-        difficulty: 'intermediate',
-        icon: 'iterations'
-    },
-    { 
-        id: 'tdd', 
-        title: '테스트 주도 개발', 
-        category: 'methodology',
-        description: 'TDD 방식으로 개발하는 방법론 학습',
-        difficulty: 'intermediate',
-        icon: 'beaker'
-    },
-    { 
-        id: 'devops-ci-cd', 
-        title: 'CI/CD 파이프라인', 
-        category: 'methodology',
-        description: '지속적 통합/배포 방법론 학습',
-        difficulty: 'advanced',
-        icon: 'sync'
-    },
-    { 
-        id: 'microservices', 
-        title: '마이크로서비스', 
-        category: 'methodology',
-        description: '마이크로서비스 아키텍처 개발 접근법',
-        icon: 'split-horizontal'
-    },
-    { 
-        id: 'domain-driven', 
-        title: '도메인 주도 설계', 
-        category: 'methodology',
-        difficulty: 'advanced',
-        icon: 'type-hierarchy'
-    }
-];
-
-// 학습 목표 기반 로드맵
-const goalBasedRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'job-ready', 
-        title: '취업 준비', 
-        category: 'goal',
-        description: '개발자 채용 시장에 빠르게 진입하기 위한 로드맵',
-        difficulty: 'beginner',
-        icon: 'briefcase',
-        steps: [
-            { title: '기본 기술 습득', content: '', completed: false },
-            { title: '포트폴리오 구성', content: '', completed: false },
-            { title: '기술 면접 준비', content: '', completed: false }
-        ]
-    },
-    { 
-        id: 'skill-upgrade', 
-        title: '역량 강화', 
-        category: 'goal',
-        description: '기존 기술을 더 심화하거나 새로운 기술을 습득하는 로드맵',
-        difficulty: 'intermediate',
-        icon: 'graph-line'
-    },
-    { 
-        id: 'certification', 
-        title: '자격증 취득', 
-        category: 'goal',
-        description: 'AWS, Azure, Google Cloud 등 기술 자격증 준비 로드맵',
-        difficulty: 'intermediate',
-        icon: 'verified'
-    },
-    { 
-        id: 'freelance', 
-        title: '프리랜서 준비', 
-        category: 'goal',
-        description: '독립 개발자/프리랜서로 활동하기 위한 로드맵',
-        icon: 'person'
-    }
-];
-
-// 학습 방식 기반 로드맵
-const learningStyleRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'hands-on', 
-        title: '실습 중심 학습', 
-        category: 'learning-style',
-        description: '실제 프로젝트를 만들며 배우는 방식',
-        difficulty: 'beginner',
-        icon: 'tools'
-    },
-    { 
-        id: 'theory-first', 
-        title: '이론 중심 학습', 
-        category: 'learning-style',
-        description: '개념과 원리를 먼저 이해하는 방식',
-        difficulty: 'intermediate',
-        icon: 'book'
-    },
-    { 
-        id: 'challenge-based', 
-        title: '도전 과제 기반 학습', 
-        category: 'learning-style',
-        description: '문제를 해결하며 배우는 방식',
-        difficulty: 'intermediate',
-        icon: 'puzzle'
-    },
-    { 
-        id: 'peer-learning', 
-        title: '동료 학습', 
-        category: 'learning-style',
-        description: '팀 프로젝트와 코드 리뷰를 통한 학습',
-        icon: 'accounts'
-    }
-];
-
-// 학습 시간 투자 기반 로드맵
-const timeInvestmentRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'quick-path', 
-        title: '빠른 학습 경로', 
-        category: 'time-investment',
-        description: '필수 개념만 집중적으로 학습하는 최소 시간 경로',
-        difficulty: 'beginner',
-        icon: 'clock'
-    },
-    { 
-        id: 'balanced-path', 
-        title: '균형 잡힌 경로', 
-        category: 'time-investment',
-        description: '이론과 실습의 균형이 잡힌 중간 시간 투자 경로',
-        difficulty: 'intermediate',
-        icon: 'balance-scale'
-    },
-    { 
-        id: 'deep-path', 
-        title: '깊이 있는 경로', 
-        category: 'time-investment',
-        description: '근본 원리부터 고급 구현까지 철저히 이해하는 장기 투자 경로',
-        difficulty: 'advanced',
-        icon: 'milestone'
-    }
-];
-
-// 기초 지식 기반 로드맵
-const foundationRoadmaps: RoadmapItem[] = [
-    { 
-        id: 'computer-science-foundation', 
-        title: '컴퓨터 과학 기초', 
-        category: 'foundation',
-        description: '알고리즘, 자료구조, 운영체제 등 기초 컴퓨터 과학 지식',
-        difficulty: 'intermediate',
-        icon: 'library'
-    },
-    { 
-        id: 'math-foundation', 
-        title: '수학적 기초', 
-        category: 'foundation',
-        description: '선형대수, 확률, 통계 등 개발자를 위한 필수 수학',
-        difficulty: 'intermediate',
-        icon: 'symbol-numeric'
-    },
-    { 
-        id: 'software-principles', 
-        title: '소프트웨어 원칙', 
-        category: 'foundation',
-        description: '디자인 패턴, 아키텍처 원칙, 클린 코드 등 영속적인 소프트웨어 개발 원칙',
-        difficulty: 'advanced',
-        icon: 'checklist'
-    },
-    { 
-        id: 'problem-solving', 
-        title: '문제 해결 능력', 
-        category: 'foundation',
-        description: '분석적 사고와 문제 해결 능력을 키우는 로드맵',
-        difficulty: 'intermediate',
-        icon: 'lightbulb'
-    }
-];
-
-// 로드맵 모드 타입 수정
-type RoadmapMode = 'browse' | 'generate';
+// 로드맵 표시 방식 상수
+const ROADMAP_MODES = {
+    BROWSE: 'browse',
+    RECOMMENDED: 'recommended'
+} as const;
 
 const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [], viewType = 'curriculum' }) => {
     const [loading, setLoading] = useState(false);
@@ -646,17 +176,17 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
         
         switch (type) {
             case 'role':
-                return roleBadedRoadmaps;
+                return roleBadedRoadmaps as unknown as RoadmapItem[];
             case 'skill':
-                return skillBasedRoadmaps;
+                return skillBasedRoadmaps as unknown as RoadmapItem[];
             case 'foundation':
-                return foundationRoadmaps;
+                return foundationRoadmaps as unknown as RoadmapItem[];
             case 'application-area':
-                return applicationAreaRoadmaps;
+                return applicationAreaRoadmaps as unknown as RoadmapItem[];
             case 'methodology':
-                return methodologyRoadmaps;
+                return methodologyRoadmaps as unknown as RoadmapItem[];
             case 'project':
-                return projectRoadmaps;
+                return projectRoadmaps as unknown as RoadmapItem[];
             default:
                 console.warn(`지원되지 않는 로드맵 유형: ${type}`);
                 return [];
@@ -693,7 +223,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
     const handleItemClick = (id: string, item: any) => {
         // 파이썬 로드맵의 경우 특별 처리
         if (id === 'python') {
-            alert('파이썬 로드맵은 준비 중입니다. 다른 로드맵을 선택해주세요.');
+            // 파이썬은 준비됐다고 가정
+            setSelectedRoadmap(id);
+            setShowRoadmapView(true);
+            onSelect(id);
             return;
         }
         
@@ -775,34 +308,17 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
 
     // 추가 아이콘 매핑 정의 (아이콘이 없는 항목용)
     const getIconForItem = (item: any): string => {
-        // 이미 아이콘이 있는 경우 그대로 사용
         if (item.icon) return item.icon;
         
-        // 카테고리별 기본 아이콘
-        const categoryIcons: Record<string, string> = {
-            'role': 'person',
-            'skill': 'tools',
-            'foundation': 'book',
-            'application-area': 'globe',
-            'methodology': 'organization',
-            'project': 'folder-type',
-            'learner-level': 'graph',
-            'goal': 'target',
-            'learning-style': 'pencil',
-            'time-investment': 'watch'
-        };
-        
-        // 제목에 따른 특정 기술 아이콘
-        if (item.title.includes('Python') || item.title.includes('파이썬')) return 'symbol-namespace';
-        if (item.title.includes('Java') || item.title.includes('자바')) return 'coffee';
-        if (item.title.includes('React') || item.title.includes('리액트')) return 'react';
-        if (item.title.includes('Angular') || item.title.includes('앵귤러')) return 'symbol-event';
-        if (item.title.includes('Vue') || item.title.includes('뷰')) return 'symbol-color';
-        if (item.title.includes('Node') || item.title.includes('노드')) return 'nodejs';
-        if (item.title.includes('Database') || item.title.includes('데이터베이스')) return 'database';
-        
-        // 카테고리별 기본 아이콘 반환
-        return categoryIcons[item.category] || 'symbol-misc';
+        if (item.type === 'roadmap') {
+            return 'project';
+        } else if (item.type === 'tutorial') {
+            return 'book';
+        } else if (item.category === 'python') {
+            return 'symbol-method';
+        } else {
+            return 'library';
+        }
     };
 
     // 아이템 렌더링 함수 개선
@@ -916,18 +432,10 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ selectedId, onSelect, items = [],
             
             {/* 로드맵 뷰 표시 */}
             {showRoadmapView && selectedRoadmap && (
-                <div className="roadmap-view-wrapper">
-                    <div className="roadmap-header">
-                        <button onClick={() => setShowRoadmapView(false)} className="back-button">
-                            <i className="codicon codicon-arrow-left"></i> 돌아가기
-                        </button>
-                        <h2 className="roadmap-title">{selectedRoadmap} 로드맵</h2>
-                    </div>
-                    <div className="roadmap-content">
-                        <p>로드맵 내용은 곧 제공될 예정입니다.</p>
-                        <p>선택된 로드맵: {selectedRoadmap}</p>
-                    </div>
-                </div>
+                <RoadmapView 
+                    roadmapId={selectedRoadmap} 
+                    onBack={() => setShowRoadmapView(false)} 
+                />
             )}
             
             {/* 로드맵 둘러보기 모드 - 로드맵 뷰가 표시되지 않을 때만 보여줌 */}

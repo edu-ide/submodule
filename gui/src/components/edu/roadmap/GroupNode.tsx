@@ -1,13 +1,13 @@
 import React, { memo } from 'react';
-import { NodeProps } from '@xyflow/react';
+import { NodePropsType } from './types';
 
 interface GroupData extends Record<string, unknown> {
   title: string;
   color: string;
 }
 
-const GroupNode = (props: NodeProps) => {
-  const data = props.data as GroupData;
+const GroupNode = memo((props: NodePropsType) => {
+  const data = props.data as any;
   
   return (
     <div className="group-node" style={{ borderColor: data.color }}>
@@ -36,6 +36,6 @@ const GroupNode = (props: NodeProps) => {
       `}</style>
     </div>
   );
-};
+});
 
-export default memo(GroupNode); 
+export default GroupNode; 
