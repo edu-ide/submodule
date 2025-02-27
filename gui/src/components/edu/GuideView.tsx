@@ -3,18 +3,65 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CurriculumItem } from '../../types/curriculum';
-import { CURRICULUM_DATA } from '../../data/curriculumData';
 import type { Components } from 'react-markdown';
 import { IdeMessengerContext } from '../../context/IdeMessenger';
 import { useWebviewListener } from '../../hooks/useWebviewListener';
 // core 프로토콜에서 정의된 타입 임포트
 import { EditorContent } from 'core/protocol/types.js';
+import axios from 'axios';
 
 interface GuideViewProps {
   tutorialId?: string;
   onClose: () => void;
   isMobileView?: boolean;
   initialStep?: number;
+}
+
+// API 응답 타입 정의 추가
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message: string | null;
+  error: string | null;
+}
+
+// CurriculumDocument 타입 정의 (백엔드와 일치)
+interface CurriculumDocument {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  difficulty: string;
+  duration: string;
+  students: number;
+  progress: number;
+  status: string;
+  lastUpdated: string;
+  source: string;
+  sourceId: string;
+  type: string;
+  uniqueId: string;
+  tags: string[];
+  steps: {
+    title: string;
+    content: string;
+    completed: boolean;
+    codingTask?: {
+      prompt: string;
+      hint: string;
+      initialFiles: {
+        name: string;
+        content: string;
+      }[];
+      expectedFiles: string[];
+    };
+    evaluation?: {
+      criteria: string;
+      successMessage: string;
+      failureMessage: string;
+    };
+    duration: string;
+  }[];
 }
 
 function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 }: GuideViewProps) {
@@ -27,6 +74,11 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [feedback, setFeedback] = useState<{ score: number; comments: string[]; suggestions: string[]; } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [curriculumData, setCurriculumData] = useState<CurriculumDocument[]>([]);
+  const [curriculumList, setCurriculumList] = useState<CurriculumDocument[]>([]);
+  const [showList, setShowList] = useState(!tutorialId);
   
   // 직접 DOM 조작으로 토스트 메시지 표시 (React 렌더링과 독립적)
   const showToastDirectly = useCallback((message: string) => {
@@ -62,12 +114,283 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
   
 
 
-  const tutorial = React.useMemo(() => {
-    if (!tutorialId) return null;
-    const found = CURRICULUM_DATA.find(item => item.id === tutorialId);
-    console.log('Found tutorial:', found);
-    return found;
+  // 백엔드에서 커리큘럼 데이터 가져오기
+  useEffect(() => {
+    const fetchCurriculumData = async () => {
+      if (!tutorialId) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // API 엔드포인트 호출
+        const response = await axios.get<ApiResponse<CurriculumDocument>>(`/api/v1/curriculums/${tutorialId}`);
+        
+        if (response.data.success && response.data.data) {
+          // 단일 커리큘럼 데이터 설정
+          setCurriculumData([response.data.data]);
+          console.log('커리큘럼 데이터 로드 완료:', response.data.data);
+        } else {
+          setError(response.data.message || '데이터를 불러오는데 실패했습니다.');
+        }
+      } catch (err) {
+        console.error('커리큘럼 데이터 로딩 중 오류 발생:', err);
+        setError('커리큘럼 데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurriculumData();
   }, [tutorialId]);
+
+  // 전체 커리큘럼 목록 가져오기
+  useEffect(() => {
+    const fetchCurriculumList = async () => {
+      if (tutorialId) return; // 특정 튜토리얼 ID가 있으면 목록을 가져오지 않음
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // 전체 커리큘럼 API 엔드포인트 호출
+        const response = await axios.get<ApiResponse<CurriculumDocument[]>>('/api/v1/curriculums');
+        
+        if (response.data.success && response.data.data) {
+          setCurriculumList(response.data.data);
+          console.log('커리큘럼 목록 로드 완료:', response.data.data);
+        } else {
+          setError(response.data.message || '목록을 불러오는데 실패했습니다.');
+        }
+      } catch (err) {
+        console.error('커리큘럼 목록 로딩 중 오류 발생:', err);
+        setError('커리큘럼 목록을 불러오는데 실패했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurriculumList();
+  }, [tutorialId]);
+
+  const tutorial = React.useMemo(() => {
+    if (!tutorialId || curriculumData.length === 0) return null;
+    
+    // API에서 가져온 데이터를 CurriculumItem 형식으로 변환
+    const apiData = curriculumData[0];
+    
+    // difficulty 타입 변환 함수
+    const convertDifficulty = (diff: string): "beginner" | "intermediate" | "advanced" => {
+      switch(diff.toLowerCase()) {
+        case "beginner":
+        case "초급":
+          return "beginner";
+        case "intermediate":
+        case "중급":
+          return "intermediate";
+        case "advanced":
+        case "고급":
+          return "advanced";
+        default:
+          return "beginner"; // 기본값
+      }
+    };
+    
+    const convertedTutorial: CurriculumItem = {
+      id: apiData.id,
+      title: apiData.title,
+      description: apiData.description,
+      category: apiData.category,
+      difficulty: convertDifficulty(apiData.difficulty), // 타입 변환
+      duration: apiData.duration,
+      steps: apiData.steps.map(step => ({
+        title: step.title,
+        content: step.content,
+        codingTask: step.codingTask ? {
+          description: step.codingTask.prompt || "", // prompt를 description으로 사용
+          requirements: [step.codingTask.prompt],
+          initialFiles: Object.fromEntries(
+            (step.codingTask.initialFiles || []).map(file => [file.name, file.content])
+          ), // 파일 형식 변환
+          expectedFiles: step.codingTask.expectedFiles
+        } : undefined
+      }))
+    };
+    
+    console.log('변환된 튜토리얼 데이터:', convertedTutorial);
+    return convertedTutorial;
+  }, [tutorialId, curriculumData]);
+
+  // 특정 튜토리얼 선택 처리
+  const handleSelectTutorial = (id: string) => {
+    // 선택한 튜토리얼로 이동하는 로직 (URL 변경 등)
+    // 예: window.location.href = `/tutorial/${id}`;
+    
+    // 또는 상태로 관리
+    const selected = curriculumList.find(item => item.id === id);
+    if (selected) {
+      setCurriculumData([selected]);
+      setShowList(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="guide-view-loading">
+        <p>커리큘럼 데이터를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="guide-view-error">
+        <p>오류: {error}</p>
+        <button onClick={onClose} className="nav-button">닫기</button>
+      </div>
+    );
+  }
+
+  if (showList) {
+    return (
+      <div className={`guide-view ${isMobileView ? 'mobile-view' : ''}`}>
+        <style>{`
+          .guide-view {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            z-index: 1000;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            padding-bottom: 60px;
+            position: relative;
+          }
+
+          .guide-view-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--vscode-editor-background);
+          }
+
+          .curriculum-list {
+            padding: 20px;
+            overflow-y: auto;
+          }
+
+          .curriculum-card {
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            background-color: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+
+          .curriculum-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          .curriculum-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+          }
+
+          .curriculum-description {
+            font-size: 0.9rem;
+            color: var(--vscode-descriptionForeground);
+            margin-bottom: 12px;
+          }
+
+          .curriculum-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.8rem;
+          }
+
+          .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          }
+
+          .difficulty-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+          }
+
+          .difficulty-beginner {
+            background-color: #4caf50;
+            color: white;
+          }
+
+          .difficulty-intermediate {
+            background-color: #ff9800;
+            color: white;
+          }
+
+          .difficulty-advanced {
+            background-color: #f44336;
+            color: white;
+          }
+        `}</style>
+
+        {!isMobileView && (
+          <div className="guide-view-header">
+            <div className="header-content">
+              <h2>커리큘럼 목록</h2>
+            </div>
+            <button onClick={onClose} className="close-button">
+              ×
+            </button>
+          </div>
+        )}
+
+        <div className="curriculum-list">
+          {curriculumList.length === 0 ? (
+            <div className="no-results">
+              <p>사용 가능한 커리큘럼이 없습니다.</p>
+            </div>
+          ) : (
+            curriculumList.map(curriculum => (
+              <div 
+                key={curriculum.id} 
+                className="curriculum-card"
+                onClick={() => handleSelectTutorial(curriculum.id)}
+              >
+                <div className="curriculum-title">{curriculum.title}</div>
+                <div className="curriculum-description">{curriculum.description}</div>
+                <div className="curriculum-meta">
+                  <div className="meta-item">
+                    <span className={`difficulty-badge difficulty-${curriculum.difficulty.toLowerCase()}`}>
+                      {curriculum.difficulty}
+                    </span>
+                  </div>
+                  <div className="meta-item">
+                    <span>⏱️ {curriculum.duration}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span>📚 {curriculum.category}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (!tutorial) {
     console.log('No tutorial found, returning null');
@@ -190,6 +513,10 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
     setCurrentStep(initialStep);
   }, [initialStep]);
 
+  // 튜토리얼 보기에서 목록으로 돌아가는 버튼 추가
+  const handleBackToList = () => {
+    setShowList(true);
+  };
 
   return (
     <div className={`guide-view ${isMobileView ? 'mobile-view' : ''}`}>
@@ -456,9 +783,25 @@ function GuideView({ tutorialId, onClose, isMobileView = false, initialStep = 0 
               Step {currentStep + 1} of {tutorial.steps.length}
             </div>
           </div>
-          <button onClick={onClose} className="close-button">
-            ×
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={handleBackToList} 
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--vscode-button-background)',
+                color: 'var(--vscode-button-background)',
+                padding: '4px 10px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              목록으로
+            </button>
+            <button onClick={onClose} className="close-button">
+              ×
+            </button>
+          </div>
         </div>
       )}
       <div className="guide-view-content">

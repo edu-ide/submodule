@@ -2,15 +2,29 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/edu/Layout';
 import EducationGUI from '../components/edu/EducationGUI';
 import GuideView from '../components/edu/GuideView';
+import RoadmapView from '../components/edu/RoadmapView';
+import CurriculumView from '../components/edu/CurriculumView';
 import { CURRICULUM_DATA } from '../data/curriculumData';
+
+// 네비게이션 아이템 타입 확장
+type NavigationType = 'curriculum' | 'category' | 'roadmap';
+interface NavigationItem {
+  id: string;
+  title: string;
+  type: NavigationType;
+}
 
 const EducationPage: React.FC = () => {
   console.log('교육 페이지 렌더링 중...');
+  
+  // 상태 확장 - 로드맵 관련 상태 추가
   const [selectedTutorial, setSelectedTutorial] = useState<string | undefined>(undefined);
   const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
+  const [selectedRoadmap, setSelectedRoadmap] = useState<string | undefined>(undefined);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
-  const [navigationStack, setNavigationStack] = useState<Array<{id: string, title: string, type: 'curriculum' | 'category'}>>([]);
+  const [navigationStack, setNavigationStack] = useState<NavigationItem[]>([]);
   const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
+  const [activeView, setActiveView] = useState<'curriculum' | 'roadmap'>('curriculum');
 
   // 커리큘럼을 선택했을 때 호출되는 함수
   const handleTutorialSelect = (tutorialId: string) => {
@@ -21,16 +35,45 @@ const EducationPage: React.FC = () => {
       return;
     }
     
+    // 로드맵 모드였다면 커리큘럼 모드로 전환
+    setActiveView('curriculum');
+    
     // 선택된 커리큘럼 정보 찾기
     const tutorial = CURRICULUM_DATA.find(item => item.id === tutorialId);
     if (tutorial) {
       setSlideDirection('forward');
       setSelectedTutorial(tutorialId);
+      setSelectedRoadmap(undefined); // 로드맵 선택 해제
       // 가이드 열지 않고 중간 단계(카테고리 목록)만 표시
       setIsGuideOpen(false);
       setSelectedCategory(undefined);
       setNavigationStack(prev => [...prev, {id: tutorialId, title: tutorial.title, type: 'curriculum'}]);
     }
+  };
+  
+  // 로드맵을 선택했을 때 호출되는 함수
+  const handleRoadmapSelect = (roadmapId: string) => {
+    if (!roadmapId) {
+      setSelectedRoadmap(undefined);
+      return;
+    }
+    
+    // 커리큘럼 모드였다면 로드맵 모드로 전환
+    setActiveView('roadmap');
+    
+    // 로드맵 선택 처리
+    setSlideDirection('forward');
+    setSelectedRoadmap(roadmapId);
+    setSelectedTutorial(undefined); // 커리큘럼 선택 해제
+    setIsGuideOpen(false);
+    setSelectedCategory(undefined);
+    
+    // 로드맵 ID를 대시로 구분된 단어로 보고 제목 생성
+    const title = roadmapId.split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+    
+    setNavigationStack(prev => [...prev, {id: roadmapId, title: `${title} 로드맵`, type: 'roadmap'}]);
   };
 
   // 카테고리를 선택했을 때 호출되는 함수
@@ -64,6 +107,8 @@ const EducationPage: React.FC = () => {
         setSelectedCategory(undefined);
       } else if (popped?.type === 'curriculum') {
         setSelectedTutorial(undefined);
+      } else if (popped?.type === 'roadmap') {
+        setSelectedRoadmap(undefined);
       }
       
       setNavigationStack(newStack);
@@ -91,22 +136,32 @@ const EducationPage: React.FC = () => {
     <Layout>
       <div className="education-page-container">
         <div className={`screen-container ${navigationStack.length > 0 ? 'shifted-' + navigationStack.length : ''} ${slideDirection}`}>
-          {/* 첫 번째 화면: 커리큘럼 목록 */}
+          {/* 첫 번째 화면: 커리큘럼/로드맵 목록 */}
           <div className="screen main-screen">
             <EducationGUI 
-              onSelectCurriculum={handleTutorialSelect} 
+              onSelectCurriculum={handleTutorialSelect}
               onSelectCategory={handleCategorySelect}
-              selectedCurriculumId={undefined} // 항상 메인 목록 표시
+              selectedCurriculumId={undefined} 
+              onSelectRoadmap={handleRoadmapSelect}
+              selectedRoadmapId={undefined}
+              activeView={activeView}
+              onChangeView={setActiveView}
             />
           </div>
           
-          {/* 두 번째 화면: 카테고리 선택 */}
-          <div className="screen category-screen">
+          {/* 두 번째 화면: 카테고리 선택 또는 로드맵 상세 */}
+          <div className="screen second-screen">
             {selectedTutorial && !isGuideOpen && (
-              <EducationGUI 
-                onSelectCurriculum={handleTutorialSelect}
+              <CurriculumView 
+                curriculumId={selectedTutorial}
+                onBack={handleBack}
                 onSelectCategory={handleCategorySelect}
-                selectedCurriculumId={selectedTutorial}
+              />
+            )}
+            {selectedRoadmap && (
+              <RoadmapView 
+                roadmapId={selectedRoadmap} 
+                onBack={handleBack} 
               />
             )}
           </div>
@@ -166,7 +221,7 @@ const EducationPage: React.FC = () => {
           overflow: auto;
         }
         
-        .category-screen {
+        .second-screen {
           display: flex;
           flex-direction: column;
         }

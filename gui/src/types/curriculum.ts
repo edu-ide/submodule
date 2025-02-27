@@ -5,6 +5,7 @@ export interface CurriculumItem {
   category: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   steps: CurriculumStep[];
+  duration: string;
 }
 
 export interface CodingTask {
@@ -38,6 +39,7 @@ export interface CurriculumStep {
     code: string;
     language?: string;
   }>;
+  duration: string; // 각 단계별 소요 시간
 }
 
 export interface CurriculumState {
