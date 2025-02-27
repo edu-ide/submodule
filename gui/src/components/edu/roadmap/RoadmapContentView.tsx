@@ -99,9 +99,7 @@ const RoadmapContentView: React.FC = () => {
   return (
     <div className="roadmap-content-view">
       <div className="roadmap-content-header">
-        <button className="back-button" onClick={handleBack}>
-          ← 로드맵으로 돌아가기
-        </button>
+ 
         <h1>{contentData.title}</h1>
         <p className="description">{contentData.description}</p>
       </div>
