@@ -1,81 +1,112 @@
 import React, { memo } from 'react';
-import { Handle, Position } from '@xyflow/react';
-import { NodeData, NodePropsType } from '../types';
+import { Handle, Position, NodeProps } from '@xyflow/react';
 
-const NodeContent = memo((props: NodePropsType) => {
-  const data = props.data as NodeData;
-  const { handles = { top: false, left: false, right: false, bottom: false, 'left-out': false, 'right-out': false } } = data;
+// 타입 명시적 정의
+interface NodeDataType {
+  name?: string;
+  label?: string;
+  title?: string;
+  description?: string;
+  status?: string;
+  direction?: string;
+  isRoot?: boolean;
+  isMainNode?: boolean;
+  hasChildren?: boolean;
+}
+
+// 디버깅 추가
+const NodeContent = memo(({ data, id }: NodeProps) => {
+  // 데이터 타입 단언
+  const nodeData = data as NodeDataType;
+  console.log('NodeContent rendering with data:', nodeData);
+
+  // 방향 설정
+  const isHorizontal = nodeData?.direction === 'LR';
   
-  const getNodeStyle = () => {
-    switch (data.status) {
-      case 'completed':
-        return {
-          background: '#ecfdf5',
-          borderColor: '#10b981'
-        };
-      case 'in-progress':
-        return {
-          background: '#eff6ff',
-          borderColor: '#3b82f6'
-        };
-      default:
-        return {
-          background: '#f3f4f6',
-          borderColor: '#94a3b8'
-        };
-    }
+  // 상태 색상 설정
+  let borderColor = '#9ca3af'; // 기본 회색
+  if (nodeData?.status === 'completed') borderColor = '#10b981'; // 완료 - 녹색
+  else if (nodeData?.status === 'in-progress') borderColor = '#3b82f6'; // 진행 중 - 파란색
+  else if (nodeData?.status === 'not-started') borderColor = '#8b5cf6'; // 시작 안함 - 보라색
+  
+  // 메인 노드 여부
+  const isMain = nodeData?.isMainNode;
+  
+  // 메인 노드 스타일
+  const mainNodeStyle = {
+    background: '#f0f9ff',
+    border: `3px solid #0284c7`,
+    borderRadius: '8px',
+    padding: '12px',
+    minWidth: '180px',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    position: 'relative',
+    zIndex: 2
   };
   
-  const styles = getNodeStyle();
-  const isOptional = data.isOptional || false;
+  // 일반 노드 스타일
+  const subNodeStyle = {
+    background: 'white',
+    border: `2px solid ${borderColor}`,
+    borderRadius: '8px',
+    padding: '10px',
+    minWidth: '150px',
+    position: 'relative',
+    zIndex: 1
+  };
+  
+  // 타겟/소스 핸들 위치 계산
+  const sourcePos = isHorizontal ? Position.Right : Position.Bottom;
+  const targetPos = isHorizontal ? Position.Left : Position.Top;
+  
+  // 핸들 스타일
+  const handleStyle = {
+    background: isMain ? '#0284c7' : borderColor,
+    width: isMain ? '10px' : '8px',
+    height: isMain ? '10px' : '8px',
+    border: '2px solid white'
+  };
   
   return (
-    <div style={{
-      border: `2px solid ${styles.borderColor}`,
-      borderRadius: '8px',
-      padding: '0px 10px 10px 10px',
-      backgroundColor: styles.background,
-      color: '#1f2937',
-      width: 160,
-      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-      position: 'relative'
-    }}>
-      {/* 핸들 연결 지점 */}
-      {handles.top && <Handle type="target" position={Position.Top} style={{ background: styles.borderColor }} />}
-      {handles.bottom && <Handle type="source" position={Position.Bottom} style={{ background: styles.borderColor }} />}
-      {handles.left && <Handle type="target" position={Position.Left} style={{ background: styles.borderColor }} />}
-      {handles.right && <Handle type="source" position={Position.Right} style={{ background: styles.borderColor }} />}
-      {handles['left-out'] && <Handle type="source" position={Position.Left} id="left-out" style={{ background: styles.borderColor, top: '70%' }} />}
-      {handles['right-out'] && <Handle type="source" position={Position.Right} id="right-out" style={{ background: styles.borderColor, top: '70%' }} />}
+    <div style={isMain ? mainNodeStyle : subNodeStyle}>
+      {/* 타겟 핸들 - 들어오는 연결 */}
+      {!nodeData?.isRoot && (
+        <Handle
+          type="target"
+          position={targetPos}
+          id={`target-${targetPos}`}
+          style={handleStyle}
+        />
+      )}
       
-      {/* 상태 표시 - 위치 조정 및 마진 감소 */}
+      {/* 노드 내용 */}
       <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        marginBottom: '3px',
-        position: 'absolute',
-        top: '6px',
-        right: '10px',
-        left: '10px'
+        fontWeight: isMain ? 'bold' : 'normal',
+        fontSize: isMain ? '16px' : '14px',
+        textAlign: isMain ? 'center' : 'left',
+        marginBottom: '5px' 
       }}>
-        <div style={{ 
-          width: '8px', height: '8px', 
-          borderRadius: '50%', 
-          backgroundColor: data.status === 'completed' ? '#10b981' : data.status === 'in-progress' ? '#3b82f6' : '#9ca3af',
-        }} />
-        {isOptional && <span style={{ padding: '0 4px', fontSize: '10px', backgroundColor: '#f3f4f6', borderRadius: '4px' }}>선택</span>}
+        {nodeData?.name || nodeData?.label || nodeData?.title || id}
       </div>
       
-      {/* 제목만 표시 - 위치 조정 */}
-      <div style={{ 
-        fontWeight: 600, 
-        fontSize: '13px', 
-        textAlign: 'center',
-        marginTop: '12px'
-      }}>
-        {data.title}
-      </div>
+      {/* 설명은 메인 노드가 아닐 때만 표시 */}
+      {!isMain && nodeData?.description && (
+        <div style={{ fontSize: '12px', color: '#666' }}>
+          {String(nodeData.description)}
+        </div>
+      )}
+      
+      {/* 소스 핸들 - 나가는 연결 (하위 노드가 있는 경우에만) */}
+      {(nodeData?.hasChildren || !isMain) && (
+        <Handle
+          type="source"
+          position={sourcePos}
+          id={`source-${sourcePos}`}
+          style={handleStyle}
+        />
+      )}
     </div>
   );
 });
