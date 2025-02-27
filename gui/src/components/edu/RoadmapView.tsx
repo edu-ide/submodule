@@ -1,22 +1,29 @@
 import React, { useCallback, useEffect } from 'react';
-import {
+import { 
   ReactFlow,
   Controls,
-  Background,
+  Background, 
   useNodesState,
   useEdgesState,
   ConnectionLineType,
   Panel,
-  Node as FlowNode
+  Node as FlowNode,
+  ReactFlowInstance,
+  Viewport
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { setViewport, setNodePosition } from '../../redux/roadmapSlice';
 
 // 로컬 컴포넌트 및 유틸 임포트
 import NodeContent from './roadmap/NodeContent';
 import { layoutElements } from './roadmap/layout-elements';
 import { pythonNodes, pythonEdges } from './roadmap/constants';
 import { RoadmapViewProps } from './types';
+import pythonRoadmapContent from './roadmap/data/pythonRoadmapContent.json';
+import { useRoadmap } from './roadmap/RoadmapContext';
 
 // 노드 타입 정의
 const nodeTypes = {
@@ -36,6 +43,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   
   // 라우터 파라미터로 roadmapId 얻기
   const routerRoadmapId = roadmapId || urlRoadmapId || 'python';
+  
+  // 상태 관리 코드 유지
+  const { viewportState, nodePositions, setFlowInstance } = useRoadmap();
+  const dispatch = useDispatch();
   
   // 컴포넌트 마운트 시 데이터 로드
   React.useEffect(() => {
@@ -70,7 +81,16 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   // 노드 클릭 핸들러 - 콘텐츠 페이지로 이동
   const onNodeClick = useCallback((event: React.MouseEvent, node: FlowNode) => {
     if (node.type === 'groupNode') return;
-    navigate(`/education/roadmap/${routerRoadmapId}/content/${node.id}`);
+    
+    // 콘텐츠 데이터에 해당 노드 ID가 있는지 확인
+    const contentId = node.id;
+    const pythonContent = pythonRoadmapContent[contentId as keyof typeof pythonRoadmapContent];
+    
+    if (pythonContent) {
+      navigate(`/education/roadmap/${routerRoadmapId}/content/${contentId}`);
+    } else {
+      console.log(`ID가 ${contentId}인 콘텐츠를 찾을 수 없습니다.`);
+    }
   }, [navigate, routerRoadmapId]);
   
   // 레이아웃 방향 변경
@@ -99,6 +119,44 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
     }
   }, [edges]);
   
+  // 뷰포트 변경 핸들러
+  const onViewportChange = useCallback((viewport: Viewport) => {
+    const { x, y, zoom } = viewport;
+    dispatch(setViewport({ x, y, zoom }));
+  }, [dispatch]);
+  
+  // 노드 위치 변경 핸들러
+  const onNodeDragStop = useCallback((event: React.MouseEvent, node: FlowNode) => {
+    dispatch(setNodePosition({ 
+      id: node.id, 
+      position: { x: node.position.x, y: node.position.y } 
+    }));
+  }, [dispatch]);
+  
+  // onInit 핸들러
+  const onInit = useCallback((reactFlowInstance: ReactFlowInstance) => {
+    setFlowInstance(reactFlowInstance);
+    
+    // 저장된 뷰포트 상태가 있으면 복원
+    if (viewportState) {
+      reactFlowInstance.setViewport(viewportState);
+    }
+    
+    // 저장된 노드 위치가 있으면 복원
+    if (Object.keys(nodePositions).length > 0) {
+      const updatedNodes = nodes.map(node => {
+        if (nodePositions[node.id]) {
+          return {
+            ...node,
+            position: nodePositions[node.id]
+          };
+        }
+        return node;
+      });
+      setNodes(updatedNodes);
+    }
+  }, [viewportState, nodePositions, setFlowInstance, setNodes]);
+  
   return (
     <div className="roadmap-container">
       <div className="roadmap-header">
@@ -117,30 +175,20 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
           onEdgesChange={onEdgesChange}
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
-          connectionLineType={ConnectionLineType.Bezier}
-          defaultEdgeOptions={{
-            animated: true,
-            style: { 
-              stroke: '#94a3b8', 
-              strokeWidth: 1.5,
-              opacity: 0.8
-            },
-            type: 'bezier'
-          }}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          onInit={onInit}
+          onViewportChange={onViewportChange}
+          onNodeDragStop={onNodeDragStop}
           fitView
-          fitViewOptions={{ padding: 0.7 }}
-          minZoom={0.4}
-          maxZoom={2.5}
-          elementsSelectable={true}
-          snapToGrid={true}
-          snapGrid={[16, 16]}
+          minZoom={0.1}
+          maxZoom={1.5}
         >
+          <Controls />
+          <Background gap={16} size={1} />
           <Panel position="top-right">
             <button onClick={() => onLayout('TB')} className="layout-button">수직 레이아웃</button>
             <button onClick={() => onLayout('LR')} className="layout-button">수평 레이아웃</button>
           </Panel>
-          <Controls position="top-right" />
-          <Background gap={12} size={1} />
         </ReactFlow>
       </div>
 

@@ -59,4 +59,30 @@ export interface LearningContentViewProps {
   content: LearningContent;
   nodeData: NodeData;
   onBack: () => void;
+}
+
+// RoadmapNode 타입 정의 수정
+export interface RoadmapNode {
+  id: string;
+  type: string;
+  data: {
+    title: string;
+    description: string;
+    status: string;
+    column?: string; // 선택적 속성
+  };
+}
+
+export interface RoadmapEdge {
+  id: string;
+  source: string;
+  target: string;
+  data: {
+    type: string;
+  };
+}
+
+export interface RoadmapData {
+  nodes: RoadmapNode[];
+  edges: RoadmapEdge[];
 } 

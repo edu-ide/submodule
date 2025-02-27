@@ -29,7 +29,7 @@ import Mem0SidebarGUI from "./integrations/mem0/Mem0SidebarGUI";
 import EducationGUI from './pages/education';
 import LeftPanel from './components/edu/LeftPanel';
 import RoadmapView from './components/edu/RoadmapView';
-import LearningContentView from './components/edu/roadmap/LearningContentView';
+import RoadmapContentView from './components/edu/roadmap/RoadmapContentView';
 import EducationLayout from './components/edu/EducationLayout';
 import EducationHome from './pages/educationHome';
 import CurriculumList from './components/edu/CurriculumList';
@@ -52,78 +52,9 @@ const RoadmapViewWrapper = () => {
   return <RoadmapView roadmapId={roadmapId || 'python'} />;
 };
 
-// LearningContentView 래퍼 수정
-const LearningContentViewWrapper = () => {
-  const { roadmapId, nodeId } = useParams();
-  const navigate = useNavigate();
-  
-  // 학습 콘텐츠 데이터 생성
-  const content = {
-    title: `${nodeId} 학습 콘텐츠`,
-    introduction: "이 학습 콘텐츠는 해당 주제에 대한 안내입니다.",
-    theory: "이론적 내용이 여기에 표시됩니다.",
-    examples: [
-      {
-        title: "예제 1",
-        code: "console.log('Hello, world!');",
-        explanation: "기본 출력 예제입니다."
-      },
-      {
-        title: "예제 2",
-        code: "const sum = (a, b) => a + b;",
-        explanation: "간단한 함수 예제입니다."
-      }
-    ],
-    practice: {
-      question: "연습 문제",
-      hints: ["힌트 1", "힌트 2"],
-      solution: "문제 해결 방법"
-    },
-    quiz: [
-      {
-        question: "문제 1",
-        options: ["선택지 1", "선택지 2", "선택지 3"],
-        answer: 0, // 첫 번째 선택지가 정답
-        explanation: "이 문제에 대한 설명입니다."
-      },
-      {
-        question: "문제 2",
-        options: ["선택지 A", "선택지 B", "선택지 C"],
-        answer: 1, // 두 번째 선택지가 정답
-        explanation: "이 문제에 대한 설명입니다."
-      }
-    ],
-    resources: [
-      {
-        title: "참고자료 1",
-        url: "https://example.com/resource1",
-        type: "article" as "video" | "article" | "tutorial"
-      },
-      {
-        title: "참고자료 2",
-        url: "https://example.com/resource2",
-        type: "video" as "video" | "article" | "tutorial"
-      }
-    ]
-  };
-  
-  // 노드 데이터 생성
-  const nodeData = {
-    title: `${nodeId} 노드`,
-    description: "노드 설명",
-    status: "in-progress" as "completed" | "in-progress" | "not-started",
-    column: "0"
-  };
-  
-  return (
-    <LearningContentView 
-      content={content} 
-      nodeData={nodeData} 
-      onBack={() => navigate(`/education/roadmap/${roadmapId}`)} 
-    />
-  );
-};
+// LearningContentViewWrapper 제거 (더 이상 필요하지 않음)
 
+// 라우터 설정에서 경로 업데이트
 const router = createMemoryRouter(
   [
     {
@@ -175,8 +106,8 @@ const router = createMemoryRouter(
               element: <RoadmapViewWrapper />
             },
             {
-              path: "roadmap/:roadmapId/content/:nodeId",
-              element: <LearningContentViewWrapper />
+              path: "roadmap/:roadmapId/content/:contentId",
+              element: <RoadmapContentView />
             }
           ]
         },

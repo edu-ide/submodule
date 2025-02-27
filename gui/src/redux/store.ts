@@ -4,6 +4,7 @@ import miscReducer from "./slices/miscSlice";
 import serverStateReducer from "./slices/serverStateReducer";
 import stateReducer from "./slices/stateSlice";
 import uiStateReducer from "./slices/uiStateSlice";
+import roadmapReducer from './roadmapSlice';
 
 import { createTransform, persistReducer, persistStore } from "redux-persist";
 import { createFilter } from "redux-persist-transform-filter";
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   misc: miscReducer,
   uiState: uiStateReducer,
   serverState: serverStateReducer,
+  roadmap: roadmapReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -70,3 +72,5 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
+
+export type AppDispatch = typeof store.dispatch;

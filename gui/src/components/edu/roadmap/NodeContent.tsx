@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 
 // 타입 명시적 정의
@@ -32,6 +32,9 @@ const NodeContent = memo(({ data, id }: NodeProps) => {
   // 메인 노드 여부
   const isMain = nodeData?.isMainNode;
   
+  // hover 스타일 추가
+  const [isHovered, setIsHovered] = useState(false);
+  
   // 메인 노드 스타일
   const mainNodeStyle = {
     background: '#f0f9ff',
@@ -41,9 +44,11 @@ const NodeContent = memo(({ data, id }: NodeProps) => {
     minWidth: '180px',
     fontWeight: 'bold',
     fontSize: '16px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    position: 'relative',
-    zIndex: 2
+    boxShadow: isHovered ? '0 8px 16px rgba(0,0,0,0.2)' : '0 4px 6px rgba(0,0,0,0.1)',
+    position: 'relative' as 'relative',
+    zIndex: 2,
+    cursor: 'pointer',
+    transition: 'all 0.3s ease'
   };
   
   // 일반 노드 스타일
@@ -53,7 +58,7 @@ const NodeContent = memo(({ data, id }: NodeProps) => {
     borderRadius: '8px',
     padding: '10px',
     minWidth: '150px',
-    position: 'relative',
+    position: 'relative' as 'relative',
     zIndex: 1
   };
   
@@ -70,7 +75,11 @@ const NodeContent = memo(({ data, id }: NodeProps) => {
   };
   
   return (
-    <div style={isMain ? mainNodeStyle : subNodeStyle}>
+    <div 
+      style={isMain ? mainNodeStyle : subNodeStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* 타겟 핸들 - 들어오는 연결 */}
       {!nodeData?.isRoot && (
         <Handle
