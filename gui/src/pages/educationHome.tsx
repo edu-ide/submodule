@@ -1,9 +1,19 @@
 export {};
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setHeaderInfo } from '../redux/slices/uiStateSlice';
 
 const EducationHome: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(setHeaderInfo({
+      title: '에듀센스 플랫폼',
+      description: '체계적인 학습을 통해 프로그래밍 실력을 향상시키세요'
+    }));
+  }, [dispatch]);
   
   return (
     <div className="education-home">

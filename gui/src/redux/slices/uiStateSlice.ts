@@ -1,30 +1,38 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-type UiState = {
-  bottomMessage: JSX.Element | undefined;
+
+interface HeaderInfo {
+  title?: string;
+  description?: string;
+}
+
+interface UiState {
+  bottomMessage: React.ReactNode | null;
   bottomMessageCloseTimeout: NodeJS.Timeout | undefined;
   displayBottomMessageOnBottom: boolean;
   showDialog: boolean;
   dialogMessage: string | JSX.Element;
   dialogEntryOn: boolean;
   activeFilePath: string | undefined;
-};
+  headerInfo: HeaderInfo;
+}
 
 export const uiStateSlice = createSlice({
   name: "uiState",
   initialState: {
-    bottomMessage: undefined,
+    bottomMessage: null,
     bottomMessageCloseTimeout: undefined,
     showDialog: false,
     dialogMessage: "",
     dialogEntryOn: false,
     displayBottomMessageOnBottom: true,
     activeFilePath: undefined,
+    headerInfo: {
+      title: '',
+      description: ''
+    }
   } as UiState,
   reducers: {
-    setBottomMessage: (
-      state,
-      action: PayloadAction<UiState["bottomMessage"]>
-    ) => {
+    setBottomMessage: (state, action: PayloadAction<React.ReactNode | null>) => {
       state.bottomMessage = action.payload;
     },
     setBottomMessageCloseTimeout: (
@@ -61,6 +69,9 @@ export const uiStateSlice = createSlice({
       // Only set non-empty strings as active file paths
       state.activeFilePath = action.payload && action.payload.length > 0 ? action.payload : undefined;
     },
+    setHeaderInfo: (state, action: PayloadAction<HeaderInfo>) => {
+      state.headerInfo = action.payload;
+    }
   },
 });
 
@@ -72,5 +83,6 @@ export const {
   setShowDialog,
   setDisplayBottomMessageOnBottom,
   setActiveFilePath,
+  setHeaderInfo
 } = uiStateSlice.actions;
 export default uiStateSlice.reducer;

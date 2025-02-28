@@ -16,7 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setViewport, setNodePosition } from '../../redux/roadmapSlice';
-import { setBottomMessage } from "../../redux/slices/uiStateSlice";
+import { setBottomMessage, setHeaderInfo } from '../../redux/slices/uiStateSlice';
 
 // 로컬 컴포넌트 및 유틸 임포트
 import NodeContent from './roadmap/NodeContent';
@@ -58,8 +58,14 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
     loadRoadmapData(routerRoadmapId);
     fetchRoadmapData().then(data => {
       setRoadmapContent(data);
+      
+      // 헤더 정보 설정
+      dispatch(setHeaderInfo({
+        title: '로드맵',
+        description: '학습 진행 상황을 시각적으로 확인하고 관리하세요'
+      }));
     });
-  }, [routerRoadmapId,]);
+  }, [routerRoadmapId, dispatch]);
   
   // 로드맵 데이터 로드 함수
   const loadRoadmapData = (id: string) => {

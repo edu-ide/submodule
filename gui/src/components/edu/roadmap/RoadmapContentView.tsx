@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { useDispatch } from 'react-redux';
 import { setNodeProgress } from '../../../redux/roadmapSlice';
+import { setBottomMessage, setHeaderInfo } from '../../../redux/slices/uiStateSlice';
 import { VscCopy, VscOpenPreview, VscFile, VscCommentDiscussion, VscPlay, VscClearAll } from 'react-icons/vsc';
 import RoadmapContentSection from './RoadmapContentSection';
 import RoadmapContentNavigator from './RoadmapContentNavigator';
@@ -12,7 +13,6 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css'; // VS Code 스타일 테마
 import { fetchRoadmapContent } from './constants';
 import { IdeMessengerContext } from '@/context/IdeMessenger';
-import { setBottomMessage } from '@/redux/slices/uiStateSlice';
 import CodeBlock from './CodeBlock';
 
 interface ContentData {
@@ -158,6 +158,12 @@ const RoadmapContentView: React.FC = () => {
         setSections(parseSections(contentInfo.content));
         setError(null);
         
+        // 헤더 정보 업데이트
+        dispatch(setHeaderInfo({
+          title: contentInfo.title,
+          description: contentInfo.description
+        }));
+        
       } catch (error) {
         console.error('콘텐츠 로드 실패:', error);
         const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
@@ -234,6 +240,30 @@ const RoadmapContentView: React.FC = () => {
     }
   };
 
+  // 이전 콘텐츠로 이동
+  const handlePrevContent = async () => {
+    try {
+      const roadmapContent = await fetchRoadmapContent();
+      const currentOrder = contentData?.order;
+      
+      // 현재 순서 이전의 콘텐츠 찾기
+      const prevContent = Object.entries(roadmapContent.roadmap)
+        .reverse()
+        .find(([_, content]) => content.order < currentOrder);
+      
+      if (prevContent) {
+        const [prevContentId] = prevContent;
+        navigate(`/education/roadmap/${roadmapId}/content/${prevContentId}`);
+      } else {
+        dispatch(setBottomMessage(
+          <div>첫 번째 콘텐츠입니다.</div>
+        ));
+      }
+    } catch (error) {
+      console.error('이전 콘텐츠 조회 실패:', error);
+    }
+  };
+
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!contentData) return (
@@ -246,11 +276,6 @@ const RoadmapContentView: React.FC = () => {
 
   return (
     <div className="roadmap-content-view">
-      <div className="roadmap-content-header">
-        <h1>{contentData.title}</h1>
-        <p className="description">{contentData.description}</p>
-      </div>
-      
       <div className="content-container">
         <Markdown
           children={contentData.content}
@@ -261,12 +286,17 @@ const RoadmapContentView: React.FC = () => {
       </div>
 
       <div className="navigation-buttons">
-        <button onClick={handleBack} className="back-button">
-          이전으로
-        </button>
+        <div className="left-buttons">
+          <button onClick={handleBack} className="back-button">
+            이전으로
+          </button>
+          <button onClick={handlePrevContent} className="nav-button">
+            ◀ 이전 콘텐츠
+          </button>
+        </div>
         <div className="right-buttons">
-          <button onClick={handleNextContent} className="next-button">
-            다음 콘텐츠
+          <button onClick={handleNextContent} className="nav-button">
+            다음 콘텐츠 ▶
           </button>
           <button onClick={handleCompleteContent} className="complete-button">
             완료
@@ -276,123 +306,176 @@ const RoadmapContentView: React.FC = () => {
 
       <style jsx>{`
         .roadmap-content-view {
-          padding: 20px;
-          max-width: 900px;
-          margin: 0 auto;
-          font-family: var(--vscode-font-family);
           height: 100%;
           display: flex;
           flex-direction: column;
-        }
-        
-        .roadmap-content-header {
-          margin-bottom: 30px;
+          gap: 16px;
         }
         
         .content-container {
           flex: 1;
-          background: var(--vscode-editor-background);
+          background: #ffffff;
           padding: 20px;
-          border-radius: 4px;
+          border-radius: 8px;
           overflow-y: auto;
-        }
-        
-        h1 {
-          font-size: 2em;
-          margin-bottom: 10px;
-          color: var(--vscode-editor-foreground);
-        }
-        
-        .description {
-          font-size: 1.2em;
-          color: var(--vscode-descriptionForeground);
-          margin-bottom: 20px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .navigation-buttons {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-top: 20px;
-          padding: 10px;
-          background: var(--vscode-editor-background);
-          border-radius: 4px;
+          padding: 15px;
+          background: #ffffff;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
+        .left-buttons,
         .right-buttons {
           display: flex;
-          gap: 10px;
+          gap: 12px;
         }
         
         .back-button,
-        .next-button,
+        .nav-button,
         .complete-button {
-          padding: 8px 16px;
+          padding: 10px 20px;
           border: none;
-          border-radius: 4px;
+          border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
+          font-size: 14px;
+          transition: all 0.2s ease;
         }
         
         .back-button {
-          background: var(--vscode-button-secondaryBackground);
-          color: var(--vscode-button-secondaryForeground);
+          background: #f0f0f0;
+          color: #666666;
         }
         
-        .next-button {
-          background: var(--vscode-button-background);
-          color: var(--vscode-button-foreground);
+        .nav-button {
+          background: #0066cc;
+          color: white;
         }
         
         .complete-button {
-          background: var(--vscode-statusBarItem-remoteBackground);
-          color: var(--vscode-statusBarItem-remoteForeground);
+          background: #28a745;
+          color: white;
         }
         
-        .back-button:hover,
-        .next-button:hover,
+        .back-button:hover {
+          background: #e0e0e0;
+        }
+        
+        .nav-button:hover {
+          background: #0052a3;
+        }
+        
         .complete-button:hover {
-          opacity: 0.9;
+          background: #218838;
         }
 
         :global(code) {
-          background: var(--vscode-textBlockQuote-background);
-          padding: 2px 4px;
-          border-radius: 3px;
-          font-family: var(--vscode-editor-font-family);
+          background: #f5f5f5;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+          font-size: 0.9em;
+          color: #333333;
+          border: 1px solid #e0e0e0;
         }
 
         :global(pre) {
-          background: var(--vscode-textBlockQuote-background);
+          background: #f8f9fa;
           padding: 16px;
-          border-radius: 4px;
+          border-radius: 8px;
           overflow-x: auto;
+          border: 1px solid #e0e0e0;
         }
 
         :global(h2) {
-          font-size: 1.5em;
-          margin: 1.5em 0 1em;
+          font-size: 1.8em;
+          margin: 1.8em 0 1em;
           padding-bottom: 0.5em;
-          border-bottom: 1px solid var(--vscode-panel-border);
+          border-bottom: 2px solid #f0f0f0;
+          color: #1a1a1a;
+          font-weight: 600;
         }
 
         :global(h3) {
-          font-size: 1.2em;
-          margin: 1em 0;
+          font-size: 1.4em;
+          margin: 1.5em 0 1em;
+          color: #1a1a1a;
+          font-weight: 600;
         }
 
         :global(p) {
           margin: 1em 0;
-          line-height: 1.6;
+          line-height: 1.8;
+          color: #333333;
         }
 
         :global(ul), :global(ol) {
           margin: 1em 0;
           padding-left: 2em;
+          color: #333333;
         }
 
         :global(li) {
-          margin: 0.5em 0;
+          margin: 0.7em 0;
+          line-height: 1.6;
+        }
+
+        :global(a) {
+          color: #0066cc;
+          text-decoration: none;
+        }
+
+        :global(a:hover) {
+          text-decoration: underline;
+        }
+
+        :global(strong) {
+          color: #1a1a1a;
+          font-weight: 600;
+        }
+
+        :global(blockquote) {
+          margin: 1em 0;
+          padding: 0.5em 1em;
+          border-left: 4px solid #e0e0e0;
+          background: #f8f9fa;
+          color: #666666;
+        }
+
+        :global(img) {
+          max-width: 100%;
+          height: auto;
+          border-radius: 8px;
+          margin: 1em 0;
+        }
+
+        :global(hr) {
+          border: none;
+          border-top: 2px solid #f0f0f0;
+          margin: 2em 0;
+        }
+
+        .error-message {
+          color: #dc3545;
+          padding: 1em;
+          background: #fff5f5;
+          border-radius: 8px;
+          border: 1px solid #ffebeb;
+        }
+
+        .error-container {
+          text-align: center;
+          padding: 2em;
+          background: #ffffff;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
       `}</style>
     </div>

@@ -1,9 +1,19 @@
 export {};
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setHeaderInfo } from '../redux/slices/uiStateSlice';
 
 const RoadmapList: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(setHeaderInfo({
+      title: '학습 로드맵',
+      description: '프로그래밍 기술을 체계적으로 학습하기 위한 로드맵'
+    }));
+  }, [dispatch]);
   
   // 샘플 로드맵 데이터
   const roadmaps = [
