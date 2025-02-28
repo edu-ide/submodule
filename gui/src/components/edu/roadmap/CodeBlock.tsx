@@ -65,7 +65,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('dark');
   const theme = themes[currentTheme];
   
-  const isTerminal = language === 'bash' || language === 'shell' || language === 'sh';
+  const isTerminal = language === 'bash' || language === 'shell' || language === 'sh' || language === 'powershell' || language === 'cmd';
 
   const handleCopy = () => {
     navigator.clipboard.writeText(value)

@@ -16,7 +16,14 @@ import { IdeMessengerContext } from '@/context/IdeMessenger';
 import CodeBlock from './CodeBlock';
 import ConsoleOutput from './ConsoleOutput';
 import InlineCode from './InlineCode';
-
+import rehypeHighlight from 'rehype-highlight';
+import rehypeKatex from 'rehype-katex';
+import rehypeExternalLinks from 'rehype-external-links';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import plantUmlPlugin from './plantUmlPlugin';
+import QuizBlock from './QuizBlock';
 interface ContentData {
   title: string;
   description: string;
@@ -49,10 +56,12 @@ const RoadmapContentView: React.FC = () => {
     const code = String(children).trim();
     
  
-    
     // language- 접두사 제거
     const lang = className?.replace('language-', '') || '';
-    
+    const match = /language-(.+)/.exec(className || '');
+    if (match && match[1] === 'quiz') {
+      return <QuizBlock value={String(children).trim()} />;
+    }
     // 터미널 관련 언어인 경우
     const isTerminalLang = ['bash', 'shell', 'sh'].includes(lang);
     if (isTerminalLang) {
@@ -64,7 +73,7 @@ const RoadmapContentView: React.FC = () => {
       );
     }
        // 인라인 코드나 백틱 하나로 감싼 경우
-    if (inline || !code.includes('\n')) {
+    if (!className && !code.includes('\n') ) {
       return <InlineCode content={code} />;
     }
     
@@ -79,6 +88,20 @@ const RoadmapContentView: React.FC = () => {
         language={lang || 'text'}
         value={code}
       />
+    );
+  };
+
+  // 볼드체 렌더링을 위한 컴포넌트
+  const renderStrong = ({ children, node }: { children: React.ReactNode, node: any }) => {
+    console.log('Strong node:', node); // 디버깅을 위한 로그
+    return (
+      <strong className="bold-text" style={{
+        fontWeight: 700,
+        color: '#1a1a1a',
+        display: 'inline-block'
+      }}>
+        {children}
+      </strong>
     );
   };
 
@@ -301,8 +324,19 @@ const RoadmapContentView: React.FC = () => {
       <div className="content-container">
         <Markdown
           children={contentData.content}
+            remarkPlugins={[
+    remarkGfm,       // GitHub 문법
+    remarkMath,      // 수식 지원
+  ]}
+          rehypePlugins={[
+            rehypeKatex,     // 수식 렌더링
+            [rehypeExternalLinks, { target: '_blank' }], // 외부링크 새창,
+            rehypeRaw,
+            plantUmlPlugin
+          ]}
           components={{
-            code: renderCodeBlock
+            code: renderCodeBlock,
+            strong: renderStrong
           }}
         />
       </div>
@@ -458,9 +492,16 @@ const RoadmapContentView: React.FC = () => {
           text-decoration: underline;
         }
 
+        :global(.bold-text) {
+          font-weight: 700 !important;
+          color: #1a1a1a !important;
+          display: inline-block !important;
+        }
+
         :global(strong) {
-          color: #1a1a1a;
-          font-weight: 600;
+          font-weight: 700 !important;
+          color: #1a1a1a !important;
+          display: inline-block !important;
         }
 
         :global(blockquote) {
