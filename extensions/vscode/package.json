@@ -407,6 +407,18 @@
         "category": "PearAI",
         "title": "파일 탐색기 토글",
         "group": "PearAI"
+      },
+      {
+        "command": "pearai.openMemFS",
+        "category": "PearAI",
+        "title": "Open MemFS Workspace",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.createMemFile",
+        "category": "PearAI",
+        "title": "Create MemFS File",
+        "group": "PearAI"
       }
     ],
     "keybindings": [
@@ -579,6 +591,12 @@
         },
         {
           "command": "pearai.focusCurriculum"
+        },
+        {
+          "command": "pearai.openMemFS"
+        },
+        {
+          "command": "pearai.createMemFile"
         }
       ],
       "editor/context": [

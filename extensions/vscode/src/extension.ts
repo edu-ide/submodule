@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 import { getExtensionVersion } from "./util/util";
 import { ConfigHandler } from "core/config/ConfigHandler";
 import { getUniqueId } from "./util/vscode";
+import { MemFS } from './memFS';
 
 async function dynamicImportAndActivate(context: vscode.ExtensionContext) {
   const { activateExtension } = await import("./activation/activate");
@@ -37,6 +38,38 @@ async function dynamicImportAndActivate(context: vscode.ExtensionContext) {
 export function activate(context: vscode.ExtensionContext) {
   setupCa();
   dynamicImportAndActivate(context);
+
+  const memFs = new MemFS();
+  context.subscriptions.push(
+    vscode.workspace.registerFileSystemProvider('memfs', memFs, {
+      isCaseSensitive: true
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pearai.openMemFS', () => {
+      vscode.workspace.updateWorkspaceFolders(0, 0, {
+        uri: vscode.Uri.parse('memfs:/'),
+        name: "PearAI MemFS"
+      });
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pearai.createMemFile', async () => {
+      const fileName = await vscode.window.showInputBox({
+        prompt: 'Enter new file name (e.g. example.txt)'
+      });
+      if (fileName) {
+        const uri = vscode.Uri.parse(`memfs:/${fileName}`);
+        memFs.writeFile(uri, new TextEncoder().encode(''), {
+          create: true,
+          overwrite: true
+        });
+        vscode.window.showTextDocument(uri);
+      }
+    })
+  );
 
   // 커리큘럼 관련 명령어 처리기 등록
   context.subscriptions.push(
