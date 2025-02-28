@@ -536,6 +536,7 @@ export interface IDE {
   getCurrentDirectory(): Promise<string>;
 
   createPracticeWorkspace(url: string): Promise<void>;
+  createPracticeFile(language: string, code: string): Promise<void>;
 }
 
 // Slash Commands

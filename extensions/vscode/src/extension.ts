@@ -172,29 +172,141 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('pearai.loadZipContent', async (url: string) => {
-	// for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
-	// 		memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
-	// 	}
-      
+    vscode.commands.registerCommand('pearai.loadZipContent', async () => {
+      const url = "http://localhost:9000/edu/content/test/test.zip"
       if (url) {
         try {
+          // 워크스페이스 확인
+          const workspaceFolders = vscode.workspace.workspaceFolders;
+          if (!workspaceFolders) {
+            throw new Error('워크스페이스가 열려있지 않습니다. 먼저 폴더를 열어주세요.');
+          }
+
           const zipBuffer = await fetchZip(url);
           const zip = new AdmZip(zipBuffer);
           
-          // 기존 워크스페이스 정리
+          // 0_practice 폴더 경로 생성
+          const workspaceRoot = workspaceFolders[0].uri;
+          const practiceFolderUri = vscode.Uri.joinPath(workspaceRoot, '0_practice');
           
-          // ZIP 내용 MemFS에 로드
-          await addZipContentToMemFS(memFs, zip);
+          // 0_practice 폴더 생성 (없는 경우)
+          try {
+            await vscode.workspace.fs.createDirectory(practiceFolderUri);
+          } catch (err) {
+            // 폴더가 이미 존재하는 경우 무시
+          }
+
+          // ZIP 파일 내용을 0_practice 폴더에 추출하면서 폴더 구조 유지
+          const entries = zip.getEntries();
+          for (const entry of entries) {
+            if (!entry.isDirectory) {
+              const entryPath = entry.entryName.replace(/\\/g, '/');
+              const entryDirPath = path.dirname(entryPath);
+              
+              // 파일이 들어갈 디렉토리 경로 생성
+              if (entryDirPath !== '.') {
+                const fullDirPath = vscode.Uri.joinPath(practiceFolderUri, entryDirPath);
+                try {
+                  await vscode.workspace.fs.createDirectory(fullDirPath);
+                } catch (err) {
+                  // 디렉토리가 이미 존재하는 경우 무시
+                }
+              }
+              
+              // 파일 생성
+              const fileUri = vscode.Uri.joinPath(practiceFolderUri, entryPath);
+              await vscode.workspace.fs.writeFile(fileUri, entry.getData());
+            }
+          }
           
-          // 워크스페이스 초기화 명령어 실행
-          await vscode.commands.executeCommand('pearai.openMemFS');
-          
-          vscode.window.showInformationMessage('Practice Content loaded successfully');
+          vscode.window.showInformationMessage('Practice Content loaded successfully to 0_practice folder');
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Unknown error occurred';
           vscode.window.showErrorMessage(`Failed to load ZIP: ${message}`);
         }
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('pearai.createPracticeFile', async (language: string, code: string) => {
+      try {
+        // 파일 확장자 결정
+        const getFileExtension = (lang: string): string => {
+          const extensionMap: { [key: string]: string } = {
+            'python': '.py',
+            'javascript': '.js',
+            'typescript': '.ts',
+            'java': '.java',
+            'c': '.c',
+            'cpp': '.cpp',
+            'csharp': '.cs',
+            'go': '.go',
+            'rust': '.rs',
+            'ruby': '.rb',
+            'php': '.php',
+            'swift': '.swift',
+            'kotlin': '.kt',
+            'scala': '.scala',
+            'html': '.html',
+            'css': '.css',
+            'sql': '.sql',
+            'shell': '.sh',
+            'bash': '.sh',
+            'powershell': '.ps1',
+            'markdown': '.md',
+            'json': '.json',
+            'yaml': '.yaml',
+            'xml': '.xml',
+            'text': '.txt'
+          };
+          return extensionMap[lang.toLowerCase()] || '.txt';
+        };
+
+        // 현재 워크스페이스 폴더 가져오기
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders) {
+          throw new Error('워크스페이스가 열려있지 않습니다. 먼저 폴더를 열어주세요.');
+        }
+
+        const extension = getFileExtension(language);
+        const fileName = `practice${extension}`;
+        
+        // 0_practice 폴더 경로 생성
+        const workspaceRoot = workspaceFolders[0].uri;
+        const practiceFolderUri = vscode.Uri.joinPath(workspaceRoot, '0_practice');
+        
+        // 0_practice 폴더 생성 (없는 경우)
+        try {
+          await vscode.workspace.fs.createDirectory(practiceFolderUri);
+        } catch (err) {
+          // 폴더가 이미 존재하는 경우 무시
+        }
+
+        const fileUri = vscode.Uri.joinPath(practiceFolderUri, fileName);
+
+        // 파일이 이미 존재하는지 확인
+        try {
+          await vscode.workspace.fs.stat(fileUri);
+          // 파일이 존재하면 타임스탬프를 추가하여 새 파일명 생성
+          const timestamp = new Date().getTime();
+          const newFileName = `practice_${timestamp}${extension}`;
+          const newFileUri = vscode.Uri.joinPath(practiceFolderUri, newFileName);
+          
+          // 새 파일 생성
+          await vscode.workspace.fs.writeFile(newFileUri, new TextEncoder().encode(code));
+          await vscode.window.showTextDocument(newFileUri);
+          vscode.window.showInformationMessage(`${newFileName} 파일이 0_practice 폴더에 생성되었습니다.`);
+        } catch (err) {
+          // 파일이 존재하지 않으면 원래 파일명으로 생성
+          await vscode.workspace.fs.writeFile(fileUri, new TextEncoder().encode(code));
+          await vscode.window.showTextDocument(fileUri);
+          vscode.window.showInformationMessage(`${fileName} 파일이 0_practice 폴더에 생성되었습니다.`);
+        }
+
+      } catch (error) {
+        const message = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다';
+        vscode.window.showErrorMessage(`파일 생성 실패: ${message}`);
       }
     })
   );

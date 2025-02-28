@@ -246,6 +246,50 @@ class FileSystemIde implements IDE {
   async createPracticeWorkspace(url: string): Promise<void> {
     console.log(`Creating practice workspace from: ${url}`);
   }
+
+  async createPracticeFile(language: string, code: string): Promise<void> {
+    try {
+      const getFileExtension = (lang: string): string => {
+        const extensionMap: { [key: string]: string } = {
+          "python": ".py",
+          "javascript": ".js",
+          "typescript": ".ts",
+          "java": ".java",
+          "c": ".c",
+          "cpp": ".cpp",
+          "csharp": ".cs",
+          "go": ".go",
+          "rust": ".rs",
+          "ruby": ".rb",
+          "php": ".php",
+          "swift": ".swift",
+          "kotlin": ".kt",
+          "scala": ".scala",
+          "html": ".html",
+          "css": ".css",
+          "sql": ".sql",
+          "shell": ".sh",
+          "bash": ".sh",
+          "powershell": ".ps1",
+          "markdown": ".md",
+          "json": ".json",
+          "yaml": ".yaml",
+          "xml": ".xml",
+          "text": ".txt"
+        };
+        return extensionMap[lang.toLowerCase()] || ".txt";
+      };
+
+      const extension = getFileExtension(language);
+      const fileName = `practice${extension}`;
+      const filePath = path.join(this.workspaceDir, fileName);
+      
+      await fs.promises.writeFile(filePath, code, "utf-8");
+    } catch (error) {
+      console.error("파일 생성 실패:", error);
+      throw error;
+    }
+  }
 }
 
 export default FileSystemIde;

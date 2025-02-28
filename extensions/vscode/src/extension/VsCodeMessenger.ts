@@ -543,5 +543,8 @@ export class VsCodeMessenger {
     this.onWebviewOrCore("createPracticeWorkspace", async (msg) => {
       await vscode.commands.executeCommand('pearai.loadZipContent', msg.data.url);
     });
+      this.onWebviewOrCore("createPracticeFile", async (msg) => {
+      await vscode.commands.executeCommand('pearai.createPracticeFile', msg.data.language, msg.data.code);
+    });
   }
 }

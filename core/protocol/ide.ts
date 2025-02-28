@@ -113,6 +113,7 @@ export type ToIdeFromWebviewOrCoreProtocol = {
   ];
 
   createPracticeWorkspace: [{ url: string }, void];
+  createPracticeFile: [{ language: string; code: string }, void];
 
 };
 
