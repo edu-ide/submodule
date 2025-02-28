@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { useDispatch } from 'react-redux';
 import { setNodeProgress } from '../../../redux/roadmapSlice';
-import { VscCopy, VscOpenPreview } from 'react-icons/vsc';
+import { VscCopy, VscOpenPreview, VscFile, VscCommentDiscussion } from 'react-icons/vsc';
 import RoadmapContentSection from './RoadmapContentSection';
 import RoadmapContentNavigator from './RoadmapContentNavigator';
 import { loadMarkdownContent } from '../../../utils/markdownLoader';
 import { useEffect as useHighlightEffect } from 'react';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css'; // VS Code 스타일 테마
-import { setBottomMessage } from '../../../redux/slices/uiStateSlice';
 import { fetchRoadmapContent } from './constants';
+import { IdeMessengerContext } from '@/context/IdeMessenger';
 
 interface ContentData {
   title: string;
@@ -19,17 +19,150 @@ interface ContentData {
   content: string;
 }
 
-// 코드 블록 컴포넌트 추가
+// 코드 블록 컴포넌트 수정
 const CodeBlock = ({ language, value }: { language: string; value: string }) => {
+    const ideMessenger = useContext(IdeMessengerContext); 
+  const dispatch = useDispatch();
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value)
+      .then(() => alert('코드가 복사되었습니다!'))
+      .catch(err => console.error('복사 실패:', err));
+  };
+
+  const handlePasteToEditor = () => {
+    if (window.vscode) {
+      // 파일명 생성 (현재 시간 기반)
+      const timestamp = new Date().getTime();
+      const fileName = `code-snippet-${timestamp}.py`;
+      
+      // memFS에 파일 생성 및 내용 삽입
+      window.vscode.postMessage({
+        command: 'createFile',
+        filePath: `/mnt/memFS/${fileName}`,
+        content: value
+      });
+      
+      // 생성된 파일 열기
+      window.vscode.postMessage({
+        command: 'openFile',
+        filePath: `/mnt/memFS/${fileName}`
+      });
+      
+ 
+    } else {
+      alert('VS Code 웹 에디터 환경에서만 사용 가능한 기능입니다.');
+    }
+  };
+
+  // 학습 도우미 전송 핸들러 추가
+  const handleSendToHelper = () => {
+    ideMessenger?.post('addEducationContextToChat', {
+      content: {
+        type: "doc",
+        content: [{
+          type: "educationBlock",
+          attrs: {
+            title: `코드 분석 요청 - ${new Date().toLocaleString()}`,
+            content: value,
+            category: "roadmap",
+            markdown: `\`\`\`${language}\n${value}\n\`\`\``
+          }
+        }]
+      },
+      shouldRun: true,
+      prompt: "이 코드를 분석하고 설명해주세요"
+    });
+
+  };
   return (
-    <pre>
-      <code
-        className={`hljs ${language}`}
-        dangerouslySetInnerHTML={{
-          __html: hljs.highlightAuto(value).value,
-        }}
-      />
-    </pre>
+    <div style={{ 
+      position: 'relative',
+      margin: '16px 0',
+      fontSize: '1.1em'
+    }}>
+      <pre style={{
+        position: 'relative',
+        padding: '20px',
+        backgroundColor: 'var(--vscode-editor-background)',
+        borderRadius: '6px',
+        overflowX: 'auto',
+        border: '1px solid var(--vscode-editor-lineHighlightBorder)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+      }}>
+        <div style={{
+          position: 'absolute',
+          right: '12px',
+          top: '12px',
+          display: 'flex',
+          gap: '4px'
+        }}>
+          <button
+            onClick={handleCopy}
+            style={{
+              background: 'var(--vscode-button-background)',
+              color: 'var(--vscode-button-foreground)',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            title="코드 복사"
+          >
+            <VscCopy size={18} />
+          </button>
+          <button
+            onClick={handlePasteToEditor}
+            style={{
+              background: 'var(--vscode-editorInfo-foreground)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            title="메모리 파일시스템에 생성"
+          >
+            <VscFile size={18} />
+          </button>
+          <button
+            onClick={handleSendToHelper}
+            style={{
+              background: 'var(--vscode-editorInfo-foreground)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease'
+            }}
+            title="학습 도우미에게 전송"
+          >
+            <VscCommentDiscussion size={18} />
+          </button>
+        </div>
+        <code
+          className={`hljs ${language}`}
+          style={{
+            display: 'block',
+            paddingRight: '120px',
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
+            lineHeight: '1.6',
+            fontSize: '1em',
+            color: 'var(--vscode-editor-foreground)'
+          }}
+          dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(value).value }}
+        />
+      </pre>
+    </div>
   );
 };
 
