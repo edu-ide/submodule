@@ -14,6 +14,8 @@ import 'highlight.js/styles/vs2015.css'; // VS Code 스타일 테마
 import { fetchRoadmapContent } from './constants';
 import { IdeMessengerContext } from '@/context/IdeMessenger';
 import CodeBlock from './CodeBlock';
+import ConsoleOutput from './ConsoleOutput';
+import InlineCode from './InlineCode';
 
 interface ContentData {
   title: string;
@@ -44,17 +46,37 @@ const RoadmapContentView: React.FC = () => {
 
   // Markdown 컴포넌트의 코드 블록 렌더링
   const renderCodeBlock = ({className, children, inline}: {className?: string, children: any, inline?: boolean}) => {
-    // 인라인 코드이거나 언어가 지정되지 않은 경우 기본 렌더링
-    if (inline || !className) {
-      return <code className={className}>{children}</code>;
+    const code = String(children).trim();
+    
+ 
+    
+    // language- 접두사 제거
+    const lang = className?.replace('language-', '') || '';
+    
+    // 터미널 관련 언어인 경우
+    const isTerminalLang = ['bash', 'shell', 'sh'].includes(lang);
+    if (isTerminalLang) {
+      return (
+        <CodeBlock 
+          language={lang}
+          value={code}
+        />
+      );
+    }
+       // 인라인 코드나 백틱 하나로 감싼 경우
+    if (inline || !code.includes('\n')) {
+      return <InlineCode content={code} />;
     }
     
-    const code = String(children).trim();
-    const lang = className.replace('language-', '') || 'text';
+    // 언어가 지정되지 않은 경우 콘솔 출력으로 처리
+    if (!className) {
+      return <ConsoleOutput content={code} />;
+    }
     
+    // 그 외의 경우 일반 CodeBlock 사용
     return (
       <CodeBlock 
-        language={lang}
+        language={lang || 'text'}
         value={code}
       />
     );
