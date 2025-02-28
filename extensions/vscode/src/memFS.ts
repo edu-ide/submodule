@@ -224,4 +224,8 @@ export class MemFS implements vscode.FileSystemProvider {
 			this._bufferedEvents.length = 0;
 		}, 5);
 	}
+
+	dispose() {
+		this._emitter.dispose();
+	}
 }
