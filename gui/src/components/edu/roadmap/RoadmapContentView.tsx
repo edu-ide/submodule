@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { useDispatch } from 'react-redux';
 import { setNodeProgress } from '../../../redux/roadmapSlice';
-import { VscCopy, VscOpenPreview, VscFile, VscCommentDiscussion } from 'react-icons/vsc';
+import { VscCopy, VscOpenPreview, VscFile, VscCommentDiscussion, VscPlay, VscClearAll } from 'react-icons/vsc';
 import RoadmapContentSection from './RoadmapContentSection';
 import RoadmapContentNavigator from './RoadmapContentNavigator';
 import { loadMarkdownContent } from '../../../utils/markdownLoader';
@@ -12,6 +12,10 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/vs2015.css'; // VS Code 스타일 테마
 import { fetchRoadmapContent } from './constants';
 import { IdeMessengerContext } from '@/context/IdeMessenger';
+import { loadPyodide } from 'pyodide';
+import { setBottomMessage } from '@/redux/slices/uiStateSlice';
+import { initializeCodeBlock } from '../../../redux/codeBlockSlice';
+import CodeBlock from './CodeBlock';
 
 interface ContentData {
   title: string;
@@ -19,152 +23,8 @@ interface ContentData {
   content: string;
 }
 
-// 코드 블록 컴포넌트 수정
-const CodeBlock = ({ language, value }: { language: string; value: string }) => {
-    const ideMessenger = useContext(IdeMessengerContext); 
-  const dispatch = useDispatch();
-  const handleCopy = () => {
-    navigator.clipboard.writeText(value)
-      .then(() => alert('코드가 복사되었습니다!'))
-      .catch(err => console.error('복사 실패:', err));
-  };
-
-  const handlePasteToEditor = () => {
-    if (window.vscode) {
-      // 파일명 생성 (현재 시간 기반)
-      const timestamp = new Date().getTime();
-      const fileName = `code-snippet-${timestamp}.py`;
-      
-      // memFS에 파일 생성 및 내용 삽입
-      window.vscode.postMessage({
-        command: 'createFile',
-        filePath: `/mnt/memFS/${fileName}`,
-        content: value
-      });
-      
-      // 생성된 파일 열기
-      window.vscode.postMessage({
-        command: 'openFile',
-        filePath: `/mnt/memFS/${fileName}`
-      });
-      
- 
-    } else {
-      alert('VS Code 웹 에디터 환경에서만 사용 가능한 기능입니다.');
-    }
-  };
-
-  // 학습 도우미 전송 핸들러 추가
-  const handleSendToHelper = () => {
-    ideMessenger?.post('addEducationContextToChat', {
-      content: {
-        type: "doc",
-        content: [{
-          type: "educationBlock",
-          attrs: {
-            title: `코드 분석 요청 - ${new Date().toLocaleString()}`,
-            content: value,
-            category: "roadmap",
-            markdown: `\`\`\`${language}\n${value}\n\`\`\``
-          }
-        }]
-      },
-      shouldRun: true,
-      prompt: "이 코드를 분석하고 설명해주세요"
-    });
-
-  };
-  return (
-    <div style={{ 
-      position: 'relative',
-      margin: '16px 0',
-      fontSize: '1.1em'
-    }}>
-      <pre style={{
-        position: 'relative',
-        padding: '20px',
-        backgroundColor: 'var(--vscode-editor-background)',
-        borderRadius: '6px',
-        overflowX: 'auto',
-        border: '1px solid var(--vscode-editor-lineHighlightBorder)',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-      }}>
-        <div style={{
-          position: 'absolute',
-          right: '12px',
-          top: '12px',
-          display: 'flex',
-          gap: '4px'
-        }}>
-          <button
-            onClick={handleCopy}
-            style={{
-              background: 'var(--vscode-button-background)',
-              color: 'var(--vscode-button-foreground)',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            title="코드 복사"
-          >
-            <VscCopy size={18} />
-          </button>
-          <button
-            onClick={handlePasteToEditor}
-            style={{
-              background: 'var(--vscode-editorInfo-foreground)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            title="메모리 파일시스템에 생성"
-          >
-            <VscFile size={18} />
-          </button>
-          <button
-            onClick={handleSendToHelper}
-            style={{
-              background: 'var(--vscode-editorInfo-foreground)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s ease'
-            }}
-            title="학습 도우미에게 전송"
-          >
-            <VscCommentDiscussion size={18} />
-          </button>
-        </div>
-        <code
-          className={`hljs ${language}`}
-          style={{
-            display: 'block',
-            paddingRight: '120px',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
-            lineHeight: '1.6',
-            fontSize: '1em',
-            color: 'var(--vscode-editor-foreground)'
-          }}
-          dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(value).value }}
-        />
-      </pre>
-    </div>
-  );
-};
+// 코드 블록 ID를 localStorage에 저장하기 위한 키
+const BLOCK_IDS_STORAGE_KEY = 'roadmap-code-block-ids';
 
 const RoadmapContentView: React.FC = () => {
   const params = useParams();
@@ -174,6 +34,82 @@ const RoadmapContentView: React.FC = () => {
   const [contentData, setContentData] = useState<ContentData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [pyodideState, setPyodideState] = useState<{
+    instance: any;
+    status: 'loading' | 'ready' | 'error';
+  }>({ instance: null, status: 'loading' });
+  const [initStatus, setInitStatus] = useState('로드 중...');
+
+  // 코드 블록 ID 매핑을 위한 ref 사용
+  const blockIdsRef = useRef<Map<string, string>>(new Map());
+  const codeBlockCounterRef = useRef<number>(0);
+
+  // 컴포넌트 마운트 시 저장된 블록 ID 복원
+  useEffect(() => {
+    if (!contentId) return;
+    
+    try {
+      const savedBlockIds = localStorage.getItem(`${BLOCK_IDS_STORAGE_KEY}-${contentId}`);
+      if (savedBlockIds) {
+        const parsedBlockIds = JSON.parse(savedBlockIds);
+        blockIdsRef.current = new Map(Object.entries(parsedBlockIds));
+        // 저장된 ID 중 가장 큰 인덱스 값을 찾아서 카운터 초기화
+        const maxIndex = Math.max(...Array.from(blockIdsRef.current.values())
+          .map(id => parseInt(id.split('-').pop() || '0')));
+        codeBlockCounterRef.current = maxIndex + 1;
+      } else {
+        blockIdsRef.current = new Map();
+        codeBlockCounterRef.current = 0;
+      }
+    } catch (error) {
+      console.error('블록 ID 복원 실패:', error);
+      blockIdsRef.current = new Map();
+      codeBlockCounterRef.current = 0;
+    }
+  }, [contentId]);
+
+  // 블록 ID 저장 함수
+  const saveBlockIds = useCallback(() => {
+    if (!contentId) return;
+    
+    try {
+      const blockIdsObject = Object.fromEntries(blockIdsRef.current);
+      localStorage.setItem(`${BLOCK_IDS_STORAGE_KEY}-${contentId}`, 
+        JSON.stringify(blockIdsObject));
+    } catch (error) {
+      console.error('블록 ID 저장 실패:', error);
+    }
+  }, [contentId]);
+
+  // 코드 블록 ID 생성 함수
+  const getBlockId = useCallback((code: string) => {
+    if (!contentId) return `temp-block-${Date.now()}`;
+    
+    const codeKey = `${contentId}-${code.slice(0, 50)}`;
+    if (!blockIdsRef.current.has(codeKey)) {
+      const blockIndex = codeBlockCounterRef.current++;
+      const newBlockId = `${contentId}-block-${blockIndex}`;
+      blockIdsRef.current.set(codeKey, newBlockId);
+      saveBlockIds();
+    }
+    return blockIdsRef.current.get(codeKey)!;
+  }, [contentId, saveBlockIds]);
+
+  // Markdown 컴포넌트의 코드 블록 렌더링
+  const renderCodeBlock = useCallback(({className, children}: {className?: string, children: any}) => {
+    const code = String(children).trim();
+    const blockId = getBlockId(code);
+    const lang = className?.replace('language-', '') || 'text';
+    
+    return (
+      <CodeBlock 
+        language={lang}
+        value={code}
+        blockId={blockId}
+        pyodideState={pyodideState}
+      />
+    );
+  }, [getBlockId, pyodideState]);
 
   console.log('현재 경로 매개변수:', params);
   console.log('로드맵 ID:', roadmapId);
@@ -243,40 +179,62 @@ const RoadmapContentView: React.FC = () => {
     loadContent();
   }, [contentId, dispatch]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const initPyodide = async () => {
+      try {
+        setPyodideState(prev => ({ ...prev, status: 'loading' }));
+        
+        const pyodideInstance = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.3/full/",
+          stdout: console.log,
+          stderr: console.error
+        });
+        
+        await pyodideInstance.loadPackage(["micropip", "ssl", "pyodide-http"]);
+        
+        if (isMounted) {
+          setPyodideState({
+            instance: pyodideInstance,
+            status: 'ready'
+          });
+          dispatch(setBottomMessage(<div>Python 환경 준비 완료 🎉</div>));
+        }
+        
+      } catch (error) {
+        if (isMounted) {
+          setPyodideState(prev => ({ ...prev, status: 'error' }));
+          dispatch(setBottomMessage(<div>초기화 실패: {error instanceof Error ? error.message : '네트워크 오류'}</div>));
+        }
+      }
+    };
+
+    if (typeof WebAssembly === 'undefined' || !WebAssembly.validate) {
+      dispatch(setBottomMessage(<div>이 브라우저는 WebAssembly를 지원하지 않습니다 (버전 0.27.3 요구)</div>));
+      return;
+    }
+
+    initPyodide();
+
+    return () => {
+      isMounted = false;
+      if (pyodideState.instance) {
+        pyodideState.instance.runPython('import sys; sys.modules.clear()');
+      }
+    };
+  }, [dispatch]);
+
   const handleBack = () => {
     navigate(`/education/roadmap/${roadmapId}`);
   };
 
-  // 콘텐츠 완료 처리 함수
   const handleCompleteContent = () => {
     if (contentId) {
       dispatch(setNodeProgress({ 
         id: contentId, 
         status: 'completed' 
       }));
-      // 완료 후 로드맵으로 돌아가기
       navigate(`/education/roadmap/${roadmapId}`);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
-      .then(() => {
-        alert('클립보드에 복사되었습니다!');
-      })
-      .catch(err => {
-        console.error('복사 실패:', err);
-      });
-  };
-
-  const sendToEditor = (content: string) => {
-    if (window.vscode) {
-      window.vscode.postMessage({
-        command: 'insertCode',
-        text: content
-      });
-    } else {
-      alert('VS Code 에디터에서만 사용 가능한 기능입니다.');
     }
   };
 
@@ -301,12 +259,7 @@ const RoadmapContentView: React.FC = () => {
         <Markdown
           children={contentData.content}
           components={{
-            code: ({ className, children }) => (
-              <CodeBlock 
-                language={className?.replace('language-', '')} 
-                value={String(children)} 
-              />
-            )
+            code: renderCodeBlock
           }}
         />
       </RoadmapContentSection>
@@ -394,22 +347,6 @@ const RoadmapContentView: React.FC = () => {
         
         a:hover {
           text-decoration: underline;
-        }
-        
-        .action-icons {
-          display: flex;
-          gap: 8px;
-          margin-top: 5px;
-        }
-        
-        .icon {
-          cursor: pointer;
-          color: var(--vscode-icon-foreground);
-          transition: color 0.2s;
-        }
-        
-        .icon:hover {
-          color: var(--vscode-button-hoverBackground);
         }
       `}</style>
     </div>
