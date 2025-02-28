@@ -1,28 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
-import pythonContent from './data/pythonRoadmapContent.json';
 import { useDispatch } from 'react-redux';
 import { setNodeProgress } from '../../../redux/roadmapSlice';
 import { VscCopy, VscOpenPreview } from 'react-icons/vsc';
-
-interface Resource {
-  title: string;
-  url: string;
-}
-
-interface Challenge {
-  title: string;
-  description: string;
-}
+import RoadmapContentSection from './RoadmapContentSection';
+import RoadmapContentNavigator from './RoadmapContentNavigator';
+import { loadMarkdownContent } from '../../../utils/markdownLoader';
+import { useEffect as useHighlightEffect } from 'react';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/vs2015.css'; // VS Code 스타일 테마
+import { setBottomMessage } from '../../../redux/slices/uiStateSlice';
+import { fetchRoadmapContent } from './constants';
 
 interface ContentData {
   title: string;
   description: string;
   content: string;
-  resources?: Resource[];
-  challenges?: Challenge[];
 }
+
+// 코드 블록 컴포넌트 추가
+const CodeBlock = ({ language, value }: { language: string; value: string }) => {
+  return (
+    <pre>
+      <code
+        className={`hljs ${language}`}
+        dangerouslySetInnerHTML={{
+          __html: hljs.highlightAuto(value).value,
+        }}
+      />
+    </pre>
+  );
+};
 
 const RoadmapContentView: React.FC = () => {
   const params = useParams();
@@ -48,34 +57,58 @@ const RoadmapContentView: React.FC = () => {
     );
   };
 
+  // Highlight.js 초기화
+  useHighlightEffect(() => {
+    hljs.configure({
+      languages: ['python', 'bash', 'javascript', 'typescript', 'json'],
+    });
+    hljs.highlightAll();
+  }, []);
+
   useEffect(() => {
-    setIsLoading(true);
-    try {
+    const loadContent = async () => {
+      setIsLoading(true);
       if (!contentId) {
-        throw new Error('콘텐츠 ID가 없습니다.');
+        setIsLoading(false);
+        setError('콘텐츠 ID가 없습니다');
+        return;
       }
       
-      // 콘텐츠 데이터가 있는지 확인
-      console.log('전체 콘텐츠 데이터:', pythonContent);
-      
-      // 문자열 키로 데이터 접근
-      const content = pythonContent[contentId as string];
-      
-      if (!content) {
-        throw new Error(`ID가 ${contentId}인 콘텐츠를 찾을 수 없습니다.`);
+      try {
+        const roadmapContent = await fetchRoadmapContent();
+        const contentInfo = roadmapContent[contentId];
+        
+        if (!contentInfo) {
+          setIsLoading(false);
+          setError('유효하지 않은 콘텐츠 ID입니다');
+          return;
+        }
+        
+        const contentPath = contentInfo.contentFile;
+        const markdownContent = await loadMarkdownContent(contentPath);
+        
+        setContentData({
+          title: contentInfo.title,
+          description: contentInfo.description,
+          content: markdownContent || '# 기본 콘텐츠\n콘텐츠를 불러올 수 없습니다'
+        });
+        setError(null);
+        
+      } catch (error) {
+        console.error('Content load error:', error);
+        setError(`콘텐츠 로드 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+        setContentData({
+          title: '임시 제목',
+          description: '임시 설명',
+          content: '# 임시 콘텐츠\n문제가 발생했습니다. 관리자에게 문의해주세요.',
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
-      console.log('선택된 콘텐츠:', content);
-      setContentData(content as ContentData);
-      setError(null);
-    } catch (err) {
-      console.error('콘텐츠 로드 오류:', err);
-      setError(err instanceof Error ? err.message : '콘텐츠를 불러오는 중 오류가 발생했습니다.');
-      setContentData(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [contentId]);
+    };
+
+    loadContent();
+  }, [contentId, dispatch]);
 
   const handleBack = () => {
     navigate(`/education/roadmap/${roadmapId}`);
@@ -116,74 +149,40 @@ const RoadmapContentView: React.FC = () => {
 
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러: {error}</div>;
-  if (!contentData) return <div>콘텐츠를 찾을 수 없습니다.</div>;
+  if (!contentData) return (
+    <div className="error-container">
+      <h2>⚠️ 콘텐츠 로드 실패</h2>
+      <p>문제가 지속되면 관리자에게 문의해주세요</p>
+      <button onClick={handleBack}>돌아가기</button>
+    </div>
+  );
 
   return (
     <div className="roadmap-content-view">
       <div className="roadmap-content-header">
- 
         <h1>{contentData.title}</h1>
         <p className="description">{contentData.description}</p>
       </div>
       
-      <div className="roadmap-content-body">
-        <div className="markdown-content">
-          <Markdown>{contentData.content}</Markdown>
-        </div>
-        
-        {contentData.resources && contentData.resources.length > 0 && (
-          <div className="resources-section">
-            <h2>참고 자료</h2>
-            <ul>
-              {contentData.resources.map((resource, index) => (
-                <li key={index}>
-                  <a href={resource.url} target="_blank" rel="noopener noreferrer">
-                    {resource.title}
-                  </a>
-                  <div className="action-icons">
-                    <VscCopy 
-                      onClick={() => copyToClipboard(resource.url)} 
-                      className="icon" 
-                      title="링크 복사"
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        
-        {contentData.challenges && contentData.challenges.length > 0 && (
-          <div className="challenges-section">
-            <h2>도전 과제</h2>
-            <ul>
-              {contentData.challenges.map((challenge, index) => (
-                <li key={index}>
-                  <h3>{challenge.title}</h3>
-                  <p>{challenge.description}</p>
-                  <div className="action-icons">
-                    <VscCopy
-                      onClick={() => copyToClipboard(challenge.description)}
-                      className="icon"
-                      title="설명 복사"
-                    />
-                    <VscOpenPreview
-                      onClick={() => sendToEditor(challenge.description)}
-                      className="icon"
-                      title="에디터로 보내기"
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-      
-      <button onClick={handleCompleteContent}>
-        학습 완료 표시하기
-      </button>
-      
+      <RoadmapContentSection title="학습 내용">
+        <Markdown
+          children={contentData.content}
+          components={{
+            code: ({ className, children }) => (
+              <CodeBlock 
+                language={className?.replace('language-', '')} 
+                value={String(children)} 
+              />
+            )
+          }}
+        />
+      </RoadmapContentSection>
+
+      <RoadmapContentNavigator 
+        onComplete={handleCompleteContent} 
+        onBack={handleBack} 
+      />
+
       <style jsx>{`
         .roadmap-content-view {
           padding: 20px;

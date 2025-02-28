@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { 
   ReactFlow,
   Controls,
@@ -21,9 +21,9 @@ import { setBottomMessage } from "../../redux/slices/uiStateSlice";
 // 로컬 컴포넌트 및 유틸 임포트
 import NodeContent from './roadmap/NodeContent';
 import { layoutElements } from './roadmap/layout-elements';
-import { pythonNodes, pythonEdges } from './roadmap/constants';
+import { roadmapNodes, roadmapEdges, fetchRoadmapData, fetchRoadmapContent } from './roadmap/constants';
 import { RoadmapViewProps } from './types';
-import pythonRoadmapContent from './roadmap/data/pythonRoadmapContent.json';
+import { RoadmapData } from './roadmap/types';
 
 // 노드 타입 정의
 const nodeTypes = {
@@ -51,19 +51,24 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   
   const prevViewport = useRef<Viewport>({ x: 0, y: 0, zoom: 1 });
   
+  const [roadmapContent, setRoadmapContent] = useState<RoadmapData>({ nodes: [], edges: [] });
+  
   // 컴포넌트 마운트 시 데이터 로드
-  React.useEffect(() => {
+  useEffect(() => {
     loadRoadmapData(routerRoadmapId);
-  }, [routerRoadmapId]);
+    fetchRoadmapData().then(data => {
+      setRoadmapContent(data);
+    });
+  }, [routerRoadmapId,]);
   
   // 로드맵 데이터 로드 함수
   const loadRoadmapData = (id: string) => {
     console.log('Loading roadmap data for:', id);
-    console.log('Python nodes:', pythonNodes);
-    console.log('Python edges:', pythonEdges);
+    console.log('Python nodes:', roadmapNodes);
+    console.log('Python edges:', roadmapEdges);
     
     // 원본 데이터 변환
-    const originalData = transformToTreeFormat(pythonNodes, pythonEdges);
+    const originalData = transformToTreeFormat(roadmapNodes, roadmapEdges);
     console.log('Original tree data:', originalData);
     
     // 루트 노드 ID 확인
@@ -82,23 +87,26 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
   };
   
   // 노드 클릭 핸들러 - 콘텐츠 페이지로 이동
-  const onNodeClick = useCallback((event: React.MouseEvent, node: FlowNode) => {
+  const onNodeClick = useCallback(async (event: React.MouseEvent, node: FlowNode) => {
     if (node.type === 'groupNode') return;
     
-    // 콘텐츠 데이터에 해당 노드 ID가 있는지 확인
     const contentId = node.id;
-    const pythonContent = pythonRoadmapContent[contentId as keyof typeof pythonRoadmapContent];
-    
-    if (pythonContent) {
-      navigate(`/education/roadmap/${routerRoadmapId}/content/${contentId}`);
-    } else {
-      console.log(`ID가 ${contentId}인 콘텐츠를 찾을 수 없습니다.`);
+    try {
+      const contentData = await fetchRoadmapContent();
+      if (contentData[contentId]) {
+        navigate(`/education/roadmap/${routerRoadmapId}/content/${contentId}`);
+      } else {
+        console.error('콘텐츠 정보 없음:', contentId);
+      }
+    } catch (error) {
+      console.error('콘텐츠 조회 실패:', error);
+  
     }
-  }, [navigate, routerRoadmapId]);
+  }, [navigate, routerRoadmapId, dispatch]);
   
   // 레이아웃 방향 변경
   const onLayout = useCallback((direction: 'TB' | 'LR') => {
-    const originalData = transformToTreeFormat(pythonNodes, pythonEdges);
+    const originalData = transformToTreeFormat(roadmapNodes, roadmapEdges);
     const rootId = Object.keys(originalData).find(id => !originalData[id].parents?.length) || 'python';
     
     const { nodes: layoutedNodes, edges: layoutedEdges } = 
