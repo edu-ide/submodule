@@ -92,15 +92,49 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) => {
     
     const contentId = node.id;
     try {
-      const contentData = await fetchRoadmapContent();
-      if (contentData[contentId]) {
-        navigate(`/education/roadmap/${routerRoadmapId}/content/${contentId}`);
-      } else {
-        console.error('콘텐츠 정보 없음:', contentId);
+      console.log('클릭한 노드 전체 정보:', {
+        id: node.id,
+        type: node.type,
+        data: node.data,
+        position: node.position
+      });
+
+      const roadmapContent = await fetchRoadmapContent();
+      console.log('가져온 콘텐츠 데이터:', roadmapContent);
+      
+      if (!roadmapContent.roadmap[contentId]) {
+        console.error('콘텐츠 정보 없음:', {
+          contentId,
+          availableIds: Object.keys(roadmapContent.roadmap),
+          nodeData: node.data
+        });
+        
+        dispatch(setBottomMessage(
+          <div>
+            해당 콘텐츠를 찾을 수 없습니다.
+            <br />
+            노드 ID: {contentId}
+            <br />
+            노드 정보: {JSON.stringify(node.data)}
+          </div>
+        ));
+        return;
       }
+
+      navigate(`/education/roadmap/${routerRoadmapId}/content/${contentId}`);
+      
     } catch (error) {
       console.error('콘텐츠 조회 실패:', error);
-  
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+      dispatch(setBottomMessage(
+        <div>
+          콘텐츠 조회 중 오류가 발생했습니다: {errorMessage}
+          <br />
+          노드 ID: {contentId}
+          <br />
+          노드 데이터: {JSON.stringify(node.data)}
+        </div>
+      ));
     }
   }, [navigate, routerRoadmapId, dispatch]);
   
@@ -262,20 +296,21 @@ const transformToTreeFormat = (nodes: any[], edges: any[]) => {
   
   // 노드 변환
   nodes.forEach(node => {
-    // 메인 노드 여부 판단 (column 속성이 있으면 메인 노드로 간주)
-    const isMain = !!node.data?.column;
+    const isMain = node.data?.column === 'main';
     
     treeData[node.id] = {
       id: node.id,
       name: node.data?.title || node.id,
       description: node.data?.description || '',
       status: node.data?.status || 'not-started',
+      order: node.data?.order || '0',
       type: node.type,
-      isMain, // 메인 노드 여부 추가
+      isMain,
       category: isMain ? 'main' : 'sub',
       children: [],
       siblings: [],
-      spouses: []
+      spouses: [],
+      prerequisites: []
     };
   });
   
@@ -284,37 +319,28 @@ const transformToTreeFormat = (nodes: any[], edges: any[]) => {
     const sourceId = edge.source;
     const targetId = edge.target;
     
-    // 관계 유형에 따라 분류
     if (treeData[sourceId] && treeData[targetId]) {
       const connectionType = edge.data?.type || 'child';
       
-      if (connectionType === 'spouse') {
-        treeData[sourceId].spouses.push(targetId);
-        treeData[targetId].isSpouse = true;
-      } else if (connectionType === 'sibling') {
-        treeData[sourceId].siblings.push(targetId);
-        treeData[targetId].isSibling = true;
-      } else {
-        // 기본값은 자식 관계
+      if (connectionType === 'main') {
+        // 메인 트랙 연결
         treeData[sourceId].children.push(targetId);
+        treeData[targetId].prerequisites.push(sourceId);
+      } else if (connectionType === 'child') {
+        // 서브 트랙 연결
+        treeData[sourceId].children.push(targetId);
+        treeData[targetId].prerequisites.push(sourceId);
       }
     }
   });
   
-  // 부모 배열 계산 (역방향 관계)
+  // 순서에 따라 노드 정렬
   Object.keys(treeData).forEach(nodeId => {
-    treeData[nodeId].parents = [];
-  });
-  
-  Object.keys(treeData).forEach(nodeId => {
-    const node = treeData[nodeId];
-    if (node.children) {
-      node.children.forEach((childId: string) => {
-        if (treeData[childId]) {
-          treeData[childId].parents.push(nodeId);
-        }
-      });
-    }
+    treeData[nodeId].children.sort((a: string, b: string) => {
+      const orderA = parseFloat(treeData[a].order);
+      const orderB = parseFloat(treeData[b].order);
+      return orderA - orderB;
+    });
   });
   
   return treeData;

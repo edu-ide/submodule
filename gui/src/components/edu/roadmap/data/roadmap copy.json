@@ -7,7 +7,8 @@
         "title": "파이썬 시작하기",
         "description": "개발 환경 설정 및 기초",
         "status": "completed",
-        "column": "main"
+        "column": "main",
+        "order": 1
       }
     },
     {
@@ -17,7 +18,8 @@
         "title": "기본 문법",
         "description": "파이썬 프로그래밍의 기초",
         "status": "completed",
-        "column": "main"
+        "column": "main",
+        "order": 2
       }
     },
     {
@@ -27,7 +29,8 @@
         "title": "자료 구조",
         "description": "파이썬의 주요 자료구조",
         "status": "in-progress",
-        "column": "main"
+        "column": "main",
+        "order": 3
       }
     },
     {
@@ -37,7 +40,8 @@
         "title": "함수",
         "description": "코드 재사용을 위한 블록",
         "status": "not-started",
-        "column": "main"
+        "column": "main",
+        "order": 4
       }
     },
     {
@@ -47,7 +51,8 @@
         "title": "객체지향 프로그래밍",
         "description": "클래스와 객체 활용",
         "status": "not-started",
-        "column": "main"
+        "column": "main",
+        "order": 5
       }
     },
     {
@@ -57,7 +62,8 @@
         "title": "모듈과 패키지",
         "description": "코드 구성과 재사용",
         "status": "not-started",
-        "column": "main"
+        "column": "main",
+        "order": 6
       }
     },
     {
@@ -67,7 +73,8 @@
         "title": "고급 주제",
         "description": "고급 파이썬 기능",
         "status": "not-started",
-        "column": "main"
+        "column": "main",
+        "order": 7
       }
     },
     {
@@ -76,7 +83,8 @@
       "data": {
         "title": "환경 설정",
         "description": "Python 설치 및 IDE 선택",
-        "status": "completed"
+        "status": "completed",
+        "order": 1.1
       }
     },
     {
@@ -85,7 +93,8 @@
       "data": {
         "title": "Hello World",
         "description": "첫 번째 파이썬 프로그램",
-        "status": "completed"
+        "status": "completed",
+        "order": 1.2
       }
     },
     {
@@ -94,7 +103,8 @@
       "data": {
         "title": "변수와 자료형",
         "description": "변수 선언과 기본 자료형",
-        "status": "completed"
+        "status": "completed",
+        "order": 2.1
       }
     },
     {
@@ -103,7 +113,8 @@
       "data": {
         "title": "연산자",
         "description": "산술, 비교, 논리 연산자",
-        "status": "completed"
+        "status": "completed",
+        "order": 2.2
       }
     },
     {
@@ -112,7 +123,8 @@
       "data": {
         "title": "조건문",
         "description": "if, else, elif 구문",
-        "status": "in-progress"
+        "status": "in-progress",
+        "order": 2.3
       }
     },
     {
@@ -121,7 +133,8 @@
       "data": {
         "title": "반복문",
         "description": "for, while 반복문",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 2.4
       }
     },
     {
@@ -130,7 +143,8 @@
       "data": {
         "title": "리스트",
         "description": "순서가 있는 컬렉션",
-        "status": "completed"
+        "status": "completed",
+        "order": 3.1
       }
     },
     {
@@ -139,7 +153,8 @@
       "data": {
         "title": "튜플",
         "description": "불변 시퀀스 자료형",
-        "status": "in-progress"
+        "status": "in-progress",
+        "order": 3.2
       }
     },
     {
@@ -148,7 +163,8 @@
       "data": {
         "title": "딕셔너리",
         "description": "키-값 쌍 컬렉션",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 3.3
       }
     },
     {
@@ -157,7 +173,8 @@
       "data": {
         "title": "집합",
         "description": "중복되지 않는 요소 모음",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 3.4
       }
     },
     {
@@ -166,7 +183,8 @@
       "data": {
         "title": "함수 기초",
         "description": "함수 선언과 호출",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 4.1
       }
     },
     {
@@ -175,7 +193,8 @@
       "data": {
         "title": "매개변수",
         "description": "위치 및 키워드 인자",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 4.2
       }
     },
     {
@@ -184,7 +203,8 @@
       "data": {
         "title": "반환 값",
         "description": "함수에서 값 반환하기",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 4.3
       }
     },
     {
@@ -193,7 +213,8 @@
       "data": {
         "title": "클래스",
         "description": "객체의 청사진",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 5.1
       }
     },
     {
@@ -202,7 +223,8 @@
       "data": {
         "title": "상속",
         "description": "기존 클래스 확장",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 5.2
       }
     },
     {
@@ -211,7 +233,8 @@
       "data": {
         "title": "모듈 기초",
         "description": "모듈 가져오기와 사용",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 6.1
       }
     },
     {
@@ -220,7 +243,8 @@
       "data": {
         "title": "패키지",
         "description": "다수의 모듈 관리",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 6.2
       }
     },
     {
@@ -229,7 +253,8 @@
       "data": {
         "title": "pip",
         "description": "패키지 설치 및 관리",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 6.3
       }
     },
     {
@@ -238,7 +263,8 @@
       "data": {
         "title": "예외 처리",
         "description": "오류 처리 메커니즘",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 7.1
       }
     },
     {
@@ -247,7 +273,8 @@
       "data": {
         "title": "제너레이터",
         "description": "반복자 및 제너레이터 함수",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 7.2
       }
     },
     {
@@ -256,7 +283,8 @@
       "data": {
         "title": "데코레이터",
         "description": "함수와 메서드 확장",
-        "status": "not-started"
+        "status": "not-started",
+        "order": 7.3
       }
     }
   ],
