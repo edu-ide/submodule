@@ -172,11 +172,10 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('pearai.loadZipContent', async () => {
-      const url = await vscode.window.showInputBox({
-        prompt: 'Enter the URL of the ZIP file'
-      });
-      //const url = 'http://localhost:9000/edu/content/test/test2.zip';
+    vscode.commands.registerCommand('pearai.loadZipContent', async (url: string) => {
+	// for (const [name] of memFs.readDirectory(vscode.Uri.parse('memfs:/'))) {
+	// 		memFs.delete(vscode.Uri.parse(`memfs:/${name}`));
+	// 	}
       
       if (url) {
         try {
@@ -191,7 +190,7 @@ export function activate(context: vscode.ExtensionContext) {
           // 워크스페이스 초기화 명령어 실행
           await vscode.commands.executeCommand('pearai.openMemFS');
           
-          vscode.window.showInformationMessage('ZIP content loaded successfully');
+          vscode.window.showInformationMessage('Practice Content loaded successfully');
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Unknown error occurred';
           vscode.window.showErrorMessage(`Failed to load ZIP: ${message}`);

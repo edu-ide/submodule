@@ -570,6 +570,10 @@ class VsCodeIde implements IDE {
 
     return "";
   }
+
+  async createPracticeWorkspace(url: string): Promise<void> {
+    await vscode.commands.executeCommand('pearai.loadZipContent', url);
+  }
 }
 
 export { VsCodeIde };

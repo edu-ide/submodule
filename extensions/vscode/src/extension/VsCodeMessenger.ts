@@ -539,5 +539,9 @@ export class VsCodeMessenger {
         sessions.map((session) => workOsAuthProvider.removeSession(session.id)),
       );
     });
+
+    this.onWebviewOrCore("createPracticeWorkspace", async (msg) => {
+      await vscode.commands.executeCommand('pearai.loadZipContent', msg.data.url);
+    });
   }
 }

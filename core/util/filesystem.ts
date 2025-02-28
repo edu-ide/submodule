@@ -242,6 +242,10 @@ class FileSystemIde implements IDE {
   getCurrentDirectory(): Promise<string> {
     return Promise.resolve("");
   }
+
+  async createPracticeWorkspace(url: string): Promise<void> {
+    console.log(`Creating practice workspace from: ${url}`);
+  }
 }
 
 export default FileSystemIde;
