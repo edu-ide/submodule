@@ -1,176 +1,137 @@
 import React, { memo } from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 
-const { Top, Bottom, Left, Right } = Position;
-
 // Node 데이터 인터페이스
-interface NodeData {
-  label?: string;
-  name?: string;
-  description?: string;
-  status?: string;
-  direction?: string;
-  isRoot?: boolean;
+interface CustomNodeData {
   isSpouse?: boolean;
   isSibling?: boolean;
+  direction?: string;
+  isRoot?: boolean;
   hasChildren?: boolean;
   hasSiblings?: boolean;
   hasSpouses?: boolean;
+  children?: any[];
+  siblings?: any[];
+  spouses?: any[];
+  name?: string;
+  label?: string;
+  description?: string;
+  level?: string;
+  style?: {
+    backgroundColor?: string;
+    borderColor?: string;
+    headerColor?: string;
+    iconEmoji?: string;
+    border?: string;
+  };
+  [key: string]: any; // 인덱스 시그니처 추가
 }
 
-const CustomNode = memo(({ data, id }: NodeProps) => {
-  const nodeData = data as NodeData;
-  const { 
-    direction, isRoot, label, name, description, 
-    status, hasChildren, hasSiblings, hasSpouses,
-    isSpouse, isSibling
-  } = nodeData;
-  
+// NodeProps를 확장하는 대신 필요한 타입만 정의
+interface CustomNodeProps {
+  data: CustomNodeData;
+  id: string;
+  selected?: boolean;
+  onClick?: (event: React.MouseEvent) => void;
+}
+
+const CustomNode = memo(({ data, id, selected, onClick }: CustomNodeProps) => {
   // 방향 설정
-  const isTreeHorizontal = direction === 'LR';
+  const isHorizontal = data.direction === 'LR';
   
-  // 타겟 포지션 계산
-  const getTargetPosition = () => {
-    if (isSpouse) {
-      return isTreeHorizontal ? Top : Left;
-    } else if (isSibling) {
-      return isTreeHorizontal ? Bottom : Right;
-    }
-    return isTreeHorizontal ? Left : Top;
+  // 노드 스타일 설정
+  const nodeStyle = {
+    backgroundColor: data.style?.backgroundColor || 'rgba(255, 255, 255, 0.9)',
+    border: data.style?.border || `2px solid ${data.style?.borderColor || '#ccc'}`,
+    borderRadius: 12,
+    overflow: 'hidden',
+    minWidth: 220,
+    boxShadow: selected ? '0 0 15px #3b82f6' : '0 4px 12px rgba(0, 0, 0, 0.1)',
+    transition: 'box-shadow 0.2s, transform 0.2s',
+    transform: selected ? 'scale(1.02)' : 'scale(1)',
+    cursor: 'pointer'
   };
-  
-  // 상태에 따른 스타일
-  let statusColor = '#9ca3af'; // 기본 회색
-  if (status === 'completed') statusColor = '#10b981'; // 완료 - 녹색
-  else if (status === 'in-progress') statusColor = '#3b82f6'; // 진행 중 - 파란색
-  else if (status === 'not-started') statusColor = '#8b5cf6'; // 시작 안함 - 보라색
-  else if (isSpouse) statusColor = '#f59e0b'; // 배우자 - 주황색
-  else if (isSibling) statusColor = '#8b5cf6'; // 형제 - 보라색
-  
+
+  // 핸들 스타일
+  const handleStyle = {
+    background: '#60a5fa',
+    width: 8,
+    height: 8,
+    opacity: 0.9,
+    border: '2px solid white'
+  };
+
   return (
-    <div className="custom-node" style={{
-      background: '#ffffff',
-      border: `2px solid ${statusColor}`,
-      borderRadius: '8px',
-      padding: '10px',
-      minWidth: '150px',
-      position: 'relative',
-      zIndex: 1
-    }}>
-      {/* 자식 노드를 위한 핸들 */}
-      {hasChildren && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Right : Bottom}
-          id={isTreeHorizontal ? Right : Bottom}
-          style={{ background: '#10b981', zIndex: 10 }}
-        />
-      )}
+    <div style={nodeStyle} onClick={onClick} className="roadmap-node">
+      {/* 왼쪽 핸들 */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="left"
+        style={handleStyle}
+      />
       
-      {/* 배우자 노드를 위한 핸들 */}
-      {hasSpouses && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Bottom : Right}
-          id={isTreeHorizontal ? Bottom : Right}
-          style={{ background: '#f59e0b' }}
-        />
-      )}
+      {/* 오른쪽 핸들 */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        style={handleStyle}
+      />
       
-      {/* 형제 노드를 위한 핸들 */}
-      {hasSiblings && (
-        <Handle
-          type="source"
-          position={isTreeHorizontal ? Top : Left}
-          id={isTreeHorizontal ? Top : Left}
-          style={{ background: '#8b5cf6' }}
-        />
-      )}
+      {/* 상단 핸들 */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="top"
+        style={handleStyle}
+      />
       
-      {/* 타겟 핸들 */}
-      {!isRoot && (
-        <Handle
-          type="target"
-          position={getTargetPosition()}
-          id={getTargetPosition()}
-          style={{ background: statusColor }}
-        />
-      )}
-      
-      {/* 노드 콘텐츠 */}
-      <div style={{ 
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '5px'
-      }}>
-        <div style={{ 
-          fontWeight: 'bold',
-          fontSize: '14px',
-          color: '#000000',
-          marginBottom: '5px'
-        }}>
-          {name || label || id}
+      {/* 하단 핸들 */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="bottom"
+        style={handleStyle}
+      />
+
+      {/* 노드 내용 */}
+      <div className="flow-node-content">
+        <div 
+          className="flow-node-header" 
+          style={{
+            backgroundColor: data.style?.headerColor || '#3b82f6',
+            padding: '8px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            color: 'white'
+          }}
+        >
+          <span className="level-icon">{data.style?.iconEmoji || '📚'}</span>
+          <span className="level-text">{data.level || '기본'}</span>
         </div>
-        {description && (
-          <div style={{ 
-            fontSize: '12px',
-            color: '#666666'
-          }}>
-            {description}
-          </div>
-        )}
-        {isSpouse && <div className="node-tag spouse-tag">배우자</div>}
-        {isSibling && <div className="node-tag sibling-tag">형제</div>}
+        <div 
+          className="flow-node-title"
+          style={{
+            padding: '12px 16px 8px',
+            fontWeight: 'bold',
+            fontSize: '1.1rem'
+          }}
+        >
+          {data.name || data.label}
+        </div>
+        <div 
+          className="flow-node-description"
+          style={{
+            padding: '0 16px 12px',
+            fontSize: '0.85rem',
+            color: 'var(--vscode-descriptionForeground)',
+            lineHeight: 1.4
+          }}
+        >
+          {data.description}
+        </div>
       </div>
-      
-      <style jsx>{`
-        .custom-node {
-          background: var(--vscode-editor-background, #ffffff);
-          border-radius: 8px;
-          padding: 10px;
-          min-width: 150px;
-          position: relative;
-          z-index: 1;
-          border: 2px solid ${statusColor || '#ccc'};
-        }
-        
-        .node-content {
-          display: flex;
-          flex-direction: column;
-          padding: 5px;
-        }
-        
-        .node-title {
-          font-weight: bold;
-          font-size: 14px;
-          color: var(--vscode-editor-foreground, #000000);
-          margin-bottom: 5px;
-        }
-        
-        .node-description {
-          font-size: 12px;
-          color: var(--vscode-descriptionForeground, #666666);
-        }
-        
-        .node-tag {
-          font-size: 10px;
-          font-weight: bold;
-          padding: 2px 4px;
-          border-radius: 4px;
-          margin-top: 5px;
-          align-self: flex-start;
-        }
-        
-        .spouse-tag {
-          background: #f59e0b20;
-          color: #f59e0b;
-        }
-        
-        .sibling-tag {
-          background: #8b5cf620;
-          color: #8b5cf6;
-        }
-      `}</style>
     </div>
   );
 });

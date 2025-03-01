@@ -1,0 +1,19 @@
+{
+  "id": "python-supplement",
+  "title": "파이썬 부록: 실전 가이드",
+  "description": "실무에서 활용 가능한 파이썬 개발 도구, 패키징, 배포 가이드",
+  "introduction": "이 로드맵에서는 파이썬 개발자로서 알아야 할 실무 도구, 테크닉, 그리고 모범 사례들을 소개합니다. 개발 환경 설정부터 패키지 배포까지 파이썬 프로젝트의 전체 생명주기를 다루는 내용이 포함되어 있습니다.",
+  "prerequisites": ["파이썬 기초 지식", "객체 지향 프로그래밍 개념 이해"],
+  "learningOutcomes": [
+    "개발 환경 설정 및 도구 활용법 습득",
+    "파이썬 코딩 스타일 가이드 적용",
+    "고급 파이썬 코딩 문제 해결 능력 향상",
+    "파이썬 패키지 배포 및 관리 방법 습득"
+  ],
+  "roadmapPath": "python/supplement/supplement-roadmap.json",
+  "difficulty": "중급",
+  "tags": ["python", "packaging", "deployment", "style-guide", "tooling"],
+  "estimatedTime": "4 시간",
+  "author": "파이썬 교육 팀",
+  "relatedRoadmaps": ["python", "python-basic", "python-data"]
+} 

@@ -70,6 +70,10 @@ export interface RoadmapNode {
     description: string;
     status: string;
     column?: string; // 선택적 속성
+    content_section?: string; // 섹션 정보 추가
+    label?: string; // 라벨 정보 추가
+    content_file?: string; // 콘텐츠 파일 정보 추가
+    order?: string; // 순서 정보 추가
   };
 }
 

@@ -5,6 +5,7 @@ import serverStateReducer from "./slices/serverStateReducer";
 import stateReducer from "./slices/stateSlice";
 import uiStateReducer from "./slices/uiStateSlice";
 import roadmapReducer from './roadmapSlice';
+import languageReducer from './slices/languageSlice';
 import { initialState as roadmapInitialState } from './roadmapSlice';
 
 import { createTransform, persistReducer, persistStore } from "redux-persist";
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   uiState: uiStateReducer,
   serverState: serverStateReducer,
   roadmap: roadmapReducer,
+  language: languageReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
@@ -54,7 +56,7 @@ const persistConfig = {
   key: "root",
   storage,
   blacklist: ['uiState'],
-  whitelist: ['roadmap'],
+  whitelist: ['roadmap', 'language'],
   transforms: [
     ...saveSubsetFilters,
     // windowIDTransform((window as any).windowId || "undefinedWindowId"),

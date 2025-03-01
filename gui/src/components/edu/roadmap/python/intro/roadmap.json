@@ -1,4 +1,5 @@
 {
+  "id": "python-intro",
   "nodes": [
     {
       "id": "python-intro",
@@ -8,7 +9,8 @@
         "description": "파이썬 언어의 특징과 활용",
         "status": "not-started",
         "order": "1.1",
-        "column": "main"
+        "column": "main",
+        "content_file": "python-intro.md"
       }
     },
     {
@@ -19,7 +21,8 @@
         "description": "개발 환경 구축",
         "status": "not-started",
         "order": "1.2",
-        "column": "main"
+        "column": "main",
+        "content_file": "python-install.md"
       }
     },
     {
@@ -30,7 +33,8 @@
         "description": "기본 명령어 학습",
         "status": "not-started",
         "column": "main",
-        "order": "1.3"
+        "order": "1.3",
+        "content_file": "python-interpreter.md"
       }
     },
     {
@@ -41,7 +45,8 @@
         "description": "대화형 개발 환경 설정",
         "status": "not-started",
         "column": "main",
-        "order": "1.4"
+        "order": "1.4",
+        "content_file": "jupyter-install.md"
       }
     },
     {
@@ -52,7 +57,8 @@
         "description": "기초 프로그래밍 개념",
         "status": "not-started",
         "column": "main",
-        "order": "1.5"
+        "order": "1.5",
+        "content_file": "python-basics.md"
       }
     },
     {
@@ -63,7 +69,8 @@
         "description": "파이썬의 주요 자료구조",
         "status": "not-started",
         "column": "main",
-        "order": "1.6"
+        "order": "1.6",
+        "content_file": "data-structures.md"
       }
     },
     {
@@ -74,7 +81,8 @@
         "description": "파일 및 데이터 처리",
         "status": "not-started",
         "column": "main",
-        "order": "1.7"
+        "order": "1.7",
+        "content_file": "io-file.md"
       }
     },
     {
@@ -85,7 +93,9 @@
         "description": "기본 데이터 타입 이해",
         "status": "not-started",
         "order": "1.5.1",
-        "column": "child"
+        "column": "child",
+        "content_file": "python-basics.md",
+        "content_section": "변수와 데이터 타입"
       }
     },
     {
@@ -96,7 +106,9 @@
         "description": "다양한 연산자 활용",
         "status": "not-started",
         "order": "1.5.2",
-        "column": "child"
+        "column": "child",
+        "content_file": "python-basics.md",
+        "content_section": "연산자"
       }
     },
     {
@@ -107,7 +119,9 @@
         "description": "if-elif-else 구문",
         "status": "not-started",
         "order": "1.5.3",
-        "column": "child"
+        "column": "child",
+        "content_file": "python-basics.md",
+        "content_section": "조건문"
       }
     },
     {
@@ -118,7 +132,9 @@
         "description": "for와 while 반복문",
         "status": "not-started",
         "order": "1.5.4",
-        "column": "child"
+        "column": "child",
+        "content_file": "python-basics.md",
+        "content_section": "반복문"
       }
     },
     {
@@ -129,7 +145,9 @@
         "description": "순서가 있는 컬렉션",
         "status": "not-started",
         "order": "1.6.1",
-        "column": "child"
+        "column": "child",
+        "content_file": "data-structures.md",
+        "content_section": "리스트"
       }
     },
     {
@@ -140,7 +158,9 @@
         "description": "불변 시퀀스 자료형",
         "status": "not-started",
         "order": "1.6.2",
-        "column": "child"
+        "column": "child",
+        "content_file": "data-structures.md",
+        "content_section": "튜플"
       }
     },
     {
@@ -151,7 +171,9 @@
         "description": "키-값 쌍 컬렉션",
         "status": "not-started",
         "order": "1.6.3",
-        "column": "child"
+        "column": "child",
+        "content_file": "data-structures.md",
+        "content_section": "딕셔너리"
       }
     },
     {
@@ -162,7 +184,9 @@
         "description": "중복되지 않는 요소 모음",
         "status": "not-started",
         "order": "1.6.4",
-        "column": "child"
+        "column": "child",
+        "content_file": "data-structures.md",
+        "content_section": "집합"
       }
     },
     {
@@ -173,7 +197,9 @@
         "description": "기본 입출력 처리",
         "status": "not-started",
         "order": "1.7.1",
-        "column": "child"
+        "column": "child",
+        "content_file": "io-file.md",
+        "content_section": "표준 입출력"
       }
     },
     {
@@ -184,7 +210,9 @@
         "description": "파일 처리 기본",
         "status": "not-started",
         "order": "1.7.2",
-        "column": "child"
+        "column": "child",
+        "content_file": "io-file.md",
+        "content_section": "파일 읽기 및 쓰기"
       }
     },
     {
@@ -195,7 +223,9 @@
         "description": "다양한 파일 처리 모드",
         "status": "not-started",
         "order": "1.7.3",
-        "column": "child"
+        "column": "child",
+        "content_file": "io-file.md",
+        "content_section": "파일 모드"
       }
     }
   ],
@@ -337,4 +367,4 @@
       }
     }
   ]
-} 
+}

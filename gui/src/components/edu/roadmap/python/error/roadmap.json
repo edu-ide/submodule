@@ -1,0 +1,349 @@
+{
+  "id": "python-error",
+  "nodes": [
+    {
+      "id": "error-intro",
+      "type": "custom",
+      "data": {
+        "title": "에러(예외)란?",
+        "description": "에러의 개념과 종류",
+        "status": "not-started",
+        "order": "8.1",
+        "column": "main",
+        "content_file": "error-intro.md"
+      }
+    },
+    {
+      "id": "error-except",
+      "type": "custom",
+      "data": {
+        "title": "예외 처리 (try-except)",
+        "description": "예외 처리 기본 구문 및 패턴",
+        "status": "not-started",
+        "order": "8.2",
+        "column": "main",
+        "content_file": "error-except.md"
+      }
+    },
+    {
+      "id": "error-types",
+      "type": "custom",
+      "data": {
+        "title": "자주 발생하는 예외 종류",
+        "description": "주요 내장 예외 클래스",
+        "status": "not-started",
+        "order": "8.3",
+        "column": "main",
+        "content_file": "error-types.md"
+      }
+    },
+    {
+      "id": "error-raise",
+      "type": "custom",
+      "data": {
+        "title": "예외 발생 (raise)",
+        "description": "예외 직접 발생 및 사용자 정의 예외",
+        "status": "not-started",
+        "order": "8.4",
+        "column": "main",
+        "content_file": "error-raise.md"
+      }
+    },
+    {
+      "id": "error-debug",
+      "type": "custom",
+      "data": {
+        "title": "디버깅 기법",
+        "description": "오류 추적 및 수정 방법",
+        "status": "not-started",
+        "order": "8.5",
+        "column": "main",
+        "content_file": "error-debug.md"
+      }
+    },
+    {
+      "id": "error-test",
+      "type": "custom",
+      "data": {
+        "title": "단위 테스트 (unittest)",
+        "description": "테스트 작성 및 실행",
+        "status": "not-started",
+        "order": "8.6",
+        "column": "main",
+        "content_file": "error-test.md"
+      }
+    },
+    {
+      "id": "error-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 문제",
+        "description": "에러 처리 실습 과제",
+        "status": "not-started",
+        "order": "8.7",
+        "column": "main",
+        "content_file": "error-project.md"
+      }
+    },
+    {
+      "id": "error-syntax",
+      "type": "custom",
+      "data": {
+        "title": "문법 오류",
+        "description": "코드 작성 규칙 위반",
+        "status": "not-started",
+        "order": "8.1.1",
+        "column": "child",
+        "content_file": "error-intro.md",
+        "content_section": "문법 오류 (Syntax Error)"
+      }
+    },
+    {
+      "id": "error-runtime",
+      "type": "custom",
+      "data": {
+        "title": "런타임 오류",
+        "description": "프로그램 실행 중 발생 오류",
+        "status": "not-started",
+        "order": "8.1.2",
+        "column": "child",
+        "content_file": "error-intro.md",
+        "content_section": "런타임 오류 (Runtime Error)"
+      }
+    },
+    {
+      "id": "error-logical",
+      "type": "custom",
+      "data": {
+        "title": "논리 오류",
+        "description": "결과가 잘못된 오류",
+        "status": "not-started",
+        "order": "8.1.3",
+        "column": "child",
+        "content_file": "error-intro.md",
+        "content_section": "논리 오류 (Logical Error)"
+      }
+    },
+    {
+      "id": "error-except-basic",
+      "type": "custom",
+      "data": {
+        "title": "기본 예외 처리 구문",
+        "description": "try-except 기본 사용법",
+        "status": "not-started",
+        "order": "8.2.1",
+        "column": "child",
+        "content_file": "error-except.md",
+        "content_section": "8.2.1 기본 예외 처리 구문"
+      }
+    },
+    {
+      "id": "error-except-pattern",
+      "type": "custom",
+      "data": {
+        "title": "예외 처리 패턴",
+        "description": "다양한 예외 처리 방법",
+        "status": "not-started",
+        "order": "8.2.2",
+        "column": "child",
+        "content_file": "error-except.md",
+        "content_section": "8.2.2 예외 처리 패턴"
+      }
+    },
+    {
+      "id": "error-types-main",
+      "type": "custom",
+      "data": {
+        "title": "주요 예외 클래스",
+        "description": "자주 사용되는 예외 유형",
+        "status": "not-started",
+        "order": "8.3.1",
+        "column": "child",
+        "content_file": "error-types.md",
+        "content_section": "8.3.1 주요 예외 클래스"
+      }
+    },
+    {
+      "id": "error-custom-except",
+      "type": "custom",
+      "data": {
+        "title": "사용자 정의 예외",
+        "description": "커스텀 예외 클래스 정의",
+        "status": "not-started",
+        "order": "8.4.1",
+        "column": "child",
+        "content_file": "error-raise.md",
+        "content_section": "8.4.1 사용자 정의 예외"
+      }
+    },
+    {
+      "id": "error-debug-tools",
+      "type": "custom",
+      "data": {
+        "title": "디버깅 도구",
+        "description": "디버깅에 사용되는 도구들",
+        "status": "not-started",
+        "order": "8.5.1",
+        "column": "child",
+        "content_file": "error-debug.md",
+        "content_section": "8.5.1 디버깅 도구"
+      }
+    },
+    {
+      "id": "error-test-principles",
+      "type": "custom",
+      "data": {
+        "title": "테스트 작성 원칙",
+        "description": "효과적인 테스트 작성법",
+        "status": "not-started",
+        "order": "8.6.1",
+        "column": "child",
+        "content_file": "error-test.md",
+        "content_section": "8.6.1 테스트 작성 원칙"
+      }
+    },
+    {
+      "id": "error-project-1",
+      "type": "custom",
+      "data": {
+        "title": "사용자 입력 예외 처리",
+        "description": "나이 확인 프로그램 구현",
+        "status": "not-started",
+        "order": "8.7.1",
+        "column": "child",
+        "content_file": "error-project.md",
+        "content_section": "[실습 1] 사용자 입력 예외 처리"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "error-intro",
+      "target": "error-except",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "error-except",
+      "target": "error-types",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "error-types",
+      "target": "error-raise",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "error-raise",
+      "target": "error-debug",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "error-debug",
+      "target": "error-test",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "error-test",
+      "target": "error-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "error-intro",
+      "target": "error-syntax",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "error-intro",
+      "target": "error-runtime",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "error-intro",
+      "target": "error-logical",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e10",
+      "source": "error-except",
+      "target": "error-except-basic",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "error-except",
+      "target": "error-except-pattern",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e12",
+      "source": "error-types",
+      "target": "error-types-main",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e13",
+      "source": "error-raise",
+      "target": "error-custom-except",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e14",
+      "source": "error-debug",
+      "target": "error-debug-tools",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e15",
+      "source": "error-test",
+      "target": "error-test-principles",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e16",
+      "source": "error-project",
+      "target": "error-project-1",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+}

@@ -1,0 +1,454 @@
+{
+  "id": "python-io",
+  "nodes": [
+    {
+      "id": "io-intro",
+      "type": "custom",
+      "data": {
+        "title": "표준 입출력",
+        "description": "데이터 입력과 출력 방법",
+        "status": "not-started",
+        "order": "4.1",
+        "column": "main",
+        "content_file": "io-intro.md"
+      }
+    },
+    {
+      "id": "io-file",
+      "type": "custom",
+      "data": {
+        "title": "파일 읽기 및 쓰기",
+        "description": "파일 조작의 기본",
+        "status": "not-started",
+        "order": "4.2",
+        "column": "main",
+        "content_file": "io-file.md"
+      }
+    },
+    {
+      "id": "io-except",
+      "type": "custom",
+      "data": {
+        "title": "예외 처리",
+        "description": "파일 작업 중 오류 처리",
+        "status": "not-started",
+        "order": "4.3",
+        "column": "main",
+        "content_file": "io-except.md"
+      }
+    },
+    {
+      "id": "io-format",
+      "type": "custom",
+      "data": {
+        "title": "CSV 및 JSON 파일 다루기",
+        "description": "구조화된 데이터 처리",
+        "status": "not-started",
+        "order": "4.4",
+        "column": "main",
+        "content_file": "io-format.md"
+      }
+    },
+    {
+      "id": "io-directory",
+      "type": "custom",
+      "data": {
+        "title": "파일 및 디렉터리 관리",
+        "description": "OS 모듈을 활용한 파일 시스템 관리",
+        "status": "not-started",
+        "order": "4.5",
+        "column": "main",
+        "content_file": "io-directory.md"
+      }
+    },
+    {
+      "id": "io-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 문제",
+        "description": "파일 입출력 실습",
+        "status": "not-started",
+        "order": "4.6",
+        "column": "main",
+        "content_file": "io-project.md"
+      }
+    },
+    {
+      "id": "io-summary",
+      "type": "custom",
+      "data": {
+        "title": "4장 요약",
+        "description": "입출력 및 파일 처리 요약",
+        "status": "not-started",
+        "order": "4.7",
+        "column": "main",
+        "content_file": "io-summary.md"
+      }
+    },
+    {
+      "id": "io-print",
+      "type": "custom",
+      "data": {
+        "title": "표준 출력 (print())",
+        "description": "화면에 데이터 출력하기",
+        "status": "not-started",
+        "order": "4.1.1",
+        "column": "child",
+        "content_file": "io-intro.md",
+        "content_section": "4.1.1 표준 출력 (print())"
+      }
+    },
+    {
+      "id": "io-input",
+      "type": "custom",
+      "data": {
+        "title": "표준 입력 (input())",
+        "description": "사용자로부터 입력 받기",
+        "status": "not-started",
+        "order": "4.1.2",
+        "column": "child",
+        "content_file": "io-intro.md",
+        "content_section": "4.1.2 표준 입력 (input())"
+      }
+    },
+    {
+      "id": "io-file-open",
+      "type": "custom",
+      "data": {
+        "title": "파일 열기/닫기",
+        "description": "open(), with 문 활용",
+        "status": "not-started",
+        "order": "4.2.1",
+        "column": "child",
+        "content_file": "io-file.md",
+        "content_section": "파일 열기/닫기"
+      }
+    },
+    {
+      "id": "io-file-mode",
+      "type": "custom",
+      "data": {
+        "title": "파일 모드",
+        "description": "읽기/쓰기/추가 모드",
+        "status": "not-started",
+        "order": "4.2.2",
+        "column": "child",
+        "content_file": "io-file.md",
+        "content_section": "파일 모드"
+      }
+    },
+    {
+      "id": "io-except-types",
+      "type": "custom",
+      "data": {
+        "title": "주요 예외 유형",
+        "description": "파일 작업 시 발생하는 예외",
+        "status": "not-started",
+        "order": "4.3.1",
+        "column": "child",
+        "content_file": "io-except.md",
+        "content_section": "주요 예외 유형"
+      }
+    },
+    {
+      "id": "io-except-syntax",
+      "type": "custom",
+      "data": {
+        "title": "try-except 구문",
+        "description": "기본 예외 처리 구조",
+        "status": "not-started",
+        "order": "4.3.2",
+        "column": "child",
+        "content_file": "io-except.md",
+        "content_section": "try-except 구문의 기본 구조"
+      }
+    },
+    {
+      "id": "io-csv",
+      "type": "custom",
+      "data": {
+        "title": "CSV 파일",
+        "description": "쉼표로 구분된 데이터 처리",
+        "status": "not-started",
+        "order": "4.4.1",
+        "column": "child",
+        "content_file": "io-format.md",
+        "content_section": "CSV (Comma-Separated Values)"
+      }
+    },
+    {
+      "id": "io-json",
+      "type": "custom",
+      "data": {
+        "title": "JSON 파일",
+        "description": "구조화된 데이터 형식",
+        "status": "not-started",
+        "order": "4.4.2",
+        "column": "child",
+        "content_file": "io-format.md",
+        "content_section": "JSON (JavaScript Object Notation)"
+      }
+    },
+    {
+      "id": "io-file-manage",
+      "type": "custom",
+      "data": {
+        "title": "파일 관리",
+        "description": "파일 삭제, 이름 변경 등",
+        "status": "not-started",
+        "order": "4.5.1",
+        "column": "child",
+        "content_file": "io-directory.md",
+        "content_section": "1. **파일 관리**"
+      }
+    },
+    {
+      "id": "io-dir-manage",
+      "type": "custom",
+      "data": {
+        "title": "디렉터리 관리",
+        "description": "디렉터리 생성, 삭제 등",
+        "status": "not-started",
+        "order": "4.5.2",
+        "column": "child",
+        "content_file": "io-directory.md",
+        "content_section": "2. **디렉터리 관리**"
+      }
+    },
+    {
+      "id": "io-path-manage",
+      "type": "custom",
+      "data": {
+        "title": "경로 관리",
+        "description": "경로 결합, 분리 등",
+        "status": "not-started",
+        "order": "4.5.3",
+        "column": "child",
+        "content_file": "io-directory.md",
+        "content_section": "3. **경로 관리**"
+      }
+    },
+    {
+      "id": "io-project-1",
+      "type": "custom",
+      "data": {
+        "title": "학생 성적 관리 시스템",
+        "description": "CSV/JSON 파일 활용 프로젝트",
+        "status": "not-started",
+        "order": "4.6.1",
+        "column": "child",
+        "content_file": "io-project.md",
+        "content_section": "[실습 1] 학생 성적 관리 시스템"
+      }
+    },
+    {
+      "id": "io-project-2",
+      "type": "custom",
+      "data": {
+        "title": "파일 암호화/복호화 프로그램",
+        "description": "파일 데이터 변환 프로젝트",
+        "status": "not-started",
+        "order": "4.6.2",
+        "column": "child",
+        "content_file": "io-project.md",
+        "content_section": "[실습 2] 파일 암호화/복호화 프로그램"
+      }
+    },
+    {
+      "id": "io-summary-std",
+      "type": "custom",
+      "data": {
+        "title": "표준 입출력 요약",
+        "description": "print, input 함수 요약",
+        "status": "not-started",
+        "order": "4.7.1",
+        "column": "child",
+        "content_file": "io-summary.md",
+        "content_section": "✅ **표준 입출력**"
+      }
+    },
+    {
+      "id": "io-summary-file",
+      "type": "custom",
+      "data": {
+        "title": "파일 처리 요약",
+        "description": "파일 열기/읽기/쓰기 요약",
+        "status": "not-started",
+        "order": "4.7.2",
+        "column": "child",
+        "content_file": "io-summary.md",
+        "content_section": "✅ **파일 처리**"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "io-intro",
+      "target": "io-file",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "io-file",
+      "target": "io-except",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "io-except",
+      "target": "io-format",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "io-format",
+      "target": "io-directory",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "io-directory",
+      "target": "io-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "io-project",
+      "target": "io-summary",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "io-intro",
+      "target": "io-print",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "io-intro",
+      "target": "io-input",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "io-file",
+      "target": "io-file-open",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e10",
+      "source": "io-file",
+      "target": "io-file-mode",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "io-except",
+      "target": "io-except-types",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e12",
+      "source": "io-except",
+      "target": "io-except-syntax",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e13",
+      "source": "io-format",
+      "target": "io-csv",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e14",
+      "source": "io-format",
+      "target": "io-json",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e15",
+      "source": "io-directory",
+      "target": "io-file-manage",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e16",
+      "source": "io-directory",
+      "target": "io-dir-manage",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e17",
+      "source": "io-directory",
+      "target": "io-path-manage",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e18",
+      "source": "io-project",
+      "target": "io-project-1",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e19",
+      "source": "io-project",
+      "target": "io-project-2",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e20",
+      "source": "io-summary",
+      "target": "io-summary-std",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e21",
+      "source": "io-summary",
+      "target": "io-summary-file",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+}

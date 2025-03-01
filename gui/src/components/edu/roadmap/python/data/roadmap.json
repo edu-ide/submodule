@@ -1,0 +1,119 @@
+{
+  "id": "python-data",
+  "nodes": [
+    {
+      "id": "python-data-intro",
+      "type": "custom",
+      "data": {
+        "title": "데이터 구조",
+        "description": "파이썬의 기본 데이터 구조에 대해 배워봅시다",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "content_file": "3.0-intro.md"
+      }
+    },
+    {
+      "id": "python-lists-tuples",
+      "type": "custom",
+      "data": {
+        "title": "리스트와 튜플",
+        "description": "순서가 있는 데이터 컬렉션",
+        "status": "not-started",
+        "order": "3.1",
+        "column": "main",
+        "content_file": "3.1-lists-tuples.md"
+      }
+    },
+    {
+      "id": "python-dict-set",
+      "type": "custom",
+      "data": {
+        "title": "딕셔너리와 집합",
+        "description": "키-값 쌍과 중복 없는 컬렉션",
+        "status": "not-started",
+        "order": "3.2",
+        "column": "main",
+        "content_file": "3.2-dict-set.md"
+      }
+    },
+    {
+      "id": "python-list-comprehension",
+      "type": "custom",
+      "data": {
+        "title": "리스트 컴프리헨션",
+        "description": "간결한 리스트 생성 방법",
+        "status": "not-started",
+        "order": "3.3",
+        "column": "main",
+        "content_file": "3.3-list-comprehension.md"
+      }
+    },
+    {
+      "id": "python-data-structures",
+      "type": "custom",
+      "data": {
+        "title": "데이터 구조 활용하기",
+        "description": "실전에서 데이터 구조 활용하기",
+        "status": "not-started",
+        "order": "3.4",
+        "column": "main",
+        "content_file": "3.4-data-structures.md"
+      }
+    },
+    {
+      "id": "python-data-summary",
+      "type": "custom",
+      "data": {
+        "title": "요약",
+        "description": "데이터 구조 정리",
+        "status": "not-started",
+        "order": "3.5",
+        "column": "main",
+        "content_file": "3.5-summary.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-data-intro-lists-tuples",
+      "source": "python-data-intro",
+      "target": "python-lists-tuples",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-lists-tuples-dict-set",
+      "source": "python-lists-tuples",
+      "target": "python-dict-set",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-dict-set-list-comprehension",
+      "source": "python-dict-set",
+      "target": "python-list-comprehension",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-list-comprehension-data-structures",
+      "source": "python-list-comprehension",
+      "target": "python-data-structures",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-data-structures-summary",
+      "source": "python-data-structures",
+      "target": "python-data-summary",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

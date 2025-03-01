@@ -9,6 +9,7 @@ interface RoadmapState {
   };
   nodePositions: Record<string, { x: number; y: number }>;
   nodeProgress: Record<string, 'completed' | 'in-progress' | 'not-started'>;
+  viewMode: 'flow' | 'toc';
 }
 
 export const initialState: RoadmapState = {
@@ -19,7 +20,8 @@ export const initialState: RoadmapState = {
     lastUpdated: Date.now()
   },
   nodePositions: {},
-  nodeProgress: {}
+  nodeProgress: {},
+  viewMode: 'flow'
 };
 
 const roadmapSlice = createSlice({
@@ -43,6 +45,9 @@ const roadmapSlice = createSlice({
       const { id, status } = action.payload;
       state.nodeProgress[id] = status;
     },
+    setViewMode: (state, action: PayloadAction<'flow' | 'toc'>) => {
+      state.viewMode = action.payload;
+    },
     resetRoadmap: (state) => {
       state.viewportState = { x: 0, y: 0, zoom: 1, lastUpdated: Date.now() };
       state.nodePositions = {};
@@ -50,10 +55,15 @@ const roadmapSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase('persist/REHYDRATE', (state, action) => {
+      // 로컬 스토리지에서 저장된 viewMode 복원
+      const savedViewMode = localStorage.getItem('roadmapViewMode') as 'flow' | 'toc';
+      if (savedViewMode) {
+        state.viewMode = savedViewMode;
+      }
     });
   }
 });
 
-export const { setViewport, setNodePosition, setNodeProgress, resetRoadmap } = roadmapSlice.actions;
+export const { setViewport, setNodePosition, setNodeProgress, setViewMode, resetRoadmap } = roadmapSlice.actions;
 
 export default roadmapSlice.reducer; 

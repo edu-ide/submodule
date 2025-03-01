@@ -14,6 +14,7 @@ export type RoadmapMode = 'browse' | 'generate' | 'recommended';
 export interface RoadmapViewProps {
   roadmapId?: string;
   onBack?: () => void;
+  parentCategoryId?: string;
 }
 
 // 학습 콘텐츠 뷰 속성 타입

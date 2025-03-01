@@ -1,0 +1,179 @@
+{
+  "id": "python-basic",
+  "nodes": [
+    {
+      "id": "python-basic-intro",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 기초 문법",
+        "description": "파이썬의 기본 문법을 배워봅시다",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "content_file": "2.0-intro.md"
+      }
+    },
+    {
+      "id": "python-variables",
+      "type": "custom",
+      "data": {
+        "title": "변수와 데이터 타입",
+        "description": "변수 선언과 데이터 타입 개념",
+        "status": "not-started",
+        "order": "2.1",
+        "column": "main",
+        "content_file": "2.1-variables.md"
+      }
+    },
+    {
+      "id": "python-data-types",
+      "type": "custom",
+      "data": {
+        "title": "기본 데이터 타입",
+        "description": "정수, 실수, 문자열, 불리언 등 기본 타입",
+        "status": "not-started",
+        "order": "2.2",
+        "column": "main",
+        "content_file": "2.2-data-types.md"
+      }
+    },
+    {
+      "id": "python-operators",
+      "type": "custom",
+      "data": {
+        "title": "기본 연산자",
+        "description": "산술, 비교, 논리 연산자 사용법",
+        "status": "not-started",
+        "order": "2.3",
+        "column": "main",
+        "content_file": "2.3-operators.md"
+      }
+    },
+    {
+      "id": "python-conditionals",
+      "type": "custom",
+      "data": {
+        "title": "조건문",
+        "description": "if, else, elif를 사용한 조건 분기",
+        "status": "not-started",
+        "order": "2.4",
+        "column": "main",
+        "content_file": "2.4-conditionals.md"
+      }
+    },
+    {
+      "id": "python-loops",
+      "type": "custom",
+      "data": {
+        "title": "반복문",
+        "description": "for, while 반복문 활용법",
+        "status": "not-started",
+        "order": "2.5",
+        "column": "main",
+        "content_file": "2.5-loops.md"
+      }
+    },
+    {
+      "id": "python-functions",
+      "type": "custom",
+      "data": {
+        "title": "함수 정의 및 사용",
+        "description": "함수 작성법과 다양한 매개변수 활용",
+        "status": "not-started",
+        "order": "2.6",
+        "column": "main",
+        "content_file": "2.6-functions.md"
+      }
+    },
+    {
+      "id": "python-practice",
+      "type": "custom",
+      "data": {
+        "title": "실습 문제",
+        "description": "기본 문법을 활용한 실전 연습",
+        "status": "not-started",
+        "order": "2.7",
+        "column": "main",
+        "content_file": "2.7-practice.md"
+      }
+    },
+    {
+      "id": "python-summary",
+      "type": "custom",
+      "data": {
+        "title": "요약",
+        "description": "파이썬 기초 문법 정리",
+        "status": "not-started",
+        "order": "2.8",
+        "column": "main",
+        "content_file": "2.8-summary.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-intro-variables",
+      "source": "python-basic-intro",
+      "target": "python-variables",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-variables-data-types",
+      "source": "python-variables",
+      "target": "python-data-types",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-data-types-operators",
+      "source": "python-data-types",
+      "target": "python-operators",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-operators-conditionals",
+      "source": "python-operators",
+      "target": "python-conditionals",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-conditionals-loops",
+      "source": "python-conditionals",
+      "target": "python-loops",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-loops-functions",
+      "source": "python-loops",
+      "target": "python-functions",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-functions-practice",
+      "source": "python-functions",
+      "target": "python-practice",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-practice-summary",
+      "source": "python-practice",
+      "target": "python-summary",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

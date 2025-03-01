@@ -1,0 +1,53 @@
+{
+  "roadmap": {
+    "python-advanced-performance-intro": {
+      "title": "고급 성능 최적화 및 병렬 프로그래밍",
+      "description": "파이썬의 성능 최적화와 병렬 처리 기법 학습",
+      "order": "5.0",
+      "prerequisites": [],
+      "content": "python/advanced-performance/sections/5.0-intro.md"
+    },
+    "python-performance-optimization": {
+      "title": "성능 최적화의 기본 원리",
+      "description": "병렬 처리 종류와 GIL의 이해",
+      "order": "5.1",
+      "prerequisites": ["python-advanced-performance-intro"],
+      "content": "python/advanced-performance/sections/5.1-optimization.md"
+    },
+    "python-parallel-processing": {
+      "title": "고급 병렬 처리 기법",
+      "description": "프로세스 풀과 스레드 풀 활용",
+      "order": "5.2",
+      "prerequisites": ["python-performance-optimization"],
+      "content": "python/advanced-performance/sections/5.2-parallel.md"
+    },
+    "python-async-programming": {
+      "title": "고급 비동기 프로그래밍",
+      "description": "asyncio 심화 활용 기법",
+      "order": "5.3",
+      "prerequisites": ["python-parallel-processing"],
+      "content": "python/advanced-performance/sections/5.3-async.md"
+    },
+    "python-profiling": {
+      "title": "성능 프로파일링 및 최적화",
+      "description": "코드 최적화와 컴파일러 활용",
+      "order": "5.4",
+      "prerequisites": ["python-async-programming"],
+      "content": "python/advanced-performance/sections/5.4-profiling.md"
+    },
+    "python-performance-projects": {
+      "title": "실습 프로젝트",
+      "description": "병렬 처리와 최적화 실전 적용",
+      "order": "5.5",
+      "prerequisites": ["python-profiling"],
+      "content": "python/advanced-performance/sections/5.5-project.md"
+    },
+    "python-advanced-performance-summary": {
+      "title": "요약",
+      "description": "고급 성능 최적화 정리",
+      "order": "5.6",
+      "prerequisites": ["python-performance-projects"],
+      "content": "python/advanced-performance/sections/5.6-summary.md"
+    }
+  }
+} 
