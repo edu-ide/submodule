@@ -205,7 +205,6 @@
         "title": "Focus PearAI Search View",
         "group": "PearAI"
       },
-
       {
         "command": "pearai.focusPearAIMem0View",
         "category": "PearAI",
@@ -390,6 +389,46 @@
         "category": "PearAI",
         "title": "Show Chat Tutorial",
         "group": "PearAI"
+      },
+      {
+        "command": "pearai.toggleCurriculum",
+        "category": "PearAI",
+        "title": "EduSense 커리큘럼 토글",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.focusCurriculum",
+        "category": "PearAI",
+        "title": "EduSense 커리큘럼 포커스",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.toggleFileExplorer",
+        "category": "PearAI",
+        "title": "파일 탐색기 토글",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.openMemFS",
+        "category": "PearAI",
+        "title": "Open MemFS Workspace",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.createMemFile",
+        "category": "PearAI",
+        "title": "Create MemFS File",
+        "group": "PearAI"
+      },
+      {
+        "command": "pearai.loadZipContent",
+        "title": "Load ZIP Content from URL",
+        "category": "PearAI"
+      },
+      {
+        "command": "pearai.workspaceInit",
+        "title": "Initialize MemFS Workspace",
+        "category": "PearAI"
       }
     ],
     "keybindings": [
@@ -507,6 +546,16 @@
         "command": "pearai.viewHistory",
         "mac": "cmd+h",
         "key": "ctrl+h"
+      },
+      {
+        "command": "pearai.toggleCurriculum",
+        "mac": "cmd+4",
+        "key": "ctrl+4"
+      },
+      {
+        "command": "pearai.toggleFileExplorer",
+        "mac": "cmd+5",
+        "key": "ctrl+5"
       }
     ],
     "submenus": [
@@ -546,6 +595,21 @@
         },
         {
           "command": "pearai.showInteractiveContinueTutorial"
+        },
+        {
+          "command": "pearai.toggleCurriculum"
+        },
+        {
+          "command": "pearai.focusCurriculum"
+        },
+        {
+          "command": "pearai.openMemFS"
+        },
+        {
+          "command": "pearai.createMemFile"
+        },
+        {
+          "command": "pearai.loadZipContent"
         }
       ],
       "editor/context": [
@@ -657,6 +721,13 @@
           "title": "PearAI Memory",
           "icon": "media/sidebar-icon.png"
         }
+      ],
+      "activitybar": [
+        {
+          "id": "pearai-curriculum",
+          "title": "EduSense 커리큘럼",
+          "icon": "media/curriculum-icon.svg"
+        }
       ]
     },
     "views": {
@@ -681,6 +752,14 @@
           "type": "webview",
           "id": "pearai.mem0View",
           "name": "PearAI Memory",
+          "visibility": "visible"
+        }
+      ],
+      "pearai-curriculum": [
+        {
+          "type": "webview",
+          "id": "pearai.curriculum",
+          "name": "EduSense 커리큘럼",
           "visibility": "visible"
         }
       ]
@@ -720,6 +799,7 @@
     "@biomejs/biome": "1.6.4",
     "@nestjs/common": "^8.4.7",
     "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@types/adm-zip": "^0.5.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/follow-redirects": "^1.14.4",
@@ -752,6 +832,7 @@
     "@types/uuid": "^9.0.8",
     "@vscode/ripgrep": "^1.15.9",
     "@vscode/test-electron": "^2.3.9",
+    "adm-zip": "^0.5.16",
     "axios": "^1.2.5",
     "core": "file:../../core",
     "cors": "^2.8.5",

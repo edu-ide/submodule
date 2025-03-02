@@ -230,14 +230,6 @@ export const stateSlice = createSlice({
         state.history = state.history.slice(0, -2);
       }
     },
-    // clearLastResponse: (state) => {
-    //   if (state.history.length < 2) {
-    //     return;
-    //   }
-    //   state.mainEditorContent =
-    //     state.history[state.history.length - 2].editorState;
-    //   state.history = state.history.slice(0, -2);
-    // },
     consumeMainEditorContent: (state) => {
       state.mainEditorContent = undefined;
     },
@@ -273,6 +265,10 @@ export const stateSlice = createSlice({
     },
     addContextItems: (state, action: PayloadAction<ContextItemWithId[]>) => {
       state.contextItems = state.contextItems.concat(action.payload);
+      
+      if (state.contextItems.length > 20) {
+        state.contextItems = state.contextItems.slice(-20);
+      }
     },
     resubmitAtIndex: (
       state,
@@ -303,22 +299,6 @@ export const stateSlice = createSlice({
       });
       state[integrationStatesMap[source].active] = true;
     },
-    // deleteMessage: (state, action: PayloadAction<number>) => {
-    //   const index = action.payload + 1;
-
-    //   if (index >= 0 && index < state.history.length) {
-    //     // Delete the current message
-    //     state.history.splice(index, 1);
-
-    //     // If the next message is an assistant message, delete it too
-    //     if (
-    //       index < state.history.length &&
-    //       state.history[index].message.role === "assistant"
-    //     ) {
-    //       state.history.splice(index, 1);
-    //     }
-    //   }
-    // },
     deleteMessage: (
       state,
       action: PayloadAction<{
@@ -626,6 +606,9 @@ export const stateSlice = createSlice({
       state.memories = payload.sort((a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
+    },
+    clearContextItems: (state) => {
+      state.contextItems = [];
     }
   },
 });
@@ -661,5 +644,6 @@ export const {
   setOnboardingState,
   setShowInteractiveContinueTutorial,
   setMem0Memories,
+  clearContextItems,
 } = stateSlice.actions;
 export default stateSlice.reducer;

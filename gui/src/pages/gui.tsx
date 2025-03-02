@@ -48,7 +48,9 @@ import {
   setDefaultModel,
   setInactive,
   setShowInteractiveContinueTutorial,
+  addContextItems,
 } from "../redux/slices/stateSlice";
+import { setBottomMessage } from "../redux/slices/uiStateSlice";
 import { RootState } from "../redux/store";
 import {
   getFontSize,
@@ -377,6 +379,13 @@ function GUI() {
       topGuiDivRef.current.style.paddingBottom = `${height + 20}px`;
     }
   }, []);
+
+  useEffect(() => {
+    // 앱 시작 시 contextItems 초기화
+    dispatch({ type: 'state/clearContextItems' });
+  }, []);
+
+
 
   return (
     <>

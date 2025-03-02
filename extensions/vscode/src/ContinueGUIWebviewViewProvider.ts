@@ -176,8 +176,13 @@ export class ContinueGUIWebviewViewProvider
         });
       }
     });
-    
+
     this.webviewProtocol.addWebview(panel?.title === PEARAI_OVERLAY_VIEW_ID? panel.title : panel.viewType, panel.webview);
+
+    // 커리큘럼 웹뷰일 경우 초기 경로를 /education으로 설정
+    if (panelViewType === "pearai.curriculum") {
+      initialRoute = "/education";
+    }
 
     return `<!DOCTYPE html>
     <html lang="en">
@@ -265,7 +270,7 @@ export class ContinueGUIWebviewViewProvider
               top: 0;
               left: 0;
             }
-            
+
             #root {
               width: 100%;
               height: 100%;

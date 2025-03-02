@@ -49,6 +49,7 @@ export class VsCodeWebviewProtocol
               messageId: id,
             });
           }
+          
         } catch (error) {
           console.error(`Failed to post message to webview ${name}:`, error);
         }

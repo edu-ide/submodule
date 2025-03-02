@@ -1,0 +1,455 @@
+{
+  "id": "python-webapp",
+  "nodes": [
+    {
+      "id": "webapp-main",
+      "type": "custom",
+      "data": {
+        "title": "웹 애플리케이션 개발",
+        "description": "Flask와 Django를 활용한 웹 애플리케이션 개발",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "content_file": "index.md"
+      }
+    },
+    {
+      "id": "web-development-concepts",
+      "type": "custom",
+      "data": {
+        "title": "웹 개발 개념 및 기본 원리",
+        "description": "웹 개발의 주요 개념 및 아키텍처",
+        "status": "not-started",
+        "order": "1.1",
+        "column": "main",
+        "content_file": "web-development-concepts.md"
+      }
+    },
+    {
+      "id": "web-architecture",
+      "type": "custom",
+      "data": {
+        "title": "웹 애플리케이션 아키텍처",
+        "description": "웹 애플리케이션의 주요 구성 요소",
+        "status": "not-started",
+        "order": "1.2",
+        "column": "child",
+        "content_file": "web-development-concepts.md",
+        "content_section": "1311-웹-애플리케이션-아키텍처"
+      }
+    },
+    {
+      "id": "client-server-model",
+      "type": "custom",
+      "data": {
+        "title": "클라이언트-서버 모델",
+        "description": "웹의 기본 동작 방식",
+        "status": "not-started",
+        "order": "1.3",
+        "column": "child",
+        "content_file": "web-development-concepts.md",
+        "content_section": "1312-클라이언트-서버-모델"
+      }
+    },
+    {
+      "id": "http-request-response",
+      "type": "custom",
+      "data": {
+        "title": "HTTP 요청과 응답 사이클",
+        "description": "HTTP 통신의 기본 메커니즘",
+        "status": "not-started",
+        "order": "1.4",
+        "column": "child",
+        "content_file": "web-development-concepts.md",
+        "content_section": "1313-http-요청과-응답-사이클"
+      }
+    },
+    {
+      "id": "mvc-pattern",
+      "type": "custom",
+      "data": {
+        "title": "MVC/MVT 패턴",
+        "description": "웹 애플리케이션 구조 패턴",
+        "status": "not-started",
+        "order": "1.5",
+        "column": "child",
+        "content_file": "web-development-concepts.md",
+        "content_section": "1314-mvcmvt-패턴"
+      }
+    },
+    {
+      "id": "flask-webapp",
+      "type": "custom",
+      "data": {
+        "title": "Flask 웹 애플리케이션",
+        "description": "Flask를 활용한 웹 개발",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "content_file": "flask-webapp.md"
+      }
+    },
+    {
+      "id": "flask-project-structure",
+      "type": "custom",
+      "data": {
+        "title": "Flask 프로젝트 구조",
+        "description": "효율적인 Flask 프로젝트 구성",
+        "status": "not-started",
+        "order": "2.1",
+        "column": "child",
+        "content_file": "flask-webapp.md",
+        "content_section": "1321-flask-프로젝트-구조"
+      }
+    },
+    {
+      "id": "flask-routes",
+      "type": "custom",
+      "data": {
+        "title": "Flask 라우트 정의",
+        "description": "URL 라우팅과 뷰 함수",
+        "status": "not-started",
+        "order": "2.2",
+        "column": "child",
+        "content_file": "flask-webapp.md",
+        "content_section": "1323-라우트-정의와-뷰-함수"
+      }
+    },
+    {
+      "id": "flask-templates",
+      "type": "custom",
+      "data": {
+        "title": "Flask 템플릿",
+        "description": "Jinja2 템플릿 엔진 사용법",
+        "status": "not-started",
+        "order": "2.3",
+        "column": "child",
+        "content_file": "flask-webapp.md",
+        "content_section": "1324-템플릿-사용"
+      }
+    },
+    {
+      "id": "django-projects",
+      "type": "custom",
+      "data": {
+        "title": "Django 웹 프로젝트",
+        "description": "Django를 활용한 대형 웹 프로젝트 구축",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "content_file": "django-projects.md"
+      }
+    },
+    {
+      "id": "django-mtv",
+      "type": "custom",
+      "data": {
+        "title": "Django MTV 패턴",
+        "description": "Model-Template-View 패턴 이해",
+        "status": "not-started",
+        "order": "3.1",
+        "column": "child",
+        "content_file": "django-projects.md",
+        "content_section": "1331-django-mtv-패턴"
+      }
+    },
+    {
+      "id": "django-models",
+      "type": "custom",
+      "data": {
+        "title": "Django 모델",
+        "description": "ORM을 활용한 데이터 모델링",
+        "status": "not-started",
+        "order": "3.2",
+        "column": "child",
+        "content_file": "django-projects.md",
+        "content_section": "1333-django-모델-정의"
+      }
+    },
+    {
+      "id": "django-views",
+      "type": "custom",
+      "data": {
+        "title": "Django 뷰",
+        "description": "함수 기반 뷰와 클래스 기반 뷰",
+        "status": "not-started",
+        "order": "3.3",
+        "column": "child",
+        "content_file": "django-projects.md",
+        "content_section": "1334-django-뷰-작성"
+      }
+    },
+    {
+      "id": "rest-api",
+      "type": "custom",
+      "data": {
+        "title": "REST API 개발",
+        "description": "RESTful API 설계 및 구현",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "content_file": "rest-api.md"
+      }
+    },
+    {
+      "id": "api-endpoints",
+      "type": "custom",
+      "data": {
+        "title": "API 엔드포인트 설계",
+        "description": "효과적인 API 설계 원칙",
+        "status": "not-started",
+        "order": "4.1",
+        "column": "child",
+        "content_file": "rest-api.md",
+        "content_section": "1341-api-엔드포인트-설계"
+      }
+    },
+    {
+      "id": "serializers",
+      "type": "custom",
+      "data": {
+        "title": "직렬화 (Serializers)",
+        "description": "데이터 변환 및 유효성 검증",
+        "status": "not-started",
+        "order": "4.2",
+        "column": "child",
+        "content_file": "rest-api.md",
+        "content_section": "1343-직렬화-serializers"
+      }
+    },
+    {
+      "id": "api-testing",
+      "type": "custom",
+      "data": {
+        "title": "API 테스트",
+        "description": "API 기능 테스트 방법",
+        "status": "not-started",
+        "order": "4.3",
+        "column": "child",
+        "content_file": "rest-api.md",
+        "content_section": "1348-api-테스트"
+      }
+    },
+    {
+      "id": "oauth-authentication",
+      "type": "custom",
+      "data": {
+        "title": "OAuth 및 인증",
+        "description": "사용자 인증 및 권한 관리",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "content_file": "oauth-authentication.md"
+      }
+    },
+    {
+      "id": "auth-basics",
+      "type": "custom",
+      "data": {
+        "title": "기본 인증 방식",
+        "description": "다양한 인증 메커니즘 이해",
+        "status": "not-started",
+        "order": "5.1",
+        "column": "child",
+        "content_file": "oauth-authentication.md",
+        "content_section": "1351-기본-인증-방식"
+      }
+    },
+    {
+      "id": "jwt-auth",
+      "type": "custom",
+      "data": {
+        "title": "JWT 인증",
+        "description": "JSON Web Token 기반 인증",
+        "status": "not-started",
+        "order": "5.2",
+        "column": "child",
+        "content_file": "oauth-authentication.md",
+        "content_section": "1354-jwt-인증"
+      }
+    },
+    {
+      "id": "oauth2-social",
+      "type": "custom",
+      "data": {
+        "title": "OAuth2 및 소셜 로그인",
+        "description": "소셜 미디어 인증 통합",
+        "status": "not-started",
+        "order": "5.3",
+        "column": "child",
+        "content_file": "oauth-authentication.md",
+        "content_section": "1355-oauth2-및-소셜-로그인"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-main-concepts",
+      "source": "webapp-main",
+      "target": "web-development-concepts",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-concepts-architecture",
+      "source": "web-development-concepts",
+      "target": "web-architecture",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-concepts-client-server",
+      "source": "web-development-concepts",
+      "target": "client-server-model",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-concepts-http",
+      "source": "web-development-concepts",
+      "target": "http-request-response",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-concepts-mvc",
+      "source": "web-development-concepts",
+      "target": "mvc-pattern",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-main-flask",
+      "source": "webapp-main",
+      "target": "flask-webapp",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-flask-structure",
+      "source": "flask-webapp",
+      "target": "flask-project-structure",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-flask-routes",
+      "source": "flask-webapp",
+      "target": "flask-routes",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-flask-templates",
+      "source": "flask-webapp",
+      "target": "flask-templates",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-main-django",
+      "source": "webapp-main",
+      "target": "django-projects",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-django-mtv",
+      "source": "django-projects",
+      "target": "django-mtv",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-django-models",
+      "source": "django-projects",
+      "target": "django-models",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-django-views",
+      "source": "django-projects",
+      "target": "django-views",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-main-rest",
+      "source": "webapp-main",
+      "target": "rest-api",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-rest-endpoints",
+      "source": "rest-api",
+      "target": "api-endpoints",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-rest-serializers",
+      "source": "rest-api",
+      "target": "serializers",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-rest-testing",
+      "source": "rest-api",
+      "target": "api-testing",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-main-oauth",
+      "source": "webapp-main",
+      "target": "oauth-authentication",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-oauth-basics",
+      "source": "oauth-authentication",
+      "target": "auth-basics",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-oauth-jwt",
+      "source": "oauth-authentication",
+      "target": "jwt-auth",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-oauth-social",
+      "source": "oauth-authentication",
+      "target": "oauth2-social",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

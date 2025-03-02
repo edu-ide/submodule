@@ -194,5 +194,13 @@ export class ReverseMessageIde {
     this.on("pathSep", (data) => {
       return this.ide.pathSep();
     });
+
+    this.on("createPracticeWorkspace", (data) => {
+      return this.ide.createPracticeWorkspace(data.url);
+    });
+
+    this.on("createPracticeFile", (data) => {
+      return this.ide.createPracticeFile(data.language, data.code);
+    });
   }
 }

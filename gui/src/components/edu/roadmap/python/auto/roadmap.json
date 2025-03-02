@@ -1,0 +1,113 @@
+{
+  "id": "python-automation",
+  "title": "자동화 및 시스템 스크립트",
+  "description": "파이썬을 활용한 자동화 및 시스템 스크립트 작성 방법을 배우는 로드맵입니다.",
+  "nodes": [
+    {
+      "id": "intro",
+      "title": "자동화 및 시스템 스크립트 입문",
+      "description": "자동화 스크립트의 개요와 학습 목표에 대해 알아봅니다.",
+      "contentPath": "14.0-intro.md"
+    },
+    {
+      "id": "automation-concepts",
+      "title": "자동화 개념 및 필요성",
+      "description": "자동화의 핵심 요소와 장점을 배웁니다.",
+      "contentPath": "14.1-automation-concepts.md"
+    },
+    {
+      "id": "file-management",
+      "title": "파일 및 폴더 자동 관리",
+      "description": "파일 시스템 모니터링과 자동 파일 처리 방법을 학습합니다.",
+      "contentPath": "14.2-file-management.md"
+    },
+    {
+      "id": "email-automation",
+      "title": "이메일 및 메시지 자동 발송",
+      "description": "이메일 자동화와 HTML 템플릿 메일 발송 방법을 배웁니다.",
+      "contentPath": "14.3-email-automation.md"
+    },
+    {
+      "id": "web-automation",
+      "title": "웹 API 자동화",
+      "description": "Selenium을 활용한 웹 자동화 고급 기능을 학습합니다.",
+      "contentPath": "14.4-web-automation.md"
+    },
+    {
+      "id": "cron-batch",
+      "title": "크론 작업 및 배치 스크립트",
+      "description": "정기적인 작업 예약과 배치 처리 방법을 배웁니다.",
+      "contentPath": "14.5-cron-batch.md"
+    },
+    {
+      "id": "project",
+      "title": "실습 프로젝트",
+      "description": "통합 자동화 시스템을 구현하는 실전 프로젝트를 수행합니다.",
+      "contentPath": "14.6-project.md"
+    },
+    {
+      "id": "summary",
+      "title": "요약",
+      "description": "자동화 및 시스템 스크립트 과정에서 배운 내용을 요약하고 다음 학습 방향을 제시합니다.",
+      "contentPath": "14.7-summary.md"
+    }
+  ],
+  "edges": [
+    {
+      "source": "intro",
+      "target": "automation-concepts",
+      "id": "edge-intro-automation-concepts",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "automation-concepts",
+      "target": "file-management",
+      "id": "edge-automation-concepts-file-management",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "file-management",
+      "target": "email-automation",
+      "id": "edge-file-management-email-automation",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "email-automation",
+      "target": "web-automation",
+      "id": "edge-email-automation-web-automation",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "web-automation",
+      "target": "cron-batch",
+      "id": "edge-web-automation-cron-batch",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "cron-batch",
+      "target": "project",
+      "id": "edge-cron-batch-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "project",
+      "target": "summary",
+      "id": "edge-project-summary",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

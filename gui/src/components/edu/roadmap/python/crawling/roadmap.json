@@ -1,0 +1,309 @@
+{
+  "id": "python-crawling",
+  "nodes": [
+    {
+      "id": "crawling-intro",
+      "type": "custom",
+      "data": {
+        "title": "웹 스크래핑 개념 및 활용",
+        "description": "웹 스크래핑의 기본 개념과 활용 분야",
+        "status": "not-started",
+        "order": "11.1",
+        "column": "main",
+        "content_file": "crawling-intro.md"
+      }
+    },
+    {
+      "id": "crawling-basic",
+      "type": "custom",
+      "data": {
+        "title": "웹 스크래핑 기본 도구",
+        "description": "requests와 BeautifulSoup 활용 방법",
+        "status": "not-started",
+        "order": "11.2",
+        "column": "main",
+        "content_file": "crawling-basic.md"
+      }
+    },
+    {
+      "id": "crawling-dynamic",
+      "type": "custom",
+      "data": {
+        "title": "동적 웹사이트 크롤링",
+        "description": "Selenium을 활용한 동적 페이지 크롤링",
+        "status": "not-started",
+        "order": "11.3",
+        "column": "main",
+        "content_file": "crawling-dynamic.md"
+      }
+    },
+    {
+      "id": "crawling-data",
+      "type": "custom",
+      "data": {
+        "title": "데이터 저장 및 분석",
+        "description": "크롤링한 데이터의 저장 및 분석 방법",
+        "status": "not-started",
+        "order": "11.4",
+        "column": "main",
+        "content_file": "crawling-data.md"
+      }
+    },
+    {
+      "id": "crawling-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "웹 스크래핑 실습 프로젝트",
+        "status": "not-started",
+        "order": "11.5",
+        "column": "main",
+        "content_file": "crawling-project.md"
+      }
+    },
+    {
+      "id": "crawling-intro-1",
+      "type": "custom",
+      "data": {
+        "title": "웹 스크래핑 활용 분야",
+        "description": "웹 스크래핑의 주요 활용 분야",
+        "status": "not-started",
+        "order": "11.1.1",
+        "column": "child",
+        "content_file": "crawling-intro.md",
+        "content_section": "11.1.1 웹 스크래핑의 주요 활용 분야"
+      }
+    },
+    {
+      "id": "crawling-intro-2",
+      "type": "custom",
+      "data": {
+        "title": "웹 스크래핑 주의사항",
+        "description": "웹 스크래핑 시 주의사항",
+        "status": "not-started",
+        "order": "11.1.2",
+        "column": "child",
+        "content_file": "crawling-intro.md",
+        "content_section": "11.1.2 웹 스크래핑 시 주의사항"
+      }
+    },
+    {
+      "id": "crawling-basic-1",
+      "type": "custom",
+      "data": {
+        "title": "BeautifulSoup 사용법",
+        "description": "고급 BeautifulSoup 사용법",
+        "status": "not-started",
+        "order": "11.2.1",
+        "column": "child",
+        "content_file": "crawling-basic.md",
+        "content_section": "11.2.1 고급 BeautifulSoup 사용법"
+      }
+    },
+    {
+      "id": "crawling-basic-2",
+      "type": "custom",
+      "data": {
+        "title": "BeautifulSoup 고급 활용",
+        "description": "BeautifulSoup 고급 사용법",
+        "status": "not-started",
+        "order": "11.2.3",
+        "column": "child",
+        "content_file": "crawling-basic.md",
+        "content_section": "11.2.3 BeautifulSoup 고급 사용법"
+      }
+    },
+    {
+      "id": "crawling-basic-3",
+      "type": "custom",
+      "data": {
+        "title": "에러 처리와 예외 상황",
+        "description": "웹 크롤링 시 에러 처리 방법",
+        "status": "not-started",
+        "order": "11.2.4",
+        "column": "child",
+        "content_file": "crawling-basic.md",
+        "content_section": "11.2.4 에러 처리와 예외 상황"
+      }
+    },
+    {
+      "id": "crawling-dynamic-1",
+      "type": "custom",
+      "data": {
+        "title": "동적 페이지 처리",
+        "description": "Selenium을 활용한 동적 페이지 처리",
+        "status": "not-started",
+        "order": "11.3.1",
+        "column": "child",
+        "content_file": "crawling-dynamic.md",
+        "content_section": "11.3.1 동적 페이지 처리"
+      }
+    },
+    {
+      "id": "crawling-data-1",
+      "type": "custom",
+      "data": {
+        "title": "데이터베이스 저장",
+        "description": "크롤링 데이터 DB 저장 방법",
+        "status": "not-started",
+        "order": "11.4.1",
+        "column": "child",
+        "content_file": "crawling-data.md",
+        "content_section": "11.4.1 데이터베이스 저장"
+      }
+    },
+    {
+      "id": "crawling-data-2",
+      "type": "custom",
+      "data": {
+        "title": "데이터 분석 및 시각화",
+        "description": "크롤링 데이터 분석 및 시각화",
+        "status": "not-started",
+        "order": "11.4.2",
+        "column": "child",
+        "content_file": "crawling-data.md",
+        "content_section": "11.4.2 데이터 분석 및 시각화"
+      }
+    },
+    {
+      "id": "crawling-data-3",
+      "type": "custom",
+      "data": {
+        "title": "텍스트 데이터 전처리",
+        "description": "크롤링한 텍스트 전처리 방법",
+        "status": "not-started",
+        "order": "11.4.3",
+        "column": "child",
+        "content_file": "crawling-data.md",
+        "content_section": "11.4.3 텍스트 데이터 전처리"
+      }
+    },
+    {
+      "id": "crawling-data-4",
+      "type": "custom",
+      "data": {
+        "title": "데이터 내보내기",
+        "description": "크롤링 데이터 내보내기",
+        "status": "not-started",
+        "order": "11.4.4",
+        "column": "child",
+        "content_file": "crawling-data.md",
+        "content_section": "11.4.4 데이터 내보내기"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "crawling-intro",
+      "target": "crawling-basic",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "crawling-basic",
+      "target": "crawling-dynamic",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "crawling-dynamic",
+      "target": "crawling-data",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "crawling-data",
+      "target": "crawling-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "crawling-intro",
+      "target": "crawling-intro-1",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "crawling-intro",
+      "target": "crawling-intro-2",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "crawling-basic",
+      "target": "crawling-basic-1",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "crawling-basic",
+      "target": "crawling-basic-2",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "crawling-basic",
+      "target": "crawling-basic-3",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e10",
+      "source": "crawling-dynamic",
+      "target": "crawling-dynamic-1",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "crawling-data",
+      "target": "crawling-data-1",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e12",
+      "source": "crawling-data",
+      "target": "crawling-data-2",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e13",
+      "source": "crawling-data",
+      "target": "crawling-data-3",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e14",
+      "source": "crawling-data",
+      "target": "crawling-data-4",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+}

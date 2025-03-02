@@ -1,0 +1,46 @@
+{
+  "roadmap": {
+    "python-data-intro": {
+      "title": "데이터 구조",
+      "description": "파이썬의 기본 데이터 구조에 대해 배워봅시다",
+      "order": "3.0",
+      "prerequisites": [],
+      "content": "python/data/sections/3.0-intro.md"
+    },
+    "python-lists-tuples": {
+      "title": "리스트와 튜플",
+      "description": "순서가 있는 데이터 컬렉션",
+      "order": "3.1",
+      "prerequisites": ["python-data-intro"],
+      "content": "python/data/sections/3.1-lists-tuples.md"
+    },
+    "python-dict-set": {
+      "title": "딕셔너리와 집합",
+      "description": "키-값 쌍과 중복 없는 컬렉션",
+      "order": "3.2",
+      "prerequisites": ["python-lists-tuples"],
+      "content": "python/data/sections/3.2-dict-set.md"
+    },
+    "python-list-comprehension": {
+      "title": "리스트 컴프리헨션",
+      "description": "간결한 리스트 생성 방법",
+      "order": "3.3",
+      "prerequisites": ["python-dict-set"],
+      "content": "python/data/sections/3.3-list-comprehension.md"
+    },
+    "python-data-structures": {
+      "title": "데이터 구조 활용하기",
+      "description": "실전에서 데이터 구조 활용하기",
+      "order": "3.4",
+      "prerequisites": ["python-list-comprehension"],
+      "content": "python/data/sections/3.4-data-structures.md"
+    },
+    "python-data-summary": {
+      "title": "요약",
+      "description": "데이터 구조 정리",
+      "order": "3.5",
+      "prerequisites": ["python-data-structures"],
+      "content": "python/data/sections/3.5-summary.md"
+    }
+  }
+} 

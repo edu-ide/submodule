@@ -218,5 +218,11 @@ export class MessageIde implements IDE {
     return this.request("authenticatePear", undefined);
   }
 
+  async createPracticeWorkspace(url: string): Promise<void> {
+    return this.request("createPracticeWorkspace", { url });
+  }
 
+  async createPracticeFile(language: string, code: string): Promise<void> {
+    return this.request("createPracticeFile", { language, code });
+  }
 }

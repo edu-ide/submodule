@@ -63,6 +63,7 @@ import {
 import { ComboBoxItem } from "./types";
 import { useLocation } from "react-router-dom";
 import { TipTapContextMenu } from './TipTapContextMenu';
+import { setBottomMessage, setBottomMessageCloseTimeout } from "../../redux/slices/uiStateSlice";
 
 const InputBoxDiv = styled.div<{ isNewSession?: boolean }>`
 	position: relative;
@@ -1084,6 +1085,87 @@ const TipTapEditor = memo(function TipTapEditor({
       return () => observer.disconnect();
     }
   }, [onHeightChange]);
+
+ useWebviewListener(
+  "forwardEducationContextToChat",
+  async (data) => {
+    // 기본 유효성 검사
+    if (!isMainInput || !editor || !data.content) {
+      console.log("에디터 또는 데이터 없음");
+      return;
+    }
+
+    const content = data.content;
+
+    // content가 'doc' 타입이고 content 배열을 포함하는지 확인
+    if (content.type !== "doc" || !Array.isArray(content.content)) {
+      console.error("유효하지 않은 문서 형식:", content);
+      dispatch(setBottomMessage(<div>지원되지 않는 문서 형식입니다</div>));
+      return;
+    }
+
+    try {
+      // 삽입 위치 계산
+      let index = 0;
+      for (const el of editor.getJSON().content) {
+        if (el.type === "codeBlock") {
+          index += 2; // 각 codeBlock이 차지하는 위치를 2로 가정
+        } else {
+          break;
+        }
+      }
+
+      // content.content 배열의 각 노드를 codeBlock으로 삽입
+      content.content.forEach((node) => {
+        // 기존 educationBlock 대신 일반 노드에서 속성 추출
+        if (node.attrs) {
+          const item: ContextItemWithId = {
+           content: node.attrs.content || '',
+                  name: node.attrs.title || '교육 자료',
+                  description: node.attrs.category || '교육 콘텐츠',
+                  id: {
+                    providerTitle: "education",
+                    itemId: Date.now().toString(),
+                  },
+                  language: node.attrs.markdown ? 'markdown' : 'text',
+          };
+
+          editor
+            .chain()
+            .insertContentAt(index, {
+              type: "codeBlock",
+              attrs: {
+                item, // ContextItemWithId 객체를 attrs에 설정
+              },
+            })
+            .run();
+          index += 2; // 다음 삽입 위치 조정
+        }
+      });
+
+      // 프롬프트가 있으면 추가
+      if (data.prompt) {
+        editor.commands.focus("end");
+        editor.commands.insertContent(data.prompt);
+      }
+
+      // 자동 실행 플래그가 있으면 실행
+      if (data.shouldRun) {
+        onEnterRef.current({ useCodebase: false, noContext: true });
+      }
+
+      // 포커스 조정
+      setTimeout(() => {
+        editor.commands.blur();
+        editor.commands.focus("end");
+      }, 20);
+
+    } catch (error) {
+      console.error("교육 콘텐츠 추가 중 오류:", error);
+    }
+  },
+  [editor, isMainInput, onEnterRef.current, dispatch]
+);
 
   return (
     <InputBoxDiv

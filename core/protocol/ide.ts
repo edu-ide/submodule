@@ -15,6 +15,7 @@ import type {
 } from "../index.js";
 
 export type ToIdeFromWebviewOrCoreProtocol = {
+
   // Methods from IDE type
   getIdeInfo: [undefined, IdeInfo];
   getWorkspaceDirs: [undefined, string[]];
@@ -111,6 +112,10 @@ export type ToIdeFromWebviewOrCoreProtocol = {
     { commandId: string; args?: any[] },
     any | undefined,
   ];
+
+  createPracticeWorkspace: [{ url: string }, void];
+  createPracticeFile: [{ language: string; code: string }, void];
+
 };
 
 export type ToWebviewOrCoreFromIdeProtocol = {
