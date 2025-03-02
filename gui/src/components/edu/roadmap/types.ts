@@ -1,17 +1,30 @@
 import { Node as FlowNode, Edge as FlowEdge } from '@xyflow/react';
-
+import { ReactNode } from 'react';
 // 노드 데이터 타입 정의
-export interface NodeData {
+export type NodeData = {
   title: string;
   description: string;
-  status: 'completed' | 'in-progress' | 'not-started';
-  column: string;
-  isOptional?: boolean;
-  requiresSkill?: string[];
-  handles?: Record<string, boolean>;
+  status: string;
+  label: ReactNode;
+  order?: string;
+  column?: number;
+  content_file?: string;
+  type?: string | undefined;
+};
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  order: string;
+}
+export interface CategoryRoadmapData {
+  categories: Category[];
+  nodes: any[];
 }
 
 // 학습 콘텐츠 데이터 인터페이스
+
 export interface LearningContent {
   title: string;
   introduction: string;
@@ -52,6 +65,7 @@ export interface NodePropsType {
 export interface RoadmapViewProps {
   roadmapId: string;
   onBack: () => void;
+  parentCategoryId?: string;
 }
 
 // 학습 콘텐츠 뷰 프롭스

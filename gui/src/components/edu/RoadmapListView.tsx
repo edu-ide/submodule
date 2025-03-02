@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setHeaderInfo } from '../../redux/slices/uiStateSlice';
+import { setListViewMode } from '../../redux/roadmapSlice';
+import { RootState } from '../../redux/store';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import { 
   ReactFlow,
@@ -281,10 +283,6 @@ const RoadmapFlowView = ({ nodes: initialNodes, edges: initialEdges, onNodeClick
   const [currentLayout, setCurrentLayout] = useState<string>('layered');
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   
-  // 설정 패널 상태 추가
-  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('control');
-  
   // ReactFlow 훅 - 이제 ReactFlowProvider 내부에서 안전하게 사용 가능
   const reactFlow = useReactFlow();
   
@@ -410,40 +408,28 @@ const RoadmapFlowView = ({ nodes: initialNodes, edges: initialEdges, onNodeClick
     }
   }, [reactFlow, nodes.length, applyLayout]);
   
-  // 설정 버튼 토글
-  const toggleSettings = useCallback(() => {
-    setSettingsOpen(prev => !prev);
-  }, []);
+  // EducationLayout의 설정 패널에서 보내는 이벤트 수신
+  useEffect(() => {
+    const handleLayoutChange = (event: CustomEvent) => {
+      if (event.detail && event.detail.layout) {
+        const layout = event.detail.layout;
+        if (layout === 'horizontal') {
+          applyLayout('layered', 'RIGHT');
+        } else if (layout === 'vertical') {
+          applyLayout('layered', 'DOWN');
+        }
+      }
+    };
+    
+    window.addEventListener('roadmap-layout-change', handleLayoutChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('roadmap-layout-change', handleLayoutChange as EventListener);
+    };
+  }, [applyLayout]);
   
   return (
     <>
-      {/* 설정 버튼 */}
-      <Panel position="top-right" className="settings-button-panel">
-        <button 
-          type="button"
-          className="settings-toggle-button" 
-          onClick={toggleSettings}
-          aria-label="설정 열기"
-        >
-          <span className="settings-icon">⚙️</span>
-          <span className="settings-text">설정</span>
-        </button>
-      </Panel>
-      
-      {/* 설정 패널 - 패널 컴포넌트 밖에서 렌더링 */}
-      <SettingsPanel 
-        isOpen={settingsOpen} 
-        onClose={() => setSettingsOpen(false)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        currentLayout={currentLayout}
-        onApplyLayout={applyLayout}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onFitView={handleFitView}
-        onResetView={handleResetView}
-      />
-      
       <SharedRoadmapFlowView
         nodes={nodes}
         edges={edges}
@@ -453,6 +439,21 @@ const RoadmapFlowView = ({ nodes: initialNodes, edges: initialEdges, onNodeClick
         onInit={(instance) => setReactFlowInstance(instance)}
         showStatistics={false}
       />
+      
+      <style jsx global>{`
+        /* ReactFlow z-index 조정 */
+        .react-flow {
+          z-index: 5 !important;
+        }
+        
+        .react-flow__controls {
+          z-index: 6 !important;
+        }
+        
+        .react-flow__panel {
+          z-index: 7 !important;
+        }
+      `}</style>
     </>
   );
 };
@@ -462,7 +463,7 @@ const RoadmapListView: React.FC = () => {
   const [roadmapNodes, setRoadmapNodes] = useState<RoadmapNode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'flow'>('list');
+  const listViewMode = useSelector((state: RootState) => state.roadmap.listViewMode);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
   
@@ -651,9 +652,9 @@ const RoadmapListView: React.FC = () => {
     }
   };
   
-  // 뷰 모드 전환 핸들러
+  // 뷰 모드 변경 핸들러
   const handleViewModeChange = (mode: 'list' | 'flow') => {
-    setViewMode(mode);
+    dispatch(setListViewMode(mode));
   };
 
   // 특정 카테고리에 속한 로드맵 노드 가져오기
@@ -668,36 +669,32 @@ const RoadmapListView: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="loading-container">로드맵 정보를 불러오는 중...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <div className="loading-text">로드맵 데이터 로딩 중...</div>
+      </div>
+    );
   }
-
+  
   if (error) {
-    return <div className="error-container">{error}</div>;
+    return (
+      <div className="error-container">
+        <div className="error-icon">❌</div>
+        <div className="error-message">{error}</div>
+        <button className="retry-button" onClick={() => window.location.reload()}>
+          다시 시도
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div className="roadmap-list-container">
-      <div className="view-mode-toggle">
-        <button 
-          className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-          onClick={() => handleViewModeChange('list')}
-        >
-          <span className="button-icon">📋</span> 목록
-        </button>
-        <button 
-          className={`toggle-button ${viewMode === 'flow' ? 'active' : ''}`}
-          onClick={() => handleViewModeChange('flow')}
-        >
-          <span className="button-icon">🔄</span> 플로우
-        </button>
-      </div>
-      
-      {viewMode === 'list' ? (
-        <>
-          {/* 추천 학습 경로 섹션 제거 */}
-          
-          {/* 카테고리별 로드맵 섹션 */}
-          {categories.map((category) => (
+    <div className="roadmap-list-page">
+      {/* 뷰 모드에 따라 다른 컴포넌트 렌더링 */}
+      {listViewMode === 'list' ? (
+        <div className="roadmap-list-container">
+          {categories.map((category, index) => (
             <div key={category.id} className="category-section">
               <div className="category-header" onClick={() => handleCategoryClick(category.id)}>
                 <h2 className="category-title">{category.title}</h2>
@@ -749,26 +746,23 @@ const RoadmapListView: React.FC = () => {
               </div>
             </div>
           ))}
-        </>
-      ) : (
-        <div className="flow-container">
-          {/* 중요: ReactFlowProvider를 최상위 레벨에 배치 */}
-          <ReactFlowProvider>
-            <RoadmapFlowView 
-              nodes={nodes} 
-              edges={edges} 
-              onNodeClick={handleNodeClick} 
-              resetView={() => {}}
-            />
-          </ReactFlowProvider>
         </div>
+      ) : (
+        <ReactFlowProvider>
+          <RoadmapFlowView 
+            nodes={nodes} 
+            edges={edges} 
+            onNodeClick={handleNodeClick} 
+            resetView={() => {}}
+          />
+        </ReactFlowProvider>
       )}
-
+      
       <style jsx global>{`
         /* 설정 버튼 스타일 */
         .settings-button-panel {
           margin: 15px;
-          z-index: 20;
+          z-index: 5;
         }
         
         .settings-toggle-button {
@@ -810,7 +804,7 @@ const RoadmapListView: React.FC = () => {
           border-radius: 12px;
           padding: 0;
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-          z-index: 15;
+          z-index: 9000;
           width: 320px;
           transform: translateX(110%);
           transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1050,48 +1044,6 @@ const RoadmapListView: React.FC = () => {
         }
       `}</style>
       <style jsx>{`
-        /* 뷰 모드 토글 스타일 */
-        .view-mode-toggle {
-          display: flex;
-          justify-content: center;
-          background-color: var(--vscode-badge-background);
-          border-radius: 24px;
-          padding: 4px;
-          width: fit-content;
-          margin: 0 auto 20px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          border: 1px solid var(--vscode-panel-border);
-        }
-        
-        .toggle-button {
-          background: none;
-          border: none;
-          border-radius: 20px;
-          padding: 8px 16px;
-          font-size: 0.9rem;
-          color: var(--vscode-badge-foreground);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.2s ease;
-        }
-        
-        .toggle-button:hover {
-          color: var(--vscode-button-foreground);
-        }
-        
-        .toggle-button.active {
-          background-color: var(--vscode-button-background);
-          color: var(--vscode-button-foreground);
-          font-weight: 500;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        
-        .button-icon {
-          font-size: 1rem;
-        }
-        
         /* 카테고리 섹션 스타일 */
         .roadmap-list-container {
           padding: 20px;

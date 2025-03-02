@@ -47,13 +47,8 @@ declare global {
   }
 }
 
-// RoadmapView 래퍼
-const RoadmapViewWrapper = () => {
-  const { roadmapId } = useParams();
-  return <RoadmapView roadmapId={roadmapId || 'python'} />;
-};
 
-// LearningContentViewWrapper 제거 (더 이상 필요하지 않음)
+
 
 // 라우터 설정에서 경로 업데이트
 const router = createMemoryRouter(
