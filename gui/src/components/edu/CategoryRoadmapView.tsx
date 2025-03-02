@@ -21,7 +21,6 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { css } from '@emotion/react';
-import { EdgeWithInteractions } from './roadmap/EdgeWithInteractions';
 import CustomNode from './roadmap/CustomNode';
 import SharedRoadmapFlowView from './SharedRoadmapFlowView';
 import { createCategoryFlowLayout, RoadmapNode, layoutElements as layoutUtilsElements } from './layoutUtils';
@@ -424,9 +423,7 @@ const CategoryRoadmapView: React.FC = () => {
     custom: CustomNode
   }), []);
   
-  const edgeTypes = useMemo(() => ({
-    custom: EdgeWithInteractions,
-  }), []);
+
   
   // 로드맵 클릭 핸들러
   const handleRoadmapClick = (roadmapId: string) => {

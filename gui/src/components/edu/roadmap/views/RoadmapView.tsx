@@ -11,6 +11,7 @@ import {
   ReactFlowProvider
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import './RoadmapView.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../redux/store';
@@ -131,13 +132,12 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
     setCurrentLayout(algorithm === 'layered' && direction === 'DOWN' ? 'vertical' : 'horizontal');
     setCurrentDirection(direction);
     
-    dispatch(setBottomMessage(`레이아웃 적용 중: ${algorithm}, 방향: ${direction}`));
     
     applyElkLayout(
       reactFlowInstanceRef.current,
       algorithm,
       direction,
-      () => dispatch(setBottomMessage(`레이아웃 적용 완료: ${algorithm}`)),
+      () => {},
       (error) => dispatch(setBottomMessage(`레이아웃 적용 실패: ${error.message}`))
     );
   }, [reactFlowInstanceRef, dispatch]);
@@ -205,7 +205,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
       })
       .catch(error => {
         console.error('로드맵 데이터 로드 중 오류 발생:', error);
-        dispatch(setBottomMessage(`오류: 로드맵 데이터를 로드할 수 없습니다 - ${error.message}`));
       });
     
     // 카테고리 정보 로드
@@ -270,7 +269,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
   // 로드맵 데이터 로드 함수 - 기본 레이아웃을 수평으로 설정
   const loadRoadmapData = (id: string, loadedNodes?: ImportedRoadmapNode[], loadedEdges?: ImportedRoadmapEdge[]) => {
     console.log('로드맵 데이터 로드:', id);
-    dispatch(setBottomMessage(`로드맵 데이터 로드 중: ${id}`));
     
     // 로드된 데이터가 있으면 사용하고, 없으면 state에서 가져옴
     const nodesToUse = loadedNodes ;
@@ -328,7 +326,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
         console.warn('엣지가 생성되지 않았습니다. 데이터를 확인하세요.');
       }
       
-      dispatch(setBottomMessage(`로드맵 데이터 로드 완료: ${id}`));
     } catch (error) {
       console.error('로드맵 레이아웃 생성 오류:', error);
       dispatch(setBottomMessage(`로드맵 레이아웃 생성 오류: ${(error as Error).message}`));
@@ -339,22 +336,25 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
   
   // 뒤로가기 처리 - 항상 카테고리로 이동하도록 수정
   const handleBack = () => {
-    if (categoryInfo && categoryInfo.category) {
-      // 항상 카테고리 페이지로 이동
-      navigate(`/education/roadmap-category/${categoryInfo.category.id}`);
-    } else {
+   
       // 카테고리 정보가 없는 경우 기본 로드맵 목록으로 이동
       navigate('/education/roadmaps');
-    }
   };
   
   // 노드 클릭 핸들러 수정
   const onNodeClick = useCallback(async (event: React.MouseEvent, node: FlowNode<NodeData>) => {
     if (node.type === 'groupNode') return;
     
-    // 노드 정보 로깅
-    dispatch(setBottomMessage(`노드 클릭: ${node.id} (로드맵: ${routerRoadmapId})`));
-    console.log(`노드 클릭 처리: ID=${node.id}, 타이틀=${node.data?.title}`);
+    // roadmapContent에서 해당 노드의 정보를 찾아 content_section을 가져옴
+    const nodeFromContent = roadmapContent.nodes.find(n => n.id === node.id);
+    const contentSection = nodeFromContent?.data?.content_section || node.data?.content_section || '';
+    const nodeOrder = nodeFromContent?.data?.order || node.data?.order || '';
+    
+    // 상위 노드 찾기 (엣지 기반)
+    const parentEdge = roadmapContent.edges.find(e => e.target === node.id);
+    const parentId = parentEdge?.source || '';
+ 
+    console.log(`노드 클릭 처리: ID=${node.id}, 타이틀=${node.data?.title}, 섹션=${contentSection}, 부모=${parentId}`);
     
     // 내비게이션 경로 정상화를 위한 정보 준비
     const contentId = node.id;
@@ -367,8 +367,15 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
         console.log(`노드 타이틀을 URL로 변환: "${node.data.title}" -> "${contentRouteId}"`);
       }
       
-      // RoadmapContentView 페이지로 이동
-      const contentPath = `/education/roadmap/${routerRoadmapId}/content/${contentRouteId}`;
+      // content_section 확인 및 URL 파라미터 추가
+      let contentPath = `/education/roadmap/${routerRoadmapId}/content/${contentRouteId}`;
+      
+      // content_section이 있는 경우 쿼리 파라미터로 추가
+      if (contentSection) {
+        contentPath += `?section=${encodeURIComponent(contentSection)}`;
+        console.log(`섹션 스크롤 파라미터 추가: ${contentSection}`);
+      }
+      
       console.log(`콘텐츠 페이지로 이동: ${contentPath}`);
       navigate(contentPath);
       
@@ -418,7 +425,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack, parentCate
         `);
       }
     }
-  }, [navigate, routerRoadmapId, dispatch, setSelectedNode, setSelectedNodeContent]);
+  }, [navigate, routerRoadmapId, dispatch, setSelectedNode, setSelectedNodeContent, roadmapContent]);
   
   // onInit 핸들러
   const onInit = useCallback((instance: ReactFlowInstance) => {

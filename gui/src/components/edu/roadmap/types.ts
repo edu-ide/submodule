@@ -1,16 +1,20 @@
 import { Node as FlowNode, Edge as FlowEdge } from '@xyflow/react';
 import { ReactNode } from 'react';
 // 노드 데이터 타입 정의
-export type NodeData = {
+export interface NodeData {
   title: string;
   description: string;
-  status: string;
-  label: ReactNode;
+  status?: string;
+  category?: string | string[];
+  thumbnail?: string;
+  tags?: string[];
+  column?: string;
   order?: string;
-  column?: number;
+  label?: string;
   content_file?: string;
-  type?: string | undefined;
-};
+  content_section?: string;  // 섹션 스크롤을 위한 속성 추가
+  [key: string]: any;  // 추가 속성을 위한 인덱스 시그니처
+}
 interface Category {
   id: string;
   title: string;

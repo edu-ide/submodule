@@ -696,7 +696,7 @@ const RoadmapListView: React.FC = () => {
         <div className="roadmap-list-container">
           {categories.map((category, index) => (
             <div key={category.id} className="category-section">
-              <div className="category-header" onClick={() => handleCategoryClick(category.id)}>
+              <div className="category-header" onClick={() => {}}>
                 <h2 className="category-title">{category.title}</h2>
                 <div className="category-description">{category.description}</div>
                 <div className="view-all">전체 보기 →</div>

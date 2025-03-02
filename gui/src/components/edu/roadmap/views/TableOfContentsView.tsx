@@ -97,13 +97,11 @@ const TableOfContentsView: React.FC<TableOfContentsViewProps> = ({ roadmapConten
   // 데이터 로깅은 useEffect에서 한 번만 실행
   useEffect(() => {
     if (validRoadmapContent) {
-      dispatch(setBottomMessage(`노드 ${nodes.length}개, 엣지 ${edges.length}개 로드됨`));
       console.log('로드된 데이터:', { 
         nodes: nodes.map(n => ({ id: n.id, order: n.data?.order })),
         edges: edges.map(e => ({ id: e.id, source: e.source, target: e.target }))
       });
     } else {
-      dispatch(setBottomMessage('유효한 로드맵 데이터가 없습니다'));
       console.warn('유효한 로드맵 데이터가 없습니다:', roadmapContent);
     }
   }, [nodes, edges, dispatch, validRoadmapContent]);
@@ -367,6 +365,28 @@ const TableOfContentsView: React.FC<TableOfContentsViewProps> = ({ roadmapConten
           const isChildNode = node.data?.column === 'child' || (node.data as any)?.type === 'child';
           const hasChildren = (childMap[node.id] || []).length > 0;
           
+          // 부모 노드에 대한 content_section 추가
+          let contentSection = node.data?.content_section;
+          
+          // 하위 노드에 대한 content_section이 없고, title이 있는 경우
+          // title을 content_section으로 사용 (부모 콘텐츠 내 해당 섹션으로 스크롤하기 위함)
+          if (isChildNode && !contentSection && node.data?.title) {
+            contentSection = node.data.title;
+            // 한 번 로깅
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`하위 노드 ${node.id}의 content_section이 없어 title로 대체:`, contentSection);
+            }
+          }
+          
+          // 데이터 속성에 content_section 추가 (원본 데이터에 직접 수정은 없음)
+          const nodeWithSection = {
+            ...node,
+            data: {
+              ...node.data,
+              content_section: contentSection
+            }
+          };
+          
           let itemClass = "toc-item";
           if (node.data?.status) itemClass += ` ${node.data.status}`;
           if (isMainNode) itemClass += " main-node";
@@ -381,7 +401,7 @@ const TableOfContentsView: React.FC<TableOfContentsViewProps> = ({ roadmapConten
               key={node.id} 
               className={itemClass}
               style={{ marginLeft: `${level * 15}px` }}
-              onClick={(e) => onNodeClick(e, node)}
+              onClick={(e) => onNodeClick(e, nodeWithSection)}
             >
               {isChildNode ? (
                 <span className="toc-icon">•</span>
@@ -495,7 +515,6 @@ const TableOfContentsView: React.FC<TableOfContentsViewProps> = ({ roadmapConten
         }
         
         .toc-order::before {
-          content: '순서';
           position: absolute;
           top: -15px;
           left: 50%;
