@@ -85,6 +85,7 @@
     "@eslint/js": "^9.11.1",
     "@swc/cli": "^0.3.14",
     "@swc/core": "^1.7.2",
+    "@tailwindcss/vite": "^4.0.0-alpha.27",
     "@types/lodash": "^4.17.6",
     "@types/node": "^20.16.12",
     "@types/node-fetch": "^2.6.4",
@@ -103,10 +104,10 @@
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
     "react-dev-inspector": "^2.0.1",
-    "tailwindcss": "^3.4.14",
+    "tailwindcss": "^4.0.0-alpha.27",
     "typescript": "^4.9.3",
     "typescript-eslint": "^8.7.0",
-    "vite": "^4.1.0"
+    "vite": "^6.2.1"
   },
   "engine-strict": true,
   "engines": {
