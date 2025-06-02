@@ -92,16 +92,49 @@ export async function* streamSse(response: Response): AsyncGenerator<any> {
 }
 
 export async function* streamJSON(response: Response): AsyncGenerator<any> {
-  let buffer = "";
-  for await (const value of streamResponse(response)) {
-    buffer += value;
-
-    let position;
-    while ((position = buffer.indexOf("\n")) >= 0) {
-      const line = buffer.slice(0, position);
-      const data = JSON.parse(line);
-      yield data;
-      buffer = buffer.slice(position + 1);
+  console.log("streamJSON 시작, 응답 상태:", response.status, response.statusText);
+  
+  try {
+    let buffer = "";
+    for await (const value of streamResponse(response)) {
+      console.log("streamResponse에서 받은 청크:", value);
+      buffer += value;
+      
+      // 버퍼 내용 출력
+      console.log("현재 버퍼 내용:", buffer);
+      
+      let position;
+      // 줄바꿈을 찾아 처리
+      while ((position = buffer.indexOf("\n")) >= 0) {
+        const line = buffer.slice(0, position);
+        console.log("파싱할 줄:", line);
+        
+        try {
+          const data = JSON.parse(line);
+          console.log("파싱된 데이터:", data);
+          yield data;
+        } catch (parseError) {
+          console.error("JSON 파싱 오류:", parseError, "원본 텍스트:", line);
+        }
+        
+        buffer = buffer.slice(position + 1);
+      }
     }
+    
+    // 마지막 버퍼 처리
+    if (buffer.length > 0) {
+      console.log("남은 버퍼 처리:", buffer);
+      try {
+        const data = JSON.parse(buffer);
+        console.log("마지막 파싱된 데이터:", data);
+        yield data;
+      } catch (parseError) {
+        console.error("마지막 JSON 파싱 오류:", parseError, "원본 텍스트:", buffer);
+      }
+    }
+  } catch (error) {
+    console.error("streamJSON 처리 중 오류 발생:", error);
+  } finally {
+    console.log("streamJSON 함수 종료");
   }
 }

@@ -22,7 +22,6 @@ import {
   NoResultsView,
 } from "./StatusViews";
 import { MemoryFooter } from "./MemoryFooter";
-import "@/continue-styles.css";
 
 const MEMORIES_PER_PAGE = 8;
 

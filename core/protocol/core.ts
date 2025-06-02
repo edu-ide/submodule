@@ -31,7 +31,6 @@ export interface ListHistoryOptions {
 export type ToCoreFromIdeOrWebviewProtocol = {
   "update/modelChange": [string, void];
   "update/selectTabAutocompleteModel": [string, void];
-
   // Special
   ping: [string, string];
   abort: [undefined, void];
@@ -56,7 +55,7 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   "config/deleteModel": [{ title: string }, void];
   "config/reload": [undefined, BrowserSerializedContinueConfig];
   "config/listProfiles": [undefined, ProfileDescription[]];
-  "config/toggleIntegration": [{ name: string }, void];
+  "config/toggleIntegration": [{name: string}, void];
   "context/getContextItems": [
     {
       name: string;
@@ -94,19 +93,8 @@ export type ToCoreFromIdeOrWebviewProtocol = {
     },
     string,
   ];
-  "llm/setPearAICredentials": [
-    { accessToken?: string; refreshToken?: string },
-    void,
-  ];
-  "llm/checkPearAITokens": [
-    undefined,
-    Promise<{
-      tokensEdited: boolean;
-      accessToken?: string;
-      refreshToken?: string;
-    }>,
-  ];
-  "llm/getUserId": [undefined, Promise<string | undefined>];
+  "llm/setPearAICredentials": [{ accessToken?: string; refreshToken?: string }, void];
+  "llm/checkPearAITokens": [undefined, { tokensEdited: boolean, accessToken?: string, refreshToken?: string }];
   "llm/listModels": [{ title: string }, string[] | undefined];
   "llm/streamComplete": [
     {
@@ -166,4 +154,5 @@ export type ToCoreFromIdeOrWebviewProtocol = {
   "profiles/switch": [{ id: string }, undefined];
 
   "auth/getAuthUrl": [undefined, { url: string }];
+
 };

@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Product Context
+
+## Problem Definition
+Developers need to work within VSCode while simultaneously building and testing web applications. Maintaining consistency between the backend and frontend during this process is challenging.
+
+## Solution Approach
+Automatically generate backend and frontend code based on OpenAPI specifications to ensure consistency, and apply Domain-Driven Design (DDD) and CQRS patterns to build a scalable backend.
+
+## User Experience Goals
+1. Enable application development and testing directly within VSCode
+2. Maintain consistent data models between backend and frontend
+3. Provide an intuitive, component-based UI development experience
+4. Simplify API development and testing workflows

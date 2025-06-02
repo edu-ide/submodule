@@ -1,0 +1,147 @@
+{
+  "id": "python-oop",
+  "nodes": [
+    {
+      "id": "oop-intro",
+      "type": "custom",
+      "data": {
+        "title": "객체 지향 프로그래밍이란?",
+        "description": "객체 지향 프로그래밍의 개념과 특징",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "content_file": "oop-intro.md"
+      }
+    },
+    {
+      "id": "oop-class",
+      "type": "custom",
+      "data": {
+        "title": "클래스와 객체",
+        "description": "클래스 정의와 객체 생성, 메서드와 속성",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "content_file": "oop-class.md"
+      }
+    },
+    {
+      "id": "oop-inheritance",
+      "type": "custom",
+      "data": {
+        "title": "상속과 다형성",
+        "description": "클래스 상속과 다형성 개념",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "content_file": "oop-inheritance.md"
+      }
+    },
+    {
+      "id": "oop-encapsulation",
+      "type": "custom",
+      "data": {
+        "title": "캡슐화와 접근 제어",
+        "description": "데이터 보호와 접근 제어 메커니즘",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "content_file": "oop-encapsulation.md"
+      }
+    },
+    {
+      "id": "oop-methods",
+      "type": "custom",
+      "data": {
+        "title": "클래스 메서드와 정적 메서드",
+        "description": "다양한 메서드 타입과 활용법",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "content_file": "oop-methods.md"
+      }
+    },
+    {
+      "id": "oop-magic",
+      "type": "custom",
+      "data": {
+        "title": "Magic Methods",
+        "description": "특별 메서드와 연산자 오버로딩",
+        "status": "not-started",
+        "order": "6.0",
+        "column": "main",
+        "content_file": "oop-magic.md"
+      }
+    },
+    {
+      "id": "oop-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "다양한 OOP 실습 예제",
+        "status": "not-started",
+        "order": "7.0",
+        "column": "main",
+        "content_file": "oop-project.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-intro-class",
+      "source": "oop-intro",
+      "target": "oop-class",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-class-inheritance",
+      "source": "oop-class",
+      "target": "oop-inheritance",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-class-encapsulation",
+      "source": "oop-class",
+      "target": "oop-encapsulation",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-inheritance-methods",
+      "source": "oop-inheritance",
+      "target": "oop-methods",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-encapsulation-methods",
+      "source": "oop-encapsulation",
+      "target": "oop-methods",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-methods-magic",
+      "source": "oop-methods",
+      "target": "oop-magic",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-magic-project",
+      "source": "oop-magic",
+      "target": "oop-project",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

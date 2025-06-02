@@ -1,0 +1,225 @@
+{
+  "id": "python-analysis",
+  "title": "데이터 분석 및 시각화",
+  "description": "파이썬을 활용한 데이터 분석과 시각화의 기초부터 고급 기법까지 학습하는 로드맵입니다.",
+  "nodes": [
+    {
+      "id": "intro",
+      "type": "custom",
+      "data": {
+        "title": "데이터 분석 및 시각화 입문",
+        "description": "데이터 분석 및 시각화의 개요와 학습 목표에 대해 알아봅니다.",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "content_file": "7.0-intro.md"
+      }
+    },
+    {
+      "id": "analysis-basics",
+      "type": "custom",
+      "data": {
+        "title": "데이터 분석 개념 및 기초",
+        "description": "데이터 분석의 단계, 기본 통계 개념, 전처리 기법, 탐색 방법 등을 배웁니다.",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "content_file": "7.1-analysis-basics.md"
+      }
+    },
+    {
+      "id": "numpy-pandas",
+      "type": "custom",
+      "data": {
+        "title": "NumPy와 Pandas를 사용한 데이터 처리",
+        "description": "NumPy와 Pandas를 활용한 효율적인 데이터 처리 방법을 익힙니다.",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "content_file": "7.2-numpy-pandas.md"
+      }
+    },
+    {
+      "id": "matplotlib-seaborn",
+      "type": "custom",
+      "data": {
+        "title": "Matplotlib과 Seaborn을 사용한 데이터 시각화",
+        "description": "Matplotlib과 Seaborn을 사용하여 다양한 유형의 데이터 시각화를 구현하는 방법을 배웁니다.",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "content_file": "7.3-matplotlib-seaborn.md"
+      }
+    },
+    {
+      "id": "plotly",
+      "type": "custom",
+      "data": {
+        "title": "Plotly를 활용한 대화형 그래프 제작",
+        "description": "Plotly를 사용하여 대화형 시각화와 대시보드를 제작하는 방법을 학습합니다.",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "content_file": "7.4-plotly.md"
+      }
+    },
+    {
+      "id": "project",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "COVID-19 데이터셋을 활용한 실전 데이터 분석 및 시각화 프로젝트를 수행합니다.",
+        "status": "not-started",
+        "order": "6.0",
+        "column": "main",
+        "content_file": "7.5-project.md"
+      }
+    },
+    {
+      "id": "summary",
+      "type": "custom",
+      "data": {
+        "title": "요약",
+        "description": "데이터 분석 및 시각화 과정에서 배운 내용을 요약하고 다음 학습 방향을 제시합니다.",
+        "status": "not-started",
+        "order": "7.0",
+        "column": "main",
+        "content_file": "7.6-summary.md"
+      }
+    },
+    {
+      "id": "numpy-basics",
+      "type": "custom",
+      "data": {
+        "title": "NumPy 기초",
+        "description": "NumPy 배열과 기본 연산",
+        "status": "not-started",
+        "order": "3.1",
+        "column": "child",
+        "content_file": "7.2-numpy-pandas.md",
+        "content_section": "NumPy 기초"
+      }
+    },
+    {
+      "id": "pandas-basics",
+      "type": "custom",
+      "data": {
+        "title": "Pandas 기초",
+        "description": "Pandas DataFrame과 Series",
+        "status": "not-started",
+        "order": "3.2",
+        "column": "child",
+        "content_file": "7.2-numpy-pandas.md",
+        "content_section": "Pandas 기초"
+      }
+    },
+    {
+      "id": "matplotlib-basics",
+      "type": "custom",
+      "data": {
+        "title": "Matplotlib 기초",
+        "description": "기본 그래프 그리기",
+        "status": "not-started",
+        "order": "4.1",
+        "column": "child",
+        "content_file": "7.3-matplotlib-seaborn.md",
+        "content_section": "Matplotlib 기초"
+      }
+    },
+    {
+      "id": "seaborn-basics",
+      "type": "custom",
+      "data": {
+        "title": "Seaborn 기초",
+        "description": "통계 시각화 라이브러리",
+        "status": "not-started",
+        "order": "4.2",
+        "column": "child",
+        "content_file": "7.3-matplotlib-seaborn.md",
+        "content_section": "Seaborn 기초"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "intro",
+      "target": "analysis-basics",
+      "id": "edge-intro-analysis-basics",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "analysis-basics",
+      "target": "numpy-pandas",
+      "id": "edge-analysis-basics-numpy-pandas",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "numpy-pandas",
+      "target": "matplotlib-seaborn",
+      "id": "edge-numpy-pandas-matplotlib-seaborn",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "matplotlib-seaborn",
+      "target": "plotly",
+      "id": "edge-matplotlib-seaborn-plotly",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "plotly",
+      "target": "project",
+      "id": "edge-plotly-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "project",
+      "target": "summary",
+      "id": "edge-project-summary",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "source": "numpy-pandas",
+      "target": "numpy-basics",
+      "id": "edge-numpy-pandas-basics",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "source": "numpy-pandas",
+      "target": "pandas-basics",
+      "id": "edge-numpy-pandas-pandas",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "source": "matplotlib-seaborn",
+      "target": "matplotlib-basics",
+      "id": "edge-matplotlib-basics",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "source": "matplotlib-seaborn",
+      "target": "seaborn-basics",
+      "id": "edge-seaborn-basics",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+}

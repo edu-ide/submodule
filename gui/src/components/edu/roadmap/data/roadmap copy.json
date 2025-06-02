@@ -1,0 +1,509 @@
+{
+  "nodes": [
+    {
+      "id": "python-start",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 시작하기",
+        "description": "개발 환경 설정 및 기초",
+        "status": "completed",
+        "column": "main",
+        "order": 1
+      }
+    },
+    {
+      "id": "python-basics",
+      "type": "custom",
+      "data": {
+        "title": "기본 문법",
+        "description": "파이썬 프로그래밍의 기초",
+        "status": "completed",
+        "column": "main",
+        "order": 2
+      }
+    },
+    {
+      "id": "data-structures",
+      "type": "custom",
+      "data": {
+        "title": "자료 구조",
+        "description": "파이썬의 주요 자료구조",
+        "status": "in-progress",
+        "column": "main",
+        "order": 3
+      }
+    },
+    {
+      "id": "functions",
+      "type": "custom",
+      "data": {
+        "title": "함수",
+        "description": "코드 재사용을 위한 블록",
+        "status": "not-started",
+        "column": "main",
+        "order": 4
+      }
+    },
+    {
+      "id": "oop",
+      "type": "custom",
+      "data": {
+        "title": "객체지향 프로그래밍",
+        "description": "클래스와 객체 활용",
+        "status": "not-started",
+        "column": "main",
+        "order": 5
+      }
+    },
+    {
+      "id": "modules",
+      "type": "custom",
+      "data": {
+        "title": "모듈과 패키지",
+        "description": "코드 구성과 재사용",
+        "status": "not-started",
+        "column": "main",
+        "order": 6
+      }
+    },
+    {
+      "id": "advanced",
+      "type": "custom",
+      "data": {
+        "title": "고급 주제",
+        "description": "고급 파이썬 기능",
+        "status": "not-started",
+        "column": "main",
+        "order": 7
+      }
+    },
+    {
+      "id": "env-setup",
+      "type": "custom",
+      "data": {
+        "title": "환경 설정",
+        "description": "Python 설치 및 IDE 선택",
+        "status": "completed",
+        "order": 1.1
+      }
+    },
+    {
+      "id": "hello-world",
+      "type": "custom",
+      "data": {
+        "title": "Hello World",
+        "description": "첫 번째 파이썬 프로그램",
+        "status": "completed",
+        "order": 1.2
+      }
+    },
+    {
+      "id": "variables",
+      "type": "custom",
+      "data": {
+        "title": "변수와 자료형",
+        "description": "변수 선언과 기본 자료형",
+        "status": "completed",
+        "order": 2.1
+      }
+    },
+    {
+      "id": "operators",
+      "type": "custom",
+      "data": {
+        "title": "연산자",
+        "description": "산술, 비교, 논리 연산자",
+        "status": "completed",
+        "order": 2.2
+      }
+    },
+    {
+      "id": "conditionals",
+      "type": "custom",
+      "data": {
+        "title": "조건문",
+        "description": "if, else, elif 구문",
+        "status": "in-progress",
+        "order": 2.3
+      }
+    },
+    {
+      "id": "loops",
+      "type": "custom",
+      "data": {
+        "title": "반복문",
+        "description": "for, while 반복문",
+        "status": "not-started",
+        "order": 2.4
+      }
+    },
+    {
+      "id": "lists",
+      "type": "custom",
+      "data": {
+        "title": "리스트",
+        "description": "순서가 있는 컬렉션",
+        "status": "completed",
+        "order": 3.1
+      }
+    },
+    {
+      "id": "tuples",
+      "type": "custom",
+      "data": {
+        "title": "튜플",
+        "description": "불변 시퀀스 자료형",
+        "status": "in-progress",
+        "order": 3.2
+      }
+    },
+    {
+      "id": "dictionaries",
+      "type": "custom",
+      "data": {
+        "title": "딕셔너리",
+        "description": "키-값 쌍 컬렉션",
+        "status": "not-started",
+        "order": 3.3
+      }
+    },
+    {
+      "id": "sets",
+      "type": "custom",
+      "data": {
+        "title": "집합",
+        "description": "중복되지 않는 요소 모음",
+        "status": "not-started",
+        "order": 3.4
+      }
+    },
+    {
+      "id": "function-basics",
+      "type": "custom",
+      "data": {
+        "title": "함수 기초",
+        "description": "함수 선언과 호출",
+        "status": "not-started",
+        "order": 4.1
+      }
+    },
+    {
+      "id": "arguments",
+      "type": "custom",
+      "data": {
+        "title": "매개변수",
+        "description": "위치 및 키워드 인자",
+        "status": "not-started",
+        "order": 4.2
+      }
+    },
+    {
+      "id": "return-values",
+      "type": "custom",
+      "data": {
+        "title": "반환 값",
+        "description": "함수에서 값 반환하기",
+        "status": "not-started",
+        "order": 4.3
+      }
+    },
+    {
+      "id": "classes",
+      "type": "custom",
+      "data": {
+        "title": "클래스",
+        "description": "객체의 청사진",
+        "status": "not-started",
+        "order": 5.1
+      }
+    },
+    {
+      "id": "inheritance",
+      "type": "custom",
+      "data": {
+        "title": "상속",
+        "description": "기존 클래스 확장",
+        "status": "not-started",
+        "order": 5.2
+      }
+    },
+    {
+      "id": "module-basics",
+      "type": "custom",
+      "data": {
+        "title": "모듈 기초",
+        "description": "모듈 가져오기와 사용",
+        "status": "not-started",
+        "order": 6.1
+      }
+    },
+    {
+      "id": "packages",
+      "type": "custom",
+      "data": {
+        "title": "패키지",
+        "description": "다수의 모듈 관리",
+        "status": "not-started",
+        "order": 6.2
+      }
+    },
+    {
+      "id": "pip",
+      "type": "custom",
+      "data": {
+        "title": "pip",
+        "description": "패키지 설치 및 관리",
+        "status": "not-started",
+        "order": 6.3
+      }
+    },
+    {
+      "id": "exceptions",
+      "type": "custom",
+      "data": {
+        "title": "예외 처리",
+        "description": "오류 처리 메커니즘",
+        "status": "not-started",
+        "order": 7.1
+      }
+    },
+    {
+      "id": "generators",
+      "type": "custom",
+      "data": {
+        "title": "제너레이터",
+        "description": "반복자 및 제너레이터 함수",
+        "status": "not-started",
+        "order": 7.2
+      }
+    },
+    {
+      "id": "decorators",
+      "type": "custom",
+      "data": {
+        "title": "데코레이터",
+        "description": "함수와 메서드 확장",
+        "status": "not-started",
+        "order": 7.3
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-main-1",
+      "source": "python-start",
+      "target": "python-basics",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-main-2",
+      "source": "python-basics",
+      "target": "data-structures",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-main-3",
+      "source": "data-structures",
+      "target": "functions",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-main-4",
+      "source": "functions",
+      "target": "oop",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-main-5",
+      "source": "oop",
+      "target": "modules",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-main-6",
+      "source": "modules",
+      "target": "advanced",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-start-1",
+      "source": "python-start",
+      "target": "env-setup",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-start-2",
+      "source": "python-start",
+      "target": "hello-world",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e1",
+      "source": "python-basics",
+      "target": "variables",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "python-basics",
+      "target": "operators",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "python-basics",
+      "target": "conditionals",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "python-basics",
+      "target": "loops",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "data-structures",
+      "target": "lists",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "data-structures",
+      "target": "tuples",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "data-structures",
+      "target": "dictionaries",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "data-structures",
+      "target": "sets",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "functions",
+      "target": "function-basics",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e12",
+      "source": "functions",
+      "target": "arguments",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e13",
+      "source": "functions",
+      "target": "return-values",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e15",
+      "source": "oop",
+      "target": "classes",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e16",
+      "source": "oop",
+      "target": "inheritance",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-mod-1",
+      "source": "modules",
+      "target": "module-basics",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-mod-2",
+      "source": "modules",
+      "target": "packages",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-mod-3",
+      "source": "modules",
+      "target": "pip",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-adv-1",
+      "source": "advanced",
+      "target": "exceptions",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-adv-2",
+      "source": "advanced",
+      "target": "generators",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e-adv-3",
+      "source": "advanced",
+      "target": "decorators",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+} 

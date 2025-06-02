@@ -1,0 +1,580 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 풀스택 구현 가이드
+
+## 개요
+
+이 가이드는 DDD/CQRS 패턴을 적용한 백엔드와 아토믹 디자인 패턴을 적용한 프론트엔드의 구현 방법을 설명합니다. 해당 프로젝트는 다음과 같은 특징을 가집니다:
+
+- **백엔드**: DDD, CQRS 패턴과 API 주도 설계 혼합
+- **프론트엔드**: VSCode 웹뷰와 웹 환경에서 동작하는 아토믹 패턴 기반 React 애플리케이션
+
+## 1. 프로젝트 구조
+
+### 백엔드 구조 (`/backend/demo/`)
+```
+backend/demo/
+├── src/main/java/com/example/demo/
+│   ├── api/                        # OpenAPI 생성 인터페이스
+│   ├── application/                # 애플리케이션 서비스 계층 (CQRS)
+│   │   ├── command/                # 명령 처리 객체
+│   │   ├── dto/                    # 애플리케이션 DTO
+│   │   ├── event/                  # 도메인 이벤트
+│   │   ├── query/                  # 쿼리 처리 객체
+│   │   └── service/                # 애플리케이션 서비스
+│   ├── config/                     # 구성 설정
+│   ├── domain/                     # 도메인 계층
+│   │   ├── model/                  # 도메인 모델
+│   │   ├── repository/             # 레포지토리 인터페이스
+│   │   └── service/                # 도메인 서비스
+│   ├── infrastructure/             # 인프라 계층
+│   │   ├── persistence/            # 영속성 구현
+│   │   └── security/               # 보안 구현
+│   └── presentation/               # 프레젠테이션 계층
+│       └── *ApiImpl.java           # API 구현체
+└── src/main/resources/
+    ├── openapi/                    # OpenAPI 명세
+    │   ├── paths/                  # API 경로 정의
+    │   └── schemas/                # 데이터 모델 정의
+    └── application.yml             # 애플리케이션 설정
+```
+
+### 프론트엔드 구조 (`/gui/microblog-lms/`)
+```
+gui/microblog-lms/
+├── components/                   # 아토믹 디자인 컴포넌트
+│   ├── atoms/                    # 기본 UI 요소
+│   ├── molecules/                # 기본 구성 요소 그룹
+│   ├── organisms/                # 복잡한 UI 섹션
+│   ├── template/                 # 페이지 레이아웃
+│   └── pages/                    # 완성된 페이지
+├── contexts/                     # React Context 관리
+├── hooks/                        # 커스텀 훅
+├── openapi-axios/                # 생성된 API 클라이언트
+├── services/                     # 서비스 로직
+├── stores/                       # 상태 관리
+├── utils/                        # 유틸리티 함수
+└── types/                        # 타입 정의
+```
+
+## 2. 백엔드 구현 (DDD & CQRS)
+
+### DDD(Domain-Driven Design) 구현
+
+#### 도메인 모델 작성
+```java
+@Entity
+@Table(name = "tweets")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Tweet extends AggregateRoot {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String content;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User author;
+    
+    // 도메인 행위 메서드
+    public void like(User user) {
+        // 비즈니스 로직
+        this.registerEvent(new TweetLikedEvent(this, user));
+    }
+    
+    // 팩토리 메서드
+    public static Tweet create(String content, User author) {
+        Tweet tweet = new Tweet();
+        tweet.content = content;
+        tweet.author = author;
+        tweet.registerEvent(new TweetCreatedEvent(tweet));
+        return tweet;
+    }
+}
+```
+
+#### 레포지토리 인터페이스
+```java
+public interface TweetRepository extends JpaRepository<Tweet, Long> {
+    // 도메인 특화 쿼리 메서드
+    List<Tweet> findByAuthorId(Long authorId);
+}
+```
+
+### CQRS 패턴 구현
+
+#### 명령(Command) 구현
+```java
+@Value
+public class CreateTweetCommand {
+    Long authorId;
+    String content;
+    List<String> mediaIds;
+}
+
+@Service
+@RequiredArgsConstructor
+public class TweetCommandService {
+    private final TweetRepository tweetRepository;
+    private final UserRepository userRepository;
+    
+    @Transactional
+    public Long createTweet(CreateTweetCommand command) {
+        User author = userRepository.findById(command.getAuthorId())
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        Tweet tweet = Tweet.create(command.getContent(), author);
+        tweetRepository.save(tweet);
+        return tweet.getId();
+    }
+}
+```
+
+#### 쿼리(Query) 구현
+```java
+@Value
+public class TweetQuery {
+    Long tweetId;
+}
+
+@Service
+@RequiredArgsConstructor
+public class TweetQueryService {
+    private final EntityManager em;
+    
+    @Transactional(readOnly = true)
+    public TweetDto getTweet(TweetQuery query) {
+        // 읽기 전용 쿼리 - 도메인 모델을 통하지 않고 직접 DTO로 매핑
+        return em.createQuery(
+            "SELECT new com.example.demo.application.dto.TweetDto(t.id, t.content, u.id, u.username) " +
+            "FROM Tweet t JOIN t.author u WHERE t.id = :id", TweetDto.class)
+            .setParameter("id", query.getTweetId())
+            .getSingleResult();
+    }
+}
+```
+
+### API 주도 설계 통합
+
+API 명세를 정의하고 인터페이스를 생성한 후, 해당 인터페이스를 구현하여 CQRS 서비스와 연결합니다.
+
+```java
+@RestController
+@RequiredArgsConstructor
+public class TweetApiImpl implements TweetApi {
+    private final TweetCommandService commandService;
+    private final TweetQueryService queryService;
+    
+    @Override
+    public ResponseEntity<TweetResponse> _createTweet(CreateTweetRequest request) {
+        CreateTweetCommand command = new CreateTweetCommand(
+            getCurrentUserId(),
+            request.getContent(),
+            request.getMediaIds()
+        );
+        
+        Long tweetId = commandService.createTweet(command);
+        TweetDto tweetDto = queryService.getTweet(new TweetQuery(tweetId));
+        
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(mapToResponse(tweetDto));
+    }
+    
+    private TweetResponse mapToResponse(TweetDto dto) {
+        // DTO를 응답 객체로 변환
+        return new TweetResponse()
+            .id(dto.getId())
+            .content(dto.getContent())
+            // ... 기타 매핑
+            ;
+    }
+}
+```
+
+## 3. 프론트엔드 구현 (아토믹 디자인)
+
+### 아토믹 디자인 패턴 구현
+
+#### 1. Atoms (원자)
+```tsx
+// components/atoms/button/Button.tsx
+import React from 'react';
+
+export interface ButtonProps {
+  label: string;
+  variant?: 'primary' | 'secondary' | 'ghost';
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+const Button: React.FC<ButtonProps> = ({
+  label,
+  variant = 'primary',
+  onClick,
+  disabled = false
+}) => {
+  return (
+    <button
+      className={`btn btn-${variant}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  );
+};
+
+export default Button;
+```
+
+#### 2. Molecules (분자)
+```tsx
+// components/molecules/forms/InputWithLabel.tsx
+import React from 'react';
+import Input from '@microblog/components/atoms/input/Input';
+import Label from '@microblog/components/atoms/label/Label';
+
+export interface InputWithLabelProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+}
+
+const InputWithLabel: React.FC<InputWithLabelProps> = ({
+  id,
+  label,
+  value,
+  onChange,
+  type = 'text'
+}) => {
+  return (
+    <div className="form-group">
+      <Label htmlFor={id}>{label}</Label>
+      <Input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+};
+
+export default InputWithLabel;
+```
+
+#### 3. Organisms (유기체)
+```tsx
+// components/organisms/forms/LoginForm.tsx
+import React, { useState } from 'react';
+import InputWithLabel from '@microblog/components/molecules/forms/InputWithLabel';
+import Button from '@microblog/components/atoms/button/Button';
+
+export interface LoginFormProps {
+  onSubmit: (username: string, password: string) => Promise<boolean>;
+  isLoading?: boolean;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({
+  onSubmit,
+  isLoading = false
+}) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit(username, password);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <InputWithLabel
+        id="username"
+        label="사용자명"
+        value={username}
+        onChange={setUsername}
+      />
+      <InputWithLabel
+        id="password"
+        label="비밀번호"
+        value={password}
+        onChange={setPassword}
+        type="password"
+      />
+      <Button
+        label={isLoading ? "로그인 중..." : "로그인"}
+        disabled={isLoading}
+      />
+    </form>
+  );
+};
+
+export default LoginForm;
+```
+
+#### 4. Templates (템플릿)
+```tsx
+// components/templates/auth/LoginTemplate.tsx
+import React from 'react';
+import LoginForm from '@microblog/components/organisms/forms/LoginForm';
+import Logo from '@microblog/components/atoms/logo/Logo';
+
+export interface LoginTemplateProps {
+  onLogin: (username: string, password: string) => Promise<boolean>;
+  isLoading?: boolean;
+}
+
+const LoginTemplate: React.FC<LoginTemplateProps> = ({
+  onLogin,
+  isLoading
+}) => {
+  return (
+    <div className="auth-layout">
+      <div className="auth-container">
+        <Logo size="large" />
+        <h1>로그인</h1>
+        <LoginForm onSubmit={onLogin} isLoading={isLoading} />
+        <div className="auth-links">
+          <a href="/auth/register">계정이 없으신가요? 회원가입</a>
+          <a href="/auth/forgot-password">비밀번호를 잊으셨나요?</a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LoginTemplate;
+```
+
+#### 5. Pages (페이지)
+```tsx
+// components/pages/auth/LoginPage/LoginPage.tsx
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { useAuth } from '@microblog/contexts/AuthContext';
+import LoginTemplate from '@microblog/components/templates/auth/LoginTemplate';
+import { AuthApi, LoginRequest } from '@microblog/openapi-axios';
+import { createOpenApiConfig } from '@microblog/utils/api';
+
+const LoginPage: React.FC = () => {
+  const { login: authLogin } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleLogin = async (username: string, password: string) => {
+    try {
+      setIsLoading(true);
+      
+      // API 클라이언트 생성
+      const config = createOpenApiConfig();
+      const apiClient = new AuthApi(config);
+      
+      // 로그인 API 호출
+      const response = await apiClient.authLogin({
+        loginRequest: {
+          username,
+          password,
+          rememberMe: true
+        }
+      });
+      
+      // 사용자 정보 가져오기
+      const userResponse = await apiClient.authMe({
+        headers: {
+          Authorization: `Bearer ${response.data.token}`
+        }
+      });
+      
+      // 컨텍스트 업데이트
+      const userData = {
+        id: String(userResponse.data.id),
+        name: userResponse.data.displayName,
+        username: userResponse.data.username,
+        profileImage: userResponse.data.profileImageUrl
+      };
+      
+      await authLogin(userData);
+      toast.success('로그인 성공!');
+      return true;
+    } catch (error) {
+      toast.error('로그인에 실패했습니다');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return <LoginTemplate onLogin={handleLogin} isLoading={isLoading} />;
+};
+
+export default LoginPage;
+```
+
+### VSCode 웹뷰 통합
+
+```tsx
+// vscode-integration.ts
+import { VSCodeMessage, VSCodeAPI } from '@microblog/types/vscode';
+
+// VSCode API 접근 (웹뷰 환경에서만 사용 가능)
+let vscode: VSCodeAPI | undefined;
+
+try {
+  // @ts-ignore - VSCode API는 전역 객체로 제공됨
+  vscode = acquireVsCodeApi();
+} catch (e) {
+  console.log('VSCode API를 사용할 수 없습니다. 웹 환경에서 실행 중입니다.');
+}
+
+// VSCode와 메시지 교환
+export const sendMessageToVSCode = (message: VSCodeMessage) => {
+  if (vscode) {
+    vscode.postMessage(message);
+  } else {
+    console.log('VSCode 메시지 (웹 환경):', message);
+  }
+};
+
+// VSCode 메시지 수신
+export const useVSCodeMessages = (callback: (message: any) => void) => {
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      callback(event.data);
+    };
+    
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [callback]);
+};
+```
+
+## 4. 풀스택 개발 워크플로우
+
+### 기능 개발 흐름
+
+1. **API 명세 정의**
+   - OpenAPI 스펙으로 API 정의
+   - `/backend/demo/src/main/resources/openapi/` 디렉토리에 추가
+
+2. **코드 생성**
+   ```bash
+   cd backend/demo
+   ./gradlew generateAll
+   ```
+
+3. **백엔드 구현**
+   - 도메인 모델 정의
+   - 명령(Command) 및 쿼리(Query) 클래스 구현
+   - API 인터페이스 구현
+
+4. **프론트엔드 구현**
+   - 아토믹 디자인 원칙에 따라 컴포넌트 구현
+   - 생성된 API 클라이언트 사용
+   - 필요한 경우 VSCode 웹뷰 통합
+
+### 공통 데이터 모델 동기화
+
+1. **도메인 모델 → DTO → API 모델 → TypeScript 모델** 흐름 유지
+2. API 변경 시 항상 `generateAll`로 동기화
+
+## 5. 테스트 및 배포
+
+### 백엔드 테스트
+
+```java
+@SpringBootTest
+class TweetCommandServiceTest {
+    @Autowired
+    private TweetCommandService commandService;
+    
+    @Autowired
+    private TweetRepository tweetRepository;
+    
+    @Test
+    void createTweet_ShouldCreateTweetWithCorrectContent() {
+        // 준비
+        CreateTweetCommand command = new CreateTweetCommand(1L, "테스트 트윗", List.of());
+        
+        // 실행
+        Long tweetId = commandService.createTweet(command);
+        
+        // 검증
+        Tweet tweet = tweetRepository.findById(tweetId).orElseThrow();
+        assertEquals("테스트 트윗", tweet.getContent());
+        assertEquals(1L, tweet.getAuthor().getId());
+    }
+}
+```
+
+### 프론트엔드 테스트
+
+```tsx
+// LoginForm.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import LoginForm from './LoginForm';
+
+test('form submission with correct values', async () => {
+  const mockSubmit = jest.fn().mockResolvedValue(true);
+  
+  render(<LoginForm onSubmit={mockSubmit} />);
+  
+  // 입력
+  fireEvent.change(screen.getByLabelText('사용자명'), {
+    target: { value: 'testuser' }
+  });
+  
+  fireEvent.change(screen.getByLabelText('비밀번호'), {
+    target: { value: 'password123' }
+  });
+  
+  // 제출
+  fireEvent.click(screen.getByText('로그인'));
+  
+  // 검증
+  expect(mockSubmit).toHaveBeenCalledWith('testuser', 'password123');
+});
+```
+
+### 배포 준비
+
+1. **백엔드 빌드 및 패키징**
+   ```bash
+   cd backend/demo
+   ./gradlew build
+   ```
+
+2. **프론트엔드 빌드**
+   ```bash
+   cd gui/microblog-lms
+   npm run build
+   ```
+
+3. **VSCode 익스텐션 패키징**
+   ```bash
+   vsce package
+   ```
+
+## 6. 문제 해결 및 팁
+
+### 백엔드 문제 해결
+- API 변경 시 항상 코드 재생성
+- DDD 패턴에서 도메인 모델과 영속성 계층 분리 유지
+- CQRS에서 명령과 쿼리 책임 분리 철저히 유지
+
+### 프론트엔드 문제 해결
+- 컴포넌트 재사용성 고려
+- VSCode 웹뷰와 웹 환경 모두에서 동작하는지 확인
+- 아토믹 디자인 계층 간 책임 명확히 구분
+
+### 통합 팁
+- API 명세 변경은 백엔드와 프론트엔드 모두에 영향을 미침
+- 로컬 개발 환경에서 CORS 설정 확인
+- 통합 테스트로 전체 흐름 검증 

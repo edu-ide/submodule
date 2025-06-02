@@ -477,6 +477,9 @@ declare global {
     getBranch(dir: string): Promise<string>;
     getTags(artifactId: string): Promise<IndexTag[]>;
     getRepoName(dir: string): Promise<string | undefined>;
+    createPracticeWorkspace(url: string, practiceId: string): Promise<void>;
+    createPracticeFile(language: string, code: string): Promise<void>;
+    submitPractice(practiceId: string, requirements: string): Promise<void>;
   }
 
 

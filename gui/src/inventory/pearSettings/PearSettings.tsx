@@ -2,13 +2,10 @@ import { lightGray, vscBackground, vscEditorBackground } from "@/components";
 import Inventory from "@/pages/inventory";
 import { getLogoPath } from "@/pages/welcome/setup/ImportExtensions";
 import { title } from "process";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import GeneralSettings from "./general";
 import HelpSettings from "./help";
 import { IdeMessengerContext } from "@/context/IdeMessenger";
-import "@/continue-styles.css";
-import { CreatorFeedback } from "./creatorFeedback";
-import { useMessaging } from "../../util/messagingContext";
 
 const inventoryItems = [
   {
@@ -31,7 +28,7 @@ const inventoryItems = [
     title: "Memory",
     icon: "memory-default.svg",
   },
-] as const;
+];
 
 // Combine settings and inventory items into a single type
 type MenuItem = {
@@ -41,33 +38,17 @@ type MenuItem = {
   section: "settings" | "inventory";
 };
 
-const menuItems = [
+const menuItems: MenuItem[] = [
   // Settings section
   { id: "general", title: "General", section: "settings" },
   { id: "help", title: "Help", section: "settings" },
-  { id: "creator-feedback", title: "Creator Feedback", section: "settings" },
-  // Inventory section (not using rn)
-  // ...inventoryItems.map((item) => ({ ...item, section: "inventory" as const })),
-] as const;
+  // Inventory section
+  ...inventoryItems.map((item) => ({ ...item, section: "inventory" as const })),
+];
 
 const PearSettings = () => {
-  const [selectedItem, setSelectedItem] =
-    useState<(typeof menuItems)[number]["id"]>("general");
+  const [selectedItem, setSelectedItem] = useState<string>("general");
   const ideMessenger = useContext(IdeMessengerContext);
-
-  const { registerListener } = useMessaging();
-
-  useEffect(() => {
-    // Register listener for theme color updates using the messaging context
-
-    return registerListener("tab", (msg: any) => {
-      const typedMsg = msg as {
-        payload: { tab: (typeof menuItems)[number]["id"] };
-      };
-      setSelectedItem(typedMsg.payload.tab);
-    });
-  }, [registerListener, setSelectedItem]);
-
   return (
     <div
       className="flex items-center justify-center h-full border-4 border-solidd border-red-500"
@@ -91,13 +72,14 @@ const Sidebar = ({
   onSelectItem,
 }: {
   selectedItem: string;
-  onSelectItem: (id: (typeof menuItems)[number]["id"]) => void;
+  onSelectItem: (id: string) => void;
 }) => {
   return (
     <div
       className="p-2 w-44 flex flex-col items-start justify-start bg-sidebar-background"
-      style={{ borderRight: `1px solid ${lightGray}20` }}
+      style={{ borderRight: `1px solid ${lightGray}20`  }}
     >
+      
       {/* Settings Section */}
       <SidebarSection
         title="SETTINGS"
@@ -163,7 +145,6 @@ const ContentArea = ({ selectedItem }: { selectedItem: string }) => {
       {/* Add your content components here based on selectedItem */}
       {selectedItem === "general" && <GeneralSettings />}
       {selectedItem === "help" && <HelpSettings />}
-      {selectedItem === "creator-feedback" && <CreatorFeedback />}
     </div>
   );
 };

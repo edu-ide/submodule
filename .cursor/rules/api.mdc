@@ -1,0 +1,138 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# API 구현 가이드
+
+## 개요
+이 가이드는 API가 존재하지 않을 때 명세를 작성하고, 코드를 생성하여 API를 구현하는 절차를 설명합니다.
+
+## 1. API 명세 확인 및 작성
+
+### 필요한 API 확인
+- 필요한 엔드포인트와 기능을 식별합니다
+- 기존 명세가 없는 경우 OpenAPI(Swagger) 형식으로 새로 작성합니다
+
+### 명세 작성 위치
+- 명세 파일 위치: `/backend/demo/src/main/resources/openapi/`
+- 경로 정의: `paths/[분류].yml`
+- 데이터 모델 정의: `schemas/[분류].yml`
+- 메인 파일: `openapi.yml`에 경로 참조 추가
+
+### 명세 작성 예시
+```yaml
+# paths/auth.yml에 추가
+auth_me:
+  get:
+    summary: 인증된 사용자 정보 조회
+    description: 현재 인증된 사용자의 상세 정보를 반환합니다.
+    operationId: authMe
+    tags:
+      - auth
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: 성공
+        content:
+          application/json:
+            schema:
+              $ref: '../schemas/user.yml#/UserProfileResponse'
+      '401':
+        description: 인증되지 않은 요청
+      '404':
+        description: 사용자를 찾을 수 없음
+```
+
+```yaml
+# openapi.yml에 경로 추가
+paths:
+  # ... 기존 경로 ...
+  /api/auth/me:
+    $ref: './paths/auth.yml#/auth_me'
+```
+
+## 2. 코드 생성
+
+### 코드 생성 실행
+```bash
+cd backend/demo
+./gradlew generateAll
+```
+
+이 명령어는 다음 작업을 수행합니다:
+- OpenAPI 명세 파일 통합
+- 백엔드용 Java 인터페이스 생성
+- 프론트엔드용 TypeScript 클라이언트 생성
+
+### 생성된 파일 확인
+- Java 인터페이스: `backend/demo/build/generated-sources/openapi-interfaces/src/main/java/com/example/demo/api/interfaces/`
+- TypeScript 클라이언트: `gui/microblog-lms/openapi-axios/`
+
+## 3. 백엔드 구현
+
+### 인터페이스 구현 클래스 작성
+```java
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+public class AuthApiImpl implements AuthApi {
+
+    /**
+     * 현재 인증된 사용자 정보 조회
+     */
+    @Override
+    public ResponseEntity<UserProfileResponse1> _authMe() {
+        log.debug("현재 인증된 사용자 정보 조회 요청");
+        
+        // 구현 코드
+        return ResponseEntity.ok(userProfile);
+    }
+}
+```
+
+### 주의사항
+- 메서드 이름은 앞에 `_`(언더스코어)가 붙습니다 (예: `_authMe()`)
+- 메서드 시그니처와 반환 타입은 생성된 인터페이스와 정확히 일치해야 합니다
+
+## 4. 프론트엔드 구현
+
+### API 클라이언트 사용
+```typescript
+// API 클라이언트 생성
+const config = createOpenApiConfig();
+const apiClient = new AuthApi(config);
+
+// API 호출 (올바른 방식)
+const userResponse = await apiClient.authMe({
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+```
+
+### 주의사항
+- 파라미터는 하나의 설정 객체만 전달합니다
+- 설정 객체 내에 `headers`, `params` 등을 포함할 수 있습니다
+- 생성된 클라이언트 메서드 이름은 언더스코어 없이 생성됩니다 (예: `authMe()`)
+
+## 5. 테스트 및 문제 해결
+
+### API 검증
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Postman이나 브라우저 개발자 도구로 테스트
+
+### 로그 확인
+- API 로그: `logs/api/[카테고리].log`
+- AOP 로그: `logs/aop-debug.log`
+
+### 문제 해결
+- 인터페이스 변경 시 `generateAll` 다시 실행
+- 메서드 호출 오류: 파라미터 개수와 타입 확인
+- 명세와 구현의 불일치: 명세 업데이트 후 코드 재생성
+
+## 참고 사항
+- 명세가 업데이트되면 인터페이스와 클라이언트도 변경될 수 있음
+- 프론트엔드와 백엔드 변경 사항을 동기화하려면 항상 `generateAll` 실행
+- 테스트하기 전에 백엔드와 프론트엔드 모두 새로 빌드 

@@ -1,0 +1,139 @@
+{
+  "nodes": [
+    {
+      "id": "python-advanced-data-intro",
+      "type": "custom",
+      "data": {
+        "title": "고급 데이터 처리",
+        "description": "파이썬의 고급 데이터 처리 기술 배우기",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "content_file": "4.0-intro.md"
+      }
+    },
+    {
+      "id": "python-advanced-data-structures",
+      "type": "custom",
+      "data": {
+        "title": "데이터 구조의 고급 활용",
+        "description": "컴프리헨션과 고급 데이터 구조 기법",
+        "status": "not-started",
+        "order": "4.1",
+        "column": "main",
+        "content_file": "4.1-data-structures.md"
+      }
+    },
+    {
+      "id": "python-collections",
+      "type": "custom",
+      "data": {
+        "title": "collections 모듈",
+        "description": "파이썬의 특수 컨테이너 데이터형",
+        "status": "not-started",
+        "order": "4.2",
+        "column": "main",
+        "content_file": "4.2-collections.md"
+      }
+    },
+    {
+      "id": "python-functional",
+      "type": "custom",
+      "data": {
+        "title": "함수형 프로그래밍 도구",
+        "description": "map, filter, reduce 등 함수형 프로그래밍",
+        "status": "not-started",
+        "order": "4.3",
+        "column": "main",
+        "content_file": "4.3-functional.md"
+      }
+    },
+    {
+      "id": "python-sorting",
+      "type": "custom",
+      "data": {
+        "title": "정렬과 검색",
+        "description": "다양한 정렬 방법과 검색 알고리즘",
+        "status": "not-started",
+        "order": "4.4",
+        "column": "main",
+        "content_file": "4.4-sorting.md"
+      }
+    },
+    {
+      "id": "python-advanced-techniques",
+      "type": "custom",
+      "data": {
+        "title": "고급 프로그래밍 기법",
+        "description": "데코레이터, 컨텍스트 매니저, 제너레이터 등",
+        "status": "not-started",
+        "order": "4.5",
+        "column": "main",
+        "content_file": "4.5-advanced.md"
+      }
+    },
+    {
+      "id": "python-advanced-data-summary",
+      "type": "custom",
+      "data": {
+        "title": "요약",
+        "description": "고급 데이터 처리 정리",
+        "status": "not-started",
+        "order": "4.6",
+        "column": "main",
+        "content_file": "4.6-summary.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-advanced-data-intro-data-structures",
+      "source": "python-advanced-data-intro",
+      "target": "python-advanced-data-structures",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-data-structures-collections",
+      "source": "python-advanced-data-structures",
+      "target": "python-collections",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-collections-functional",
+      "source": "python-collections",
+      "target": "python-functional",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-functional-sorting",
+      "source": "python-functional",
+      "target": "python-sorting",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-sorting-advanced-techniques",
+      "source": "python-sorting",
+      "target": "python-advanced-techniques",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-advanced-techniques-summary",
+      "source": "python-advanced-techniques",
+      "target": "python-advanced-data-summary",
+      "data": {
+        "type": "main"
+      }
+    }
+  ],
+  "id": "python-advanced-data"
+}

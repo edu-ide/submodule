@@ -169,3 +169,7 @@ extensions/vscode/manual-testing-sandbox/example.ts
 
 .prompts/
 .aider*
+db-orm/
+dummy_projects/
+*.md
+edusense.practice/

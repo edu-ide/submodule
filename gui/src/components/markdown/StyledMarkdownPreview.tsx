@@ -15,7 +15,7 @@ import {
 import { RootState } from "../../redux/store";
 import { getFontSize } from "../../util";
 import LinkableCode from "./LinkableCode";
-import PreWithToolbar, { ToolbarOptions } from "./PreWithToolbar";
+import PreWithToolbar from "./PreWithToolbar";
 import { SyntaxHighlightedPre } from "./SyntaxHighlightedPre";
 import "./katex.css";
 import "./markdown.css";
@@ -24,8 +24,7 @@ import { Citation } from "core";
 const StyledMarkdown = styled.div<{
   fontSize?: number;
   showBorder?: boolean;
-  isCodeSnippet?: boolean;
-  hideBackground?: boolean;
+	isCodeSnippet?: boolean;
 }>`
   pre {
     background-color: ${props => window.isPearOverlay ?  vscBackground : (props.isCodeSnippet ? vscBackground : vscEditorBackground)};
@@ -69,7 +68,7 @@ const StyledMarkdown = styled.div<{
     color: #f78383;
   }
 
-  background-color: ${props => props.hideBackground ? "transparent" : (window.isPearOverlay ? "transparent" : vscBackground)};
+  background-color: ${window.isPearOverlay ?  "transparent" : vscBackground};
   font-family:
     var(--vscode-font-family),
     system-ui,
@@ -106,10 +105,7 @@ interface StyledMarkdownPreviewProps {
   messageIndex?: number;
   integrationSource?: "perplexity" | "continue";
   citations?: Citation[];
-  isCodeSnippet?: boolean;
-  hideBackground?: boolean;
-  toolbarOptions?: ToolbarOptions;
-  onBlockEditClick?: (editedContent: string) => void;
+	isCodeSnippet?: boolean;
 }
 
 interface FadeInWordsProps extends StyledMarkdownPreviewProps {
@@ -266,15 +262,8 @@ const StyledMarkdownPreview = memo(function StyledMarkdownPreview(
             ?.split(" ")
             .find((word) => word.startsWith("language-"))
             ?.split("-")[1];
-          const codeString = preProps?.children?.[0]?.props?.children?.[0] || "";
-
           return props.showCodeBorder ? (
-            <PreWithToolbar
-              language={language}
-              toolbarOptions={props.toolbarOptions}
-              onBlockEditClick={props.onBlockEditClick}
-              codeString={codeString}
-            >
+            <PreWithToolbar language={language}>
               <SyntaxHighlightedPre {...preProps}></SyntaxHighlightedPre>
             </PreWithToolbar>
           ) : (
@@ -418,12 +407,7 @@ const StyledMarkdownPreview = memo(function StyledMarkdownPreview(
   }, [props.source, props.citations]);
 
   return (
-    <StyledMarkdown
-      fontSize={getFontSize()}
-      showBorder={false}
-      isCodeSnippet={props.isCodeSnippet}
-      hideBackground={props.hideBackground}
-    >
+    <StyledMarkdown fontSize={getFontSize()} showBorder={false} isCodeSnippet={props.isCodeSnippet}>
       {reactContent}
     </StyledMarkdown>
   );

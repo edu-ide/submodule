@@ -6,8 +6,27 @@ import { v4 as uuidv4 } from "uuid";
 import * as vscode from "vscode";
 import { IMessenger } from "../../../core/util/messenger";
 import { getExtensionUri } from "./util/vscode";
-import { getApi } from "./extension";
-import { assert } from "./util/assert";
+
+// VSCode 테마 타입 정의
+export type VSCodeThemeInfo = {
+  kind: 'light' | 'dark' | 'high-contrast';
+  colors: Record<string, string>;
+};
+
+// 현재 VSCode 테마 정보 가져오기
+export function getVSCodeThemeInfo(): VSCodeThemeInfo {
+  const workbenchColorCustomizations = vscode.workspace.getConfiguration('workbench').get('colorCustomizations');
+  const kind = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light
+    ? 'light'
+    : vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark
+      ? 'dark'
+      : 'high-contrast';
+
+  return {
+    kind,
+    colors: workbenchColorCustomizations as Record<string, string> || {}
+  };
+}
 
 export async function showTutorial() {
   const tutorialPath = path.join(
@@ -30,12 +49,89 @@ export async function showTutorial() {
 }
 
 export class VsCodeWebviewProtocol
-  implements IMessenger<FromWebviewProtocol, ToWebviewProtocol>
-{
+  implements IMessenger<FromWebviewProtocol, ToWebviewProtocol> {
   listeners = new Map<
     keyof FromWebviewProtocol,
     ((message: Message) => any)[]
   >();
+
+  // 테마 변경 이벤트 구독
+  private themeChangeSubscription: vscode.Disposable | null = null;
+
+  // 웹뷰에 테마 정보 전송
+  sendThemeInfo(specificWebviews?: string[]) {
+    try {
+      const themeInfo = getVSCodeThemeInfo();
+      console.log(`[THEME] 테마 정보 전송: ${themeInfo.kind}`);
+
+      // 새로운 형식 (messageType 사용)
+      this.send('theme-changed', themeInfo, undefined, specificWebviews);
+
+      // 이전 형식과의 호환성을 위한 메시지도 전송 (type 사용)
+      if (specificWebviews) {
+        specificWebviews.forEach(name => {
+          try {
+            const webview = this.webviews.get(name);
+            if (webview) {
+              webview.postMessage({
+                type: 'theme-changed',
+                theme: themeInfo.kind,
+                messageId: uuidv4()
+              });
+            }
+          } catch (error) {
+            console.error(`[ERROR] 이전 형식 테마 메시지 전송 실패 (${name}):`, error);
+          }
+        });
+      } else {
+        this.webviews.forEach(webview => {
+          try {
+            webview.postMessage({
+              type: 'theme-changed',
+              theme: themeInfo.kind,
+              messageId: uuidv4()
+            });
+          } catch (error) {
+            console.error('[ERROR] 이전 형식 테마 메시지 전송 실패:', error);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[ERROR] 테마 정보 전송 중 오류:', error);
+    }
+  }
+
+  // 테마 변경 구독 시작
+  startThemeChangeSubscription() {
+    try {
+      if (!this.themeChangeSubscription) {
+        this.themeChangeSubscription = vscode.window.onDidChangeActiveColorTheme((colorTheme) => {
+          console.log(`[THEME] VSCode 테마 변경 감지: ${colorTheme.kind === vscode.ColorThemeKind.Dark ? 'dark' : 'light'}`);
+
+          // 약간의 지연을 주어 VSCode가 테마를 완전히 적용할 시간을 줌
+          setTimeout(() => {
+            this.sendThemeInfo();
+          }, 100);
+        });
+        console.log('[INFO] 테마 변경 이벤트 구독 시작');
+      }
+    } catch (error) {
+      console.error('[ERROR] 테마 변경 이벤트 구독 실패:', error);
+    }
+  }
+
+  // 테마 변경 구독 중지
+  stopThemeChangeSubscription() {
+    try {
+      if (this.themeChangeSubscription) {
+        this.themeChangeSubscription.dispose();
+        this.themeChangeSubscription = null;
+        console.log('[INFO] 테마 변경 이벤트 구독 중지');
+      }
+    } catch (error) {
+      console.error('[ERROR] 테마 변경 이벤트 구독 중지 중 오류:', error);
+    }
+  }
 
   send(messageType: string, data: any, messageId?: string, specificWebviews?: string[],
   ): string {
@@ -51,6 +147,7 @@ export class VsCodeWebviewProtocol
               messageId: id,
             });
           }
+
         } catch (error) {
           console.error(`Failed to post message to webview ${name}:`, error);
         }
@@ -86,9 +183,14 @@ export class VsCodeWebviewProtocol
     return this._webviews;
   }
   resetWebviews() {
-    this._webviews.clear();
-    this._webviewListeners.forEach(listener => listener.dispose());
+    // 모든 웹뷰 리스너 정리
+    this._webviewListeners.forEach((listener) => listener.dispose());
     this._webviewListeners.clear();
+
+    // 테마 변경 이벤트 구독 정리
+    this.stopThemeChangeSubscription();
+
+    this._webviews.clear();
   }
 
   resetWebviewToDefault() {
@@ -111,20 +213,19 @@ export class VsCodeWebviewProtocol
   }
 
   addWebview(viewType: string, webView: vscode.Webview) {
+    console.log(`[VsCodeWebviewProtocol addWebview] Called for viewType: ${viewType}`);
+
+    const existingListener = this._webviewListeners.get(viewType);
+    if (existingListener) {
+      console.log(`[VsCodeWebviewProtocol addWebview] Disposing existing listener for viewType: ${viewType}`);
+      existingListener.dispose();
+      this._webviewListeners.delete(viewType);
+    }
+
     this._webviews.set(viewType, webView);
     const listener = webView.onDidReceiveMessage(async (msg) => {
-      if(msg?.destination === "creator") {
-        const creatorMode = getApi()?.creatorMode;
-        assert(!!creatorMode, "creator mode is not present in submodule API :(");
-        if(webView) {
-          const respond = (messageType: string, message: Record<string, unknown>) =>
-            this.send(messageType, message, msg.messageId);
-          creatorMode.handleIncomingWebViewMessage(msg, respond);
-        } else {
-          console.error("WARNING: ⚠️ CREATOR WEBVIEW DOES NOT EXIST ⚠️");
-        }
-
-        return;
+      if (msg.messageType === "addEducationContextToChat") {
+        console.log(`[VsCodeWebviewProtocol onDidReceiveMessage] Received 'addEducationContextToChat', ID: ${msg.messageId}`);
       }
 
       if (!msg.messageType || !msg.messageId) {
@@ -178,17 +279,13 @@ export class VsCodeWebviewProtocol
             vscode.window
               .showErrorMessage(
                 message,
-                'Login To PearAI',
+                'Login to PearAI',
                 'Show Logs',
               )
               .then((selection) => {
-                if (selection === 'Login To PearAI') {
-                  // Redirect to auth login URL
-                  vscode.env.openExternal(
-                    vscode.Uri.parse(
-                      'https://trypear.ai/signin?callback=pearai://pearai.pearai/auth',
-                    ),
-                  );
+                if (selection === 'Login to PearAI') {
+                  // Execute the login command which uses EduSenseProvider
+                  vscode.commands.executeCommand('pearai.login');
                 } else if (selection === 'Show Logs') {
                   vscode.commands.executeCommand(
                     'workbench.action.toggleDevTools',
@@ -223,7 +320,7 @@ export class VsCodeWebviewProtocol
             message = message.split("\n").filter((l: string) => l !== "")[1];
             try {
               message = JSON.parse(message).message;
-            } catch {}
+            } catch { }
             if (message.includes("exceeded")) {
               message +=
                 " To keep using PearAI, you can set up a local model or use your own API key.";
@@ -281,20 +378,33 @@ export class VsCodeWebviewProtocol
           }
         }
       }
-    }, this);
+    });
     this._webviewListeners.set(viewType, listener);
-  }
 
-  removeWebview(name: string) {
-    const webView = this._webviews.get(name);
-    if (webView) {
-      this._webviews.delete(name);
-      this._webviewListeners.get(name)?.dispose();
-      this._webviewListeners.delete(name);
+    // 웹뷰가 모두 제거된 경우 테마 변경 이벤트 구독 정리
+    if (this._webviews.size === 0) {
+      this.stopThemeChangeSubscription();
     }
   }
 
-  constructor(private readonly reloadConfig: () => void) {}
+  removeWebview(name: string) {
+    const listener = this._webviewListeners.get(name);
+    if (listener) {
+      listener.dispose();
+      this._webviewListeners.delete(name);
+    }
+    this._webviews.delete(name);
+
+    // 웹뷰가 모두 제거된 경우 테마 변경 이벤트 구독 정리
+    if (this._webviews.size === 0) {
+      this.stopThemeChangeSubscription();
+    }
+  }
+
+  constructor(private readonly reloadConfig: () => void) {
+    // 테마 변경 이벤트 구독 시작
+    this.startThemeChangeSubscription();
+  }
 
   invoke<T extends keyof FromWebviewProtocol>(
     messageType: T,

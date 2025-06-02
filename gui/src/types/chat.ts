@@ -1,0 +1,8 @@
+import { HistorySource } from './curriculum';
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}

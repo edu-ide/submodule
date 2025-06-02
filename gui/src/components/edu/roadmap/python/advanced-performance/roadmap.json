@@ -1,0 +1,139 @@
+{
+  "nodes": [
+    {
+      "id": "python-advanced-performance-intro",
+      "type": "custom",
+      "data": {
+        "title": "고급 성능 최적화 및 병렬 프로그래밍",
+        "description": "파이썬의 성능 최적화와 병렬 처리 기법 학습",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "content_file": "5.0-intro.md"
+      }
+    },
+    {
+      "id": "python-performance-optimization",
+      "type": "custom",
+      "data": {
+        "title": "성능 최적화의 기본 원리",
+        "description": "병렬 처리 종류와 GIL의 이해",
+        "status": "not-started",
+        "order": "5.1",
+        "column": "main",
+        "content_file": "5.1-optimization.md"
+      }
+    },
+    {
+      "id": "python-parallel-processing",
+      "type": "custom",
+      "data": {
+        "title": "고급 병렬 처리 기법",
+        "description": "프로세스 풀과 스레드 풀 활용",
+        "status": "not-started",
+        "order": "5.2",
+        "column": "main",
+        "content_file": "5.2-parallel.md"
+      }
+    },
+    {
+      "id": "python-async-programming",
+      "type": "custom",
+      "data": {
+        "title": "고급 비동기 프로그래밍",
+        "description": "asyncio 심화 활용 기법",
+        "status": "not-started",
+        "order": "5.3",
+        "column": "main",
+        "content_file": "5.3-async.md"
+      }
+    },
+    {
+      "id": "python-profiling",
+      "type": "custom",
+      "data": {
+        "title": "성능 프로파일링 및 최적화",
+        "description": "코드 최적화와 컴파일러 활용",
+        "status": "not-started",
+        "order": "5.4",
+        "column": "main",
+        "content_file": "5.4-profiling.md"
+      }
+    },
+    {
+      "id": "python-performance-projects",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "병렬 처리와 최적화 실전 적용",
+        "status": "not-started",
+        "order": "5.5",
+        "column": "main",
+        "content_file": "5.5-project.md"
+      }
+    },
+    {
+      "id": "python-advanced-performance-summary",
+      "type": "custom",
+      "data": {
+        "title": "요약",
+        "description": "고급 성능 최적화 정리",
+        "status": "not-started",
+        "order": "5.6",
+        "column": "main",
+        "content_file": "5.6-summary.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-advanced-performance-intro-optimization",
+      "source": "python-advanced-performance-intro",
+      "target": "python-performance-optimization",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-optimization-parallel",
+      "source": "python-performance-optimization",
+      "target": "python-parallel-processing",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-parallel-async",
+      "source": "python-parallel-processing",
+      "target": "python-async-programming",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-async-profiling",
+      "source": "python-async-programming",
+      "target": "python-profiling",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-profiling-projects",
+      "source": "python-profiling",
+      "target": "python-performance-projects",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-projects-summary",
+      "source": "python-performance-projects",
+      "target": "python-advanced-performance-summary",
+      "data": {
+        "type": "main"
+      }
+    }
+  ],
+  "id": "python-advanced-performance"
+}

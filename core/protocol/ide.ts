@@ -15,13 +15,13 @@ import type {
 } from "../index.js";
 
 export type ToIdeFromWebviewOrCoreProtocol = {
+
   // Methods from IDE type
   getIdeInfo: [undefined, IdeInfo];
   getWorkspaceDirs: [undefined, string[]];
   listFolders: [undefined, string[]];
   writeFile: [{ path: string; contents: string }, void];
   showVirtualFile: [{ name: string; content: string }, void];
-  replaceWorkspaceFolder: [{ path: string }, void];
   getContinueDir: [undefined, string];
   openFile: [{ path: string }, void];
   runCommand: [{ command: string }, void];
@@ -94,15 +94,10 @@ export type ToIdeFromWebviewOrCoreProtocol = {
   markNewOnboardingComplete: [undefined, void];
   importUserSettingsFromVSCode: [undefined, boolean];
   pearWelcomeOpenFolder: [undefined, void];
-  pearOpenCreator: [undefined, void];
   pearInstallCommandLine: [undefined, void];
   changeColorScheme: [{ isDark: boolean }, void];
   installVscodeExtension: [{ extensionId: string }, void];
   is_vscode_extension_installed: [{ extensionId: string }, boolean];
-
-  // pear file/folder selection
-  pearSelectFolder: [{ openLabel?: string }, string | undefined];
-  pearSelectFile: [{ openLabel?: string }, string | undefined];
 
   // overlay
   closeOverlay: [undefined, void];
@@ -118,6 +113,18 @@ export type ToIdeFromWebviewOrCoreProtocol = {
     { commandId: string; args?: any[] },
     any | undefined,
   ];
+
+  createPracticeWorkspace: [{ url: string, practiceId: string }, void];
+  createPracticeFile: [{ language: string; code: string }, void];
+  submitPractice: [{ practiceId: string; requirements: string }, void];
+
+  "ide/executeCommand": [
+    { commandId: string; args?: any[] },
+    void,
+  ];
+
+  // Terminal commands
+  "sendCommandsToTerminal": [{ commands: string[], language: string }, void];
 };
 
 export type ToWebviewOrCoreFromIdeProtocol = {

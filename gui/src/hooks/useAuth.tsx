@@ -7,9 +7,6 @@ import { setDialogMessage, setShowDialog } from "../redux/slices/uiStateSlice";
 import { getLocalStorage, setLocalStorage } from "../util/localStorage";
 import { useWebviewListener } from "./useWebviewListener";
 
-/**
- * @deprecated Don't use - old continue code
- */
 export function useAuth(): {
   session: ControlPlaneSessionInfo | undefined;
   logout: () => void;

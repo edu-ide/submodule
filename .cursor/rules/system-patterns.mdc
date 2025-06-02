@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# System Patterns
+
+## Architecture
+This system is structured as a multi-tier architecture:
+1. **Presentation Layer**: VSCode webview / Web application
+2. **API Layer**: Based on OpenAPI
+3. **Application Layer**: CQRS pattern
+4. **Domain Layer**: DDD pattern
+5. **Infrastructure Layer**: Persistence, security, etc.
+
+## Backend Patterns
+### DDD (Domain-Driven Design)
+- **Domain Model**: Entities representing business concepts and rules
+- **Aggregate Root**: Manages consistency and integrity of a group of entities
+- **Repository**: Handles persistence of domain objects
+- **Domain Events**: Notifies significant changes within the domain
+
+### CQRS (Command Query Responsibility Segregation)
+- **Command**: Objects that handle state changes
+- **Query**: Objects that handle data retrieval
+- **Responsibility Segregation**: Clear separation of read and write operations
+
+## Frontend Patterns
+### Atomic Design
+- **Atoms**: Basic UI elements like buttons, input fields, etc.
+- **Molecules**: Combinations of basic UI elements
+- **Organisms**: Complex UI sections composed of multiple molecules and atoms
+- **Templates**: Page layout structures
+- **Pages**: Fully completed screens
+
+## Integration Patterns
+### API-Driven Design
+- Definition of OpenAPI specifications
+- Code generation-based development (Contract-First)
+- Synchronization of frontend and backend interfaces

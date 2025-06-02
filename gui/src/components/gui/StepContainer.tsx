@@ -26,7 +26,7 @@ import { RootState } from "../../redux/store";
 import { getMetaKeyLabel, getFontSize } from "../../util";
 import HeaderButtonWithText from "../HeaderButtonWithText";
 import { CopyButton } from "../markdown/CopyButton";
-import StyledMarkdownPreview from "../markdown/StyledMarkdownPreview";
+import AnimatedMessageRenderer from "./AnimatedMessageRenderer";
 import { getModelImage } from "@/util/aibrandimages";
 
 interface StepContainerProps {
@@ -44,11 +44,11 @@ interface StepContainerProps {
   source?: "perplexity"| "continue";
 }
 
-const ContentDiv = styled.div<{ isUserInput: boolean; fontSize?: number }>`
+const ContentDiv = styled.div<{ $isUserInput: boolean; fontSize?: number }>`
   padding-left: 10px;
   padding-right: 10px;
   background-color: ${(props) =>
-    props.isUserInput
+    props.$isUserInput
       ? vscInputBackground
       : window.isPearOverlay
         ? "transparent"
@@ -153,7 +153,7 @@ function StepContainer({
         <ContentDiv
           className="max-w-4xl mx-auto"
           hidden={!open}
-          isUserInput={isUserInput}
+          $isUserInput={isUserInput}
           fontSize={getFontSize()}
         >
           {uiConfig?.displayRawMarkdown ? (
@@ -164,7 +164,7 @@ function StepContainer({
               {stripImages(item.message.content)}
             </pre>
           ) : (
-            <StyledMarkdownPreview
+            <AnimatedMessageRenderer
               source={stripImages(item.message.content)}
               showCodeBorder={true}
               isStreaming={active}
@@ -172,6 +172,8 @@ function StepContainer({
               messageIndex={index}
               integrationSource={source}
               citations={isPerplexity ? item.citations : undefined}
+              // @ts-ignore - message 타입에 messageSource가 없을 수 있음 (임시 무시)
+              messageSource={item.message.messageSource}
             />
           )}
 

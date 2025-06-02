@@ -3,21 +3,6 @@
   "tasks": [
     // Compile and bundle the extension
     {
-      "label": "vscode-extension:dev",
-      "dependsOn": [
-        // To detect compile errors
-        "vscode-extension:tsc-watch",
-        // To bundle the code the same way we do for publishing
-        "vscode-extension:esbuild",
-        // Start the React app that is used in the extension
-        "gui:dev"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
-    },
-    {
       "label": "vscode-extension:build",
       "dependsOn": [
         // To detect compile errors
@@ -67,18 +52,9 @@
       "type": "npm",
       "script": "tsc",
       "path": "extensions/vscode",
-      "problemMatcher": ["$tsc"],
-      "presentation": {
-        "revealProblems": "onProblem",
-        "clear": true
-      }
-    },
-    {
-      "label": "vscode-extension:tsc-watch",
-      "type": "npm",
-      "script": "tsc-watch",
-      "path": "extensions/vscode",
-      "problemMatcher": ["$tsc"],
+      "problemMatcher": [
+        "$tsc"
+      ],
       "presentation": {
         "revealProblems": "onProblem",
         "clear": true
@@ -89,8 +65,12 @@
       "label": "vscode-extension:continue-ui:build",
       "type": "shell",
       "command": "node",
-      "args": ["scripts/prepackage.js"],
-      "problemMatcher": ["$tsc"],
+      "args": [
+        "scripts/prepackage.js"
+      ],
+      "problemMatcher": [
+        "$tsc"
+      ],
       "presentation": {
         "revealProblems": "onProblem",
         "clear": true
@@ -135,7 +115,9 @@
     {
       "label": "install-and-build",
       "type": "shell",
-      "windows": { "command": "./scripts/install-and-build.ps1" },
+      "windows": {
+        "command": "./scripts/install-and-build.ps1"
+      },
       "command": "./scripts/install-and-build.sh",
       "problemMatcher": [] // Empty so users are not prompted to select progress reporting
     },
@@ -148,7 +130,10 @@
       "options": {
         "cwd": "${workspaceFolder}/gui"
       },
-      "args": ["run", "dev"],
+      "args": [
+        "run",
+        "dev"
+      ],
       "isBackground": true,
       "problemMatcher": [
         {
@@ -174,7 +159,10 @@
       "label": "binary:esbuild",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "esbuild"],
+      "args": [
+        "run",
+        "esbuild"
+      ],
       "problemMatcher": [],
       "options": {
         "cwd": "binary"
@@ -184,10 +172,123 @@
       "label": "docs:start",
       "type": "shell",
       "command": "npm",
-      "args": ["run", "start", "--", "--no-open"],
+      "args": [
+        "run",
+        "start",
+        "--",
+        "--no-open"
+      ],
       "problemMatcher": [],
       "options": {
         "cwd": "docs"
+      }
+    },
+    {
+      "label": "Kill Port 8080",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-File",
+        "${workspaceFolder}/backend/kill_port_8080.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "X Clone Dev Backend",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "$env:JAVA_OPTS='-XX:TieredStopAtLevel=1 -Dfile.encoding=UTF-8 -Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true'; ./gradlew bootRun --continuous"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/backend/demo"
+      },
+      "dependsOn": [
+        "Kill Port 8080"
+      ],
+      "group": "build"
+    },
+    // 새로운 복합 태스크 추가
+    {
+      "label": "build-both-extensions",
+      "dependsOn": [
+        "vscode-extension:build", // pearai-submodule 빌드
+        "pearai-roo-code:build" // PearAI-Roo-Code 빌드
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    // PearAI-Roo-Code 빌드 태스크 추가
+    {
+      "label": "pearai-roo-code:build",
+      "dependsOn": [
+        "pearai-roo-code:dev",
+        "pearai-roo-code:watch-tsc",
+        "pearai-roo-code:watch-esbuild"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "pearai-roo-code:dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "E:/ws/edu-ide/edusense-ide/extensions/PearAI-Roo-Code"
+      },
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*VITE.*",
+          "endsPattern": ".*Local:.*"
+        }
+      },
+      "isBackground": true,
+      "presentation": {
+        "group": "pearai-roo-code",
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "pearai-roo-code:watch-esbuild",
+      "type": "shell",
+      "command": "npm run watch:esbuild",
+      "options": {
+        "cwd": "E:/ws/edu-ide/edusense-ide/extensions/PearAI-Roo-Code"
+      },
+      "problemMatcher": "$esbuild-watch",
+      "isBackground": true,
+      "presentation": {
+        "group": "pearai-roo-code",
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "pearai-roo-code:watch-tsc",
+      "type": "shell",
+      "command": "npm run watch:tsc",
+      "options": {
+        "cwd": "E:/ws/edu-ide/edusense-ide/extensions/PearAI-Roo-Code"
+      },
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "group": "pearai-roo-code",
+        "reveal": "silent"
       }
     }
   ]

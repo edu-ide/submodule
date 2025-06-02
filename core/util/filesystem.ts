@@ -18,7 +18,7 @@ import {
 import { getContinueGlobalPath } from "./paths.js";
 
 class FileSystemIde implements IDE {
-  constructor(private readonly workspaceDir: string) {}
+  constructor(private readonly workspaceDir: string) { }
 
   pathSep(): Promise<string> {
     return Promise.resolve(path.sep);
@@ -241,6 +241,59 @@ class FileSystemIde implements IDE {
 
   getCurrentDirectory(): Promise<string> {
     return Promise.resolve("");
+  }
+
+  async createPracticeWorkspace(url: string): Promise<void> {
+    console.log(`Creating practice workspace from: ${url}`);
+  }
+
+  async createPracticeFile(language: string, code: string): Promise<void> {
+    try {
+      const getFileExtension = (lang: string): string => {
+        const extensionMap: { [key: string]: string } = {
+          "python": ".py",
+          "javascript": ".js",
+          "typescript": ".ts",
+          "java": ".java",
+          "c": ".c",
+          "cpp": ".cpp",
+          "csharp": ".cs",
+          "go": ".go",
+          "rust": ".rs",
+          "ruby": ".rb",
+          "php": ".php",
+          "swift": ".swift",
+          "kotlin": ".kt",
+          "scala": ".scala",
+          "html": ".html",
+          "css": ".css",
+          "sql": ".sql",
+          "shell": ".sh",
+          "bash": ".sh",
+          "powershell": ".ps1",
+          "markdown": ".md",
+          "json": ".json",
+          "yaml": ".yaml",
+          "xml": ".xml",
+          "text": ".txt"
+        };
+        return extensionMap[lang.toLowerCase()] || ".txt";
+      };
+
+      const extension = getFileExtension(language);
+      const fileName = `practice${extension}`;
+      const filePath = path.join(this.workspaceDir, fileName);
+
+      await fs.promises.writeFile(filePath, code, "utf-8");
+    } catch (error) {
+      console.error("파일 생성 실패:", error);
+      throw error;
+    }
+  }
+
+  async submitPractice(practiceId: string, requirements: string): Promise<void> {
+    console.log(`Practice submitted (FileSystemIde) for practiceId: ${practiceId}. Requirements provided (length: ${requirements?.length ?? 0}).`);
+    // 실제 파일 시스템 기반 제출 로직은 필요 시 여기에 구현
   }
 }
 

@@ -1,0 +1,139 @@
+{
+  "id": "python-performance",
+  "nodes": [
+    {
+      "id": "performance-intro",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 성능 최적화 입문",
+        "description": "파이썬 성능 최적화의 기본 개념과 전체 로드맵 소개",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "content_file": "index.md"
+      }
+    },
+    {
+      "id": "profiling",
+      "type": "custom",
+      "data": {
+        "title": "프로파일링과 병목 식별",
+        "description": "코드 성능 측정과 병목 지점 찾기",
+        "status": "not-started",
+        "order": "1.1",
+        "column": "main",
+        "content_file": "code-profiling.md"
+      }
+    },
+    {
+      "id": "code-optimization",
+      "type": "custom",
+      "data": {
+        "title": "코드 최적화 기법",
+        "description": "알고리즘 개선, 자료구조 선택, 메모리 사용 최적화",
+        "status": "not-started",
+        "order": "1.2",
+        "column": "main",
+        "content_file": "optimization-overview.md"
+      }
+    },
+    {
+      "id": "memory-optimization",
+      "type": "custom",
+      "data": {
+        "title": "메모리 최적화",
+        "description": "메모리 사용량 최적화 및 관리 기법",
+        "status": "not-started",
+        "order": "1.3",
+        "column": "main",
+        "content_file": "memory-optimization.md"
+      }
+    },
+    {
+      "id": "multiprocessing",
+      "type": "custom",
+      "data": {
+        "title": "멀티프로세싱과 병렬처리",
+        "description": "GIL 이해와 병렬 처리를 통한 성능 향상",
+        "status": "not-started",
+        "order": "1.4",
+        "column": "main",
+        "content_file": "parallel-processing.md"
+      }
+    },
+    {
+      "id": "performance-monitoring",
+      "type": "custom",
+      "data": {
+        "title": "성능 모니터링",
+        "description": "응용 프로그램의 성능 모니터링 및 분석",
+        "status": "not-started",
+        "order": "1.5",
+        "column": "main",
+        "content_file": "performance-monitoring.md"
+      }
+    },
+    {
+      "id": "practice-problems",
+      "type": "custom",
+      "data": {
+        "title": "실습 문제",
+        "description": "성능 최적화 기법을 적용한 실습 문제 풀이",
+        "status": "not-started",
+        "order": "1.6",
+        "column": "main",
+        "content_file": "practice-problems.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "intro-to-profiling",
+      "source": "performance-intro",
+      "target": "profiling",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "profiling-to-code-optimization",
+      "source": "profiling",
+      "target": "code-optimization",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "code-optimization-to-memory-optimization",
+      "source": "code-optimization",
+      "target": "memory-optimization",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "memory-optimization-to-multiprocessing",
+      "source": "memory-optimization",
+      "target": "multiprocessing",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "multiprocessing-to-performance-monitoring",
+      "source": "multiprocessing",
+      "target": "performance-monitoring",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "performance-monitoring-to-practice-problems",
+      "source": "performance-monitoring",
+      "target": "practice-problems",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

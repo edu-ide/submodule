@@ -9,8 +9,6 @@ import SplashScreen from "./splashScreen";
 import { motion, AnimatePresence } from "framer-motion";
 import PearSettings from "@/inventory/pearSettings/PearSettings";
 import { useNavigate } from "react-router-dom";
-import "@/continue-styles.css";
-import { MessagingProvider } from "@/util/messagingContext";
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -106,9 +104,7 @@ export default function Welcome() {
         animate={{ opacity: step === 4 ? 1 : 0 }}
         transition={{ duration: 0.5 }}
       >
-        <MessagingProvider destination="settings">
-              <PearSettings />
-        </MessagingProvider>
+        <PearSettings />
       </motion.div>
     </div>
   );

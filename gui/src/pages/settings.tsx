@@ -21,7 +21,6 @@ import { IdeMessengerContext } from "../context/IdeMessenger";
 import { RootState } from "../redux/store";
 import { getFontSize, getPlatform } from "../util";
 import { setLocalStorage } from "../util/localStorage";
-import "@/continue-styles.css";
 
 const CancelButton = styled(Button)`
   background-color: transparent;

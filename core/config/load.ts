@@ -76,6 +76,7 @@ function resolveSerializedConfig(filepath: string): SerializedContinueConfig {
   content = content.replace(/"pearai-server"/g, '"pearai_server"');
 
   const config = JSONC.parse(content) as unknown as SerializedContinueConfig;
+
   if (config.env && Array.isArray(config.env)) {
     const env = {
       ...process.env,
@@ -92,7 +93,8 @@ function resolveSerializedConfig(filepath: string): SerializedContinueConfig {
     });
   }
 
-  return JSONC.parse(content) as unknown as SerializedContinueConfig;
+  const finalConfig = JSONC.parse(content) as unknown as SerializedContinueConfig;
+  return finalConfig;
 }
 
 const configMergeKeys = {
@@ -109,12 +111,16 @@ function loadSerializedConfig(
   overrideConfigJson: SerializedContinueConfig | undefined,
 ): SerializedContinueConfig {
   const configPath = getConfigJsonPath(ideType);
+
   let config: SerializedContinueConfig = overrideConfigJson!;
   if (!config) {
     try {
       config = resolveSerializedConfig(configPath);
     } catch (e) {
-      throw new Error(`Failed to parse config.json: ${e}`);
+      console.error("[load.ts] Failed to load config from", configPath, ":", e);
+      config = { ...defaultConfig };
+      console.log("[load.ts] Using default config due to error.");
+      addDefaultModels(config);
     }
   }
 
@@ -182,7 +188,7 @@ async function serializedToIntermediateConfig(
   const promptFolder = initial.experimental?.promptPath;
 
   if (loadPromptFiles) {
-    let promptFiles: { path: string; content: string } [] = [];
+    let promptFiles: { path: string; content: string }[] = [];
     promptFiles = (
       await Promise.all(
         workspaceDirs.map((dir) =>
@@ -331,11 +337,9 @@ async function intermediateToFinalConfig(
         (model as FreeTrial).setupGhAuthToken(ghAuthToken);
       }
     }
-    console.log("Free trial models:", freeTrialModels);
   } else {
     // Remove free trial models
     models = models.filter((model) => model.providerName !== "free-trial");
-    // console.log("Models:", models);
   }
 
   // Tab autocomplete model
@@ -358,14 +362,6 @@ async function intermediateToFinalConfig(
               config.systemMessage,
             );
 
-            // if (llm?.providerName === "free-trial") {
-            //   if (!allowFreeTrial) {
-            //     // This shouldn't happen
-            //     throw new Error("Free trial cannot be used with control plane");
-            //   }
-            //   const ghAuthToken = await ide.getGitHubAuthToken();
-            //   (llm as FreeTrial).setupGhAuthToken(ghAuthToken);
-            // }
             return llm;
           } else {
             return new CustomLLMClass(desc);
@@ -377,7 +373,7 @@ async function intermediateToFinalConfig(
 
   // These context providers are always included, regardless of what, if anything,
   // the user has configured in config.json
-  const DEFAULT_CONTEXT_PROVIDERS : any[] = [
+  const DEFAULT_CONTEXT_PROVIDERS: any[] = [
     // new FileContextProvider({}),
     // new CodebaseContextProvider({}),
   ];
@@ -561,8 +557,7 @@ async function buildConfigTs() {
   try {
     if (process.env.IS_BINARY === "true") {
       execSync(
-        `${escapeSpacesInPath(path.dirname(process.execPath))}/esbuild${
-          getTarget().startsWith("win32") ? ".exe" : ""
+        `${escapeSpacesInPath(path.dirname(process.execPath))}/esbuild${getTarget().startsWith("win32") ? ".exe" : ""
         } ${escapeSpacesInPath(
           getConfigTsPath(),
         )} --bundle --outfile=${escapeSpacesInPath(
@@ -652,32 +647,60 @@ const getDefaultModels = async () => {
 };
 
 async function addDefaultModels(config: SerializedContinueConfig): Promise<void> {
-  // First, add static models
-  STATIC_MODELS.forEach((staticModel) => {
-    const modelExists = config.models.some(
-      (configModel) =>
-        configModel.title === staticModel.title &&
-        configModel.provider === staticModel.provider
-    );
+  config.models = config.models ?? [];
 
-    if (!modelExists) {
-      config.models.push({ ...staticModel });
-    }
-  });
+  if (!Array.isArray(STATIC_MODELS)) {
+    const errorMsg = "[addDefaultModels] FATAL: STATIC_MODELS is not a valid array!";
+    console.error(errorMsg, STATIC_MODELS);
+    throw new Error(errorMsg);
+  } else {
+    STATIC_MODELS.forEach((staticModel) => {
+      if (!staticModel || typeof staticModel !== 'object') {
+        console.warn("[addDefaultModels] Skipping invalid element in STATIC_MODELS:", staticModel);
+        return;
+      }
+      const modelExists = config.models.some(
+        (configModel) =>
+          configModel?.title === staticModel.title &&
+          configModel?.provider === staticModel.provider
+      );
 
-  // Then, add dynamic models from server
-  const dynamicModels = await getDefaultModels();
-  dynamicModels.forEach((defaultModel: ModelDescription) => {
-    const modelExists = config.models.some(
-      (configModel) =>
-        configModel.title === defaultModel.title &&
-        configModel.provider === defaultModel.provider
-    );
+      if (!modelExists) {
+        config.models.push({ ...staticModel });
+      }
+    });
+  }
 
-    if (!modelExists) {
-      config.models.push({ ...defaultModel });
-    }
-  });
+  console.log("[addDefaultModels] Fetching dynamic models...");
+  let dynamicModels;
+  try {
+    dynamicModels = await getDefaultModels();
+  } catch (error) {
+    console.error("[addDefaultModels] Error fetching dynamic models:", error);
+    dynamicModels = undefined;
+  }
+
+  if (!Array.isArray(dynamicModels)) {
+    const errorMsg = "[addDefaultModels] FATAL: dynamicModels is not a valid array!";
+    console.error(errorMsg, dynamicModels);
+    console.warn("[addDefaultModels] Skipping second forEach due to invalid dynamicModels.");
+  } else {
+    dynamicModels.forEach((defaultModel: ModelDescription) => {
+      if (!defaultModel || typeof defaultModel !== 'object') {
+        console.warn("[addDefaultModels] Skipping invalid element in dynamicModels:", defaultModel);
+        return;
+      }
+      const modelExists = config.models.some(
+        (configModel) =>
+          configModel?.title === defaultModel.title &&
+          configModel?.provider === defaultModel.provider
+      );
+
+      if (!modelExists) {
+        config.models.push({ ...defaultModel });
+      }
+    });
+  }
 }
 
 function addDefaultCustomCommands(config: SerializedContinueConfig): void {

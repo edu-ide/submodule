@@ -130,6 +130,8 @@ type State = {
   };
   showInteractiveContinueTutorial: boolean;
   memories: Memory[];  // mem0 memories
+  educationLayoutInitialized: boolean;
+  educationLearnMessageSent: boolean;
 };
 
 const initialState: State = {
@@ -173,6 +175,8 @@ const initialState: State = {
   },
   showInteractiveContinueTutorial: getLocalStorage("showTutorialCard") ?? false,
   memories: [],
+  educationLayoutInitialized: false,
+  educationLearnMessageSent: false,
 };
 
 export const stateSlice = createSlice({
@@ -193,9 +197,9 @@ export const stateSlice = createSlice({
     },
     addPromptCompletionPair: (
       state,
-      { payload }: PayloadAction<{promptLogs: PromptLog[], source: keyof typeof integrationStatesMap}>,
+      { payload }: PayloadAction<{ promptLogs: PromptLog[], source: keyof typeof integrationStatesMap }>,
     ) => {
-      const {promptLogs, source} = payload;
+      const { promptLogs, source } = payload;
       const { history: historyKey } = integrationStatesMap[source];
       const currentHistory = state[historyKey];
       if (!currentHistory.length) {
@@ -230,14 +234,6 @@ export const stateSlice = createSlice({
         state.history = state.history.slice(0, -2);
       }
     },
-    // clearLastResponse: (state) => {
-    //   if (state.history.length < 2) {
-    //     return;
-    //   }
-    //   state.mainEditorContent =
-    //     state.history[state.history.length - 2].editorState;
-    //   state.history = state.history.slice(0, -2);
-    // },
     consumeMainEditorContent: (state) => {
       state.mainEditorContent = undefined;
     },
@@ -273,6 +269,10 @@ export const stateSlice = createSlice({
     },
     addContextItems: (state, action: PayloadAction<ContextItemWithId[]>) => {
       state.contextItems = state.contextItems.concat(action.payload);
+
+      if (state.contextItems.length > 20) {
+        state.contextItems = state.contextItems.slice(-20);
+      }
     },
     resubmitAtIndex: (
       state,
@@ -303,27 +303,12 @@ export const stateSlice = createSlice({
       });
       state[integrationStatesMap[source].active] = true;
     },
-    // deleteMessage: (state, action: PayloadAction<number>) => {
-    //   const index = action.payload + 1;
-
-    //   if (index >= 0 && index < state.history.length) {
-    //     // Delete the current message
-    //     state.history.splice(index, 1);
-
-    //     // If the next message is an assistant message, delete it too
-    //     if (
-    //       index < state.history.length &&
-    //       state.history[index].message.role === "assistant"
-    //     ) {
-    //       state.history.splice(index, 1);
-    //     }
-    //   }
-    // },
     deleteMessage: (
       state,
       action: PayloadAction<{
         index: number,
-        source: keyof typeof integrationStatesMap}>
+        source: keyof typeof integrationStatesMap
+      }>
     ) => {
       const { index, source = 'continue' } = action.payload;
       const { history: historyKey } = integrationStatesMap[source];
@@ -331,12 +316,12 @@ export const stateSlice = createSlice({
 
       if (index >= 0 && index < currentHistory.length) {
         currentHistory.splice(index, 1);
-          if (
-            index < currentHistory.length &&
-            currentHistory[index].message.role === "assistant"
-          ) {
-            currentHistory.splice(index, 1);
-          }
+        if (
+          index < currentHistory.length &&
+          currentHistory[index].message.role === "assistant"
+        ) {
+          currentHistory.splice(index, 1);
+        }
       }
     },
 
@@ -456,9 +441,10 @@ export const stateSlice = createSlice({
       state,
       { payload }: PayloadAction<{
         session: PersistedSessionInfo | undefined,
-        source: keyof typeof integrationStatesMap}>,
+        source: keyof typeof integrationStatesMap
+      }>,
     ) => {
-      const {session, source} = payload;
+      const { session, source } = payload;
       if (session) {
         state.history = session.history;
         state.perplexityHistory = session.perplexityHistory;
@@ -539,9 +525,8 @@ export const stateSlice = createSlice({
         }
       }
 
-      const lineNums = `(${
-        payload.rangeInFileWithContents.range.start.line + 1
-      }-${payload.rangeInFileWithContents.range.end.line + 1})`;
+      const lineNums = `(${payload.rangeInFileWithContents.range.start.line + 1
+        }-${payload.rangeInFileWithContents.range.end.line + 1})`;
       contextItems.push({
         name: `${base} ${lineNums}`,
         description: payload.rangeInFileWithContents.filepath,
@@ -622,11 +607,40 @@ export const stateSlice = createSlice({
     setShowInteractiveContinueTutorial: (state, action: PayloadAction<boolean>) => {
       state.showInteractiveContinueTutorial = action.payload;
     },
-    setMem0Memories: (state, { payload}: PayloadAction<Memory[]>) => {
+    setMem0Memories: (state, { payload }: PayloadAction<Memory[]>) => {
       state.memories = payload.sort((a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
-    }
+    },
+    clearContextItems: (state) => {
+      state.contextItems = [];
+    },
+    addAssistantMessage: (state, action: PayloadAction<{ message: ChatMessage, source: 'continue' | 'perplexity' }>) => {
+      console.log(`[Reducer addAssistantMessage] Called with payload:`, action.payload);
+      const { message, source } = action.payload;
+      const historyKey = integrationStatesMap[source].history;
+
+      const messageWithSource = {
+        ...message,
+        messageSource: 'assistant'
+      };
+
+      const newHistoryItem: ChatHistoryItem = {
+        message: messageWithSource,
+        contextItems: [],
+      };
+
+      console.log(`[Reducer addAssistantMessage] Pushing to state.${historyKey}`);
+      state[historyKey].push(newHistoryItem);
+    },
+    markEducationLayoutInitialized: (state) => {
+      console.log("[Reducer markEducationLayoutInitialized] Setting flag to true.");
+      state.educationLayoutInitialized = true;
+    },
+    markEducationLearnMessageSent: (state) => {
+      console.log("[Reducer markEducationLearnMessageSent] Setting flag to true.");
+      state.educationLearnMessageSent = true;
+    },
   },
 });
 
@@ -661,5 +675,9 @@ export const {
   setOnboardingState,
   setShowInteractiveContinueTutorial,
   setMem0Memories,
+  clearContextItems,
+  addAssistantMessage,
+  markEducationLayoutInitialized,
+  markEducationLearnMessageSent,
 } = stateSlice.actions;
 export default stateSlice.reducer;

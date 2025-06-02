@@ -1,0 +1,159 @@
+{
+  "id": "python-log",
+  "nodes": [
+    {
+      "id": "log-intro",
+      "type": "custom",
+      "data": {
+        "title": "로깅 개념",
+        "description": "파이썬의 로깅 시스템 이해",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "content_file": "log-intro.md"
+      }
+    },
+    {
+      "id": "log-config",
+      "type": "custom",
+      "data": {
+        "title": "로깅 설정",
+        "description": "로깅 레벨과 포맷 지정",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "content_file": "log-config.md"
+      }
+    },
+    {
+      "id": "log-handlers",
+      "type": "custom",
+      "data": {
+        "title": "로그 핸들러",
+        "description": "다양한 출력 방식 설정",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "content_file": "log-handlers.md"
+      }
+    },
+    {
+      "id": "log-test-concept",
+      "type": "custom",
+      "data": {
+        "title": "테스트 자동화 개념",
+        "description": "테스트 자동화의 개념과 이점",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "content_file": "log-test-concept.md"
+      }
+    },
+    {
+      "id": "unittest",
+      "type": "custom",
+      "data": {
+        "title": "단위 테스트",
+        "description": "unittest 모듈 활용",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "content_file": "unittest.md"
+      }
+    },
+    {
+      "id": "pytest",
+      "type": "custom",
+      "data": {
+        "title": "pytest 프레임워크",
+        "description": "고급 테스트 기능 활용",
+        "status": "not-started",
+        "order": "6.0",
+        "column": "main",
+        "content_file": "pytest.md"
+      }
+    },
+    {
+      "id": "log-coverage",
+      "type": "custom",
+      "data": {
+        "title": "코드 커버리지",
+        "description": "코드 커버리지 측정 및 개선",
+        "status": "not-started",
+        "order": "7.0",
+        "column": "main",
+        "content_file": "log-coverage.md"
+      }
+    },
+    {
+      "id": "log-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "로깅과 테스트를 활용한 파일 관리 시스템 개발",
+        "status": "not-started",
+        "order": "8.0",
+        "column": "main",
+        "content_file": "log-project.md"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-intro-config",
+      "source": "log-intro",
+      "target": "log-config",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-config-handlers",
+      "source": "log-config",
+      "target": "log-handlers",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-handlers-test-concept",
+      "source": "log-handlers",
+      "target": "log-test-concept",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-test-concept-unittest",
+      "source": "log-test-concept",
+      "target": "unittest",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-unittest-pytest",
+      "source": "unittest",
+      "target": "pytest",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-pytest-coverage",
+      "source": "pytest",
+      "target": "log-coverage",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "edge-coverage-project",
+      "source": "log-coverage",
+      "target": "log-project",
+      "data": {
+        "type": "main"
+      }
+    }
+  ]
+}

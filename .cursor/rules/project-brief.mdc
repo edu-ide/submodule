@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Overview
+
+## Objective
+This project is a full-stack application consisting of a backend implemented with DDD/CQRS patterns and a frontend built using the Atomic Design pattern. The goal is to ensure compatibility with both VSCode webview and web environments.
+
+## Key Requirements
+1. Integration of backend and frontend through an API-driven design approach
+2. Code generation based on OpenAPI specifications
+3. Application of Domain-Driven Design (DDD) and CQRS patterns
+4. Structuring frontend components using the Atomic Design pattern
+5. Support for both VSCode webview and web browser environments
+
+## Key Deliverables
+1. Backend API server
+2. Frontend web application
+3. VSCode extension

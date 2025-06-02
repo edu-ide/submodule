@@ -14,7 +14,6 @@ import {
 } from "../../components/modelSelection/quickSetup/StyledListbox";
 import { IdeMessengerContext } from "../../context/IdeMessenger";
 import { useOnboarding } from "./utils";
-import "@/continue-styles.css";
 
 interface AutocompleteOption {
   provider: ModelProvider;

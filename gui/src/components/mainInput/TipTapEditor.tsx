@@ -12,6 +12,7 @@ import {
   ContextProviderDescription,
   InputModifiers,
   RangeInFile,
+  EditorContent as CoreEditorContent
 } from "core";
 import { modelSupportsImages } from "core/llm/autodetect";
 import { getBasename, getRelativePath } from "core/util";
@@ -51,6 +52,7 @@ import {
   isWebEnvironment,
 } from "../../util";
 import CodeBlockExtension from "./CodeBlockExtension";
+import TestResultBlockExtension from "./TestResultBlockExtension";
 import { SlashCommand } from "./CommandsExtension";
 import InputToolbar from "./InputToolbar";
 import ContextToolbar from "./ContextToolbar";
@@ -63,6 +65,7 @@ import {
 import { ComboBoxItem } from "./types";
 import { useLocation } from "react-router-dom";
 import { TipTapContextMenu } from './TipTapContextMenu';
+import { setBottomMessage, setBottomMessageCloseTimeout } from "../../redux/slices/uiStateSlice";
 
 const InputBoxDiv = styled.div<{ isNewSession?: boolean }>`
 	position: relative;
@@ -407,7 +410,7 @@ const TipTapEditor = memo(function TipTapEditor({
           const imageIcon = document.createElement('div');
           imageIcon.className = 'image-icon';
           const deleteButton = document.createElement('button');
-          
+
           deleteButton.className = 'image-delete-button';
           deleteButton.textContent = 'Image';
           deleteButton.onclick = (e) => {
@@ -589,6 +592,7 @@ const TipTapEditor = memo(function TipTapEditor({
         },
       }),
       CodeBlockExtension,
+      TestResultBlockExtension,
       HardBreak.extend({
         renderText() {
           return '\n'
@@ -1091,6 +1095,153 @@ const TipTapEditor = memo(function TipTapEditor({
     }
   }, [onHeightChange]);
 
+  // practiceSubmissionResult 리스너는 제거하거나 주석 처리
+  /*
+  useWebviewListener(
+    'practiceSubmissionResult',
+    async (payload: { practiceId: string; diffResult: string | null; requirements?: string; error?: string }) => {
+      console.log('Received practiceSubmissionResult via useWebviewListener:', payload);
+
+      // Display result in bottom message area
+      const title = payload.error ? `제출 오류 (${payload.practiceId})` : `제출 결과 (${payload.practiceId})`;
+      const contentToShow = payload.error || payload.diffResult || "결과를 표시할 수 없습니다.";
+      const requirementsText = payload.requirements ? `\n\n**요구사항:**\n${payload.requirements}` : "";
+
+      // Use dangerouslySetInnerHTML for HTML diff, or just text for error/simple messages
+      const messageContent = payload.error ? (
+        <div style={{ color: 'var(--vscode-errorForeground)' }}>{contentToShow}</div>
+      ) : (
+        <div dangerouslySetInnerHTML={{ __html: contentToShow + requirementsText.replace(/\n/g, '<br/>') }} />
+      );
+
+      dispatch(setBottomMessage(
+        <div style={{ maxWidth: '80vw', maxHeight: '30vh', overflow: 'auto', padding: '10px' }}>
+          <h4>{title}</h4>
+          {messageContent}
+        </div>
+      ));
+      // Optional: Auto-close message after some time
+      // dispatch(setBottomMessageCloseTimeout(15000));
+    },
+    [dispatch] // Add dispatch to dependency array
+  );
+  */
+
+  // forwardEducationContextToChat 리스너 수정
+  useWebviewListener(
+    "forwardEducationContextToChat",
+    async (data: { content: CoreEditorContent; shouldRun?: boolean; prompt?: string }) => {
+      if (!isMainInput || !editor || !data.content) {
+        console.warn("forwardEducationContextToChat: Editor, mainInput flag, or data content missing.");
+        return;
+      }
+
+      const receivedContent = data.content;
+
+      if (receivedContent.type !== "doc" || !Array.isArray(receivedContent.content) || receivedContent.content.length === 0) {
+        console.error("forwardEducationContextToChat: Invalid content format received:", receivedContent);
+        return;
+      }
+
+      try {
+        let index = 0;
+        for (const el of editor.getJSON().content || []) {
+          if (el.type === "codeBlock" || el.type === "testResultBlock") { // Adjust index calculation for both types
+            index += (el.nodeSize || 1) * 2;
+          } else {
+            break;
+          }
+        }
+
+        const firstNode = receivedContent.content[0];
+
+        if (firstNode?.type === "testResultBlock" && firstNode.attrs) {
+          // Handle Test Result Block
+          console.log("Inserting testResultBlock with attrs:", firstNode.attrs);
+          editor
+            .chain()
+            .insertContentAt(index, {
+              type: "testResultBlock",
+              attrs: firstNode.attrs,
+            })
+            .run();
+        } else if (firstNode?.attrs && (firstNode.type === 'educationBlock' || firstNode.attrs.category === 'roadmap')) {
+          // Handle Education Block from Roadmap CodeBlock.tsx
+          const nodeAttrs = firstNode.attrs;
+          // Create ContextItemWithId from the received attrs
+          const item: ContextItemWithId = {
+            content: nodeAttrs.content || '',
+            name: nodeAttrs.title || '교육 자료',
+            description: nodeAttrs.category || '교육 콘텐츠',
+            id: {
+              providerTitle: nodeAttrs.category || "education", // Use category as provider title
+              itemId: nodeAttrs.title || Date.now().toString(), // Use title or timestamp as ID
+            },
+            // language: nodeAttrs.markdown ? 'markdown' : 'text', // Determine language if needed
+          };
+
+          console.log("Inserting education context as standard codeBlock:", item);
+          editor
+            .chain()
+            .insertContentAt(index, {
+              type: "codeBlock", // Insert as a standard codeBlock
+              attrs: {
+                item, // Pass the constructed ContextItemWithId
+              },
+            })
+            .run();
+        } else if (firstNode?.attrs?.item) {
+          // Handle standard Code Block with existing 'item' (e.g., from highlightedCode)
+          console.log("Inserting standard codeBlock with existing item:", firstNode.attrs.item);
+          editor
+            .chain()
+            .insertContentAt(index, {
+              type: "codeBlock",
+              attrs: {
+                item: firstNode.attrs.item,
+              },
+            })
+            .run();
+        } else {
+          console.warn("forwardEducationContextToChat: Received node is not testResultBlock, educationBlock, or lacks expected attributes.", firstNode);
+        }
+
+        // Handle prompt (if any)
+        if (data.prompt) {
+          editor.commands.focus("end");
+          editor.commands.insertContent(data.prompt);
+        }
+
+        // Handle shouldRun (if requested)
+        if (data.shouldRun) {
+          // Ensure editor state updates before calling onEnter
+          setTimeout(() => {
+            // --- DEBUGGING LOG ---
+            const currentState = editor.getJSON();
+            console.log("Attempting to run onEnter with state:", JSON.stringify(currentState, null, 2));
+            if (!currentState.content || currentState.content.length === 0 || !currentState.content.some(node => node.type === 'testResultBlock' || node.type === 'codeBlock')) {
+              console.warn("onEnter not called because editor state seems empty or lacks expected block after insertion.");
+              return; // 상태가 이상하면 실행 중단 (선택적)
+            }
+            // --- END DEBUGGING LOG ---
+            onEnterRef.current({ useCodebase: false, noContext: true });
+          }, 50); // 타이밍 이슈 확인 위해 딜레이를 약간 늘려볼 수 있음 (0 -> 50)
+        }
+
+        // Adjust focus
+        setTimeout(() => {
+          editor.commands.blur();
+          editor.commands.focus("end");
+        }, 20);
+
+      } catch (error) {
+        console.error("forwardEducationContextToChat: Error processing received content:", error);
+      }
+    },
+    [editor, isMainInput, onEnterRef, dispatch]
+  );
+
+
   return (
     <InputBoxDiv
       ref={inputBoxRef}
@@ -1230,3 +1381,4 @@ const TipTapEditor = memo(function TipTapEditor({
 });
 
 export default TipTapEditor;
+

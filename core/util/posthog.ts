@@ -51,7 +51,7 @@ export class Telemetry {
     //     if (!Telemetry.client) {
     //       const { PostHog } = await import("posthog-node");
     //       Telemetry.client = new PostHog(
-    //         "phc_EixCfQZYA5It6ZjtZG2C8THsUQzPzXZsdCsvR8AYhfh",
+    //         "phc_JS6XFROuNbhJtVCEdTSYk6gl5ArRrTNMpCcguAXlSPs",
     //         {
     //           host: "https://app.posthog.com",
     //         },

@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Technical Context
+
+## Backend Tech Stack
+- **Language**: Java
+- **Framework**: Spring Boot
+- **Database Access**: JPA/Hibernate
+- **API Documentation**: OpenAPI/Swagger
+- **Build Tool**: Gradle
+
+## Frontend Tech Stack
+- **Language**: TypeScript
+- **Framework**: React
+- **State Management**: React Context/Hooks
+- **UI Components**: Atomic Design pattern
+- **HTTP Client**: Axios
+
+## Development Environment
+- **IDE**: VSCode
+- **Version Control**: Git
+- **Backend Server**: Embedded Spring Boot server for local development
+- **Frontend Server**: Node.js development server
+- **Database**: MySQL
+
+## Automation Tools
+- **OpenAPI Code Generation**: OpenAPI Generator
+- **Backend API Interface Generation**: Custom Gradle task
+- **Frontend API Client Generation**: Custom Gradle task
+
+## Integration and Deployment
+- **VSCode Extension Packaging**: vsce
+- **Backend Packaging**: Gradle build (JAR)
+- **Frontend Build**: npm build

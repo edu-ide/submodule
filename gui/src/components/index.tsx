@@ -362,9 +362,9 @@ export const HeaderButton = styled.button<{
 
   &:hover {
     background-color: ${({ inverted, hoverBackgroundColor }) =>
-      typeof inverted === "undefined" || inverted
-        ? hoverBackgroundColor ?? vscInputBackground
-        : "transparent"};
+    typeof inverted === "undefined" || inverted
+      ? hoverBackgroundColor ?? vscInputBackground
+      : "transparent"};
   }
   display: flex;
   align-items: center;

@@ -7,7 +7,6 @@ import { lightGray, vscBackground, vscInputBackground } from "../components";
 import { CopyButton } from "../components/markdown/CopyButton";
 import { IdeMessengerContext } from "../context/IdeMessenger";
 import { useNavigationListener } from "../hooks/useNavigationListener";
-import "@/continue-styles.css";
 
 const Th = styled.th`
   padding: 0.5rem;

@@ -169,8 +169,7 @@ export class VsCodeIdeUtils {
     vscode.workspace
       .openTextDocument(
         vscode.Uri.parse(
-          `${
-            VsCodeExtension.continueVirtualDocumentScheme
+          `${VsCodeExtension.continueVirtualDocumentScheme
           }:${encodeURIComponent(name)}?${encodeURIComponent(contents)}`,
         ),
       )
@@ -344,8 +343,8 @@ export class VsCodeIdeUtils {
     return `${lines
       .slice(range.start.line, range.end.line)
       .join("\n")}\n${lines[
-      range.end.line < lines.length - 1 ? range.end.line : lines.length - 1
-    ].slice(0, range.end.character)}`;
+        range.end.line < lines.length - 1 ? range.end.line : lines.length - 1
+      ].slice(0, range.end.character)}`;
   }
 
   async getTerminalContents(commands = -1): Promise<string> {
@@ -670,40 +669,14 @@ export class VsCodeIdeUtils {
   }
 
   /**
-   * Set the stored credentials in vscode
+   * @deprecated Set the stored credentials in vscode. This method is deprecated.
+   * Credentials are now managed automatically via the VS Code Authentication API and EduSenseProvider.
    */
   async updatePearAICredentials(auth: PearAuth) {
-    await vscode.commands.executeCommand("pearai.updateUserAuth", auth);
+    // Do not call the removed command. Log a warning instead.
+    const message = "PearAI: updatePearAICredentials is deprecated and no longer functional. Authentication is now managed by VS Code's Authentication API.";
+    console.warn(message);
+    // Optionally show a warning message to the user, but might be noisy.
+    // vscode.window.showWarningMessage(message);
   }
-}
-
-
-export async function selectFolder(openLabel?: string): Promise<string | undefined> {
-  const result = await vscode.window.showOpenDialog({
-    canSelectFolders: true,
-    canSelectFiles: false,
-    canSelectMany: false,
-    openLabel: openLabel || 'Select Folder'
-  });
-
-  if (result && result.length > 0) {
-    console.dir("SELECT FOLDER:")
-    console.dir(result[0].fsPath)
-    return result[0].fsPath;
-  }
-  return undefined;
-}
-
-export async function selectFile(openLabel?: string): Promise<string | undefined> {
-  const result = await vscode.window.showOpenDialog({
-    canSelectFolders: false,
-    canSelectFiles: true,
-    canSelectMany: false,
-    openLabel: openLabel || 'Select File'
-  });
-
-  if (result && result.length > 0) {
-    return result[0].fsPath;
-  }
-  return undefined;
 }

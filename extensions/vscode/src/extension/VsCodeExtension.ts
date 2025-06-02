@@ -32,7 +32,12 @@ import { Battery } from "../util/battery";
 import { TabAutocompleteModel } from "../util/loadAutocompleteModel";
 import type { VsCodeWebviewProtocol } from "../webviewProtocol";
 import { VsCodeMessenger } from "./VsCodeMessenger";
-import { PEARAI_CHAT_VIEW_ID, PEARAI_CREATOR_VIEW_ID, PEARAI_MEM0_VIEW_ID, PEARAI_SEARCH_VIEW_ID } from "../util/pearai/pearaiViewTypes";
+import { PEARAI_CHAT_VIEW_ID, PEARAI_MEM0_VIEW_ID, PEARAI_SEARCH_VIEW_ID, PEARAI_CURRICULUM_VIEW_ID } from "../util/pearai/pearaiViewTypes";
+import { EduSenseProvider, AUTH_PROVIDER_ID, SCOPES } from "../auth/EduSenseProvider";
+import { getNonce, getExtensionUri, getUniqueId } from "../util/vscode";
+import { getTheme } from "../util/getTheme";
+import { getExtensionVersion } from "../util/util";
+import { isFirstLaunch } from "../copySettings";
 
 export class VsCodeExtension {
   // Currently some of these are public so they can be used in testing (test/test-suites)
@@ -46,20 +51,23 @@ export class VsCodeExtension {
   private diffManager: DiffManager;
   private verticalDiffManager: VerticalPerLineDiffManager;
   webviewProtocolPromise: Promise<VsCodeWebviewProtocol>;
-  public core: Core;
+  private core: Core;
   private battery: Battery;
-  private workOsAuthProvider: WorkOsAuthProvider;
+  private eduSenseProvider: EduSenseProvider;
+  private curriculumPanel: vscode.WebviewPanel | undefined = undefined;
+  private resolveWebviewProtocol!: (protocol: VsCodeWebviewProtocol) => void;
 
   constructor(context: vscode.ExtensionContext) {
     // Register auth provider
-    this.workOsAuthProvider = new WorkOsAuthProvider(context);
-    // this.workOsAuthProvider.initialize();
-    // context.subscriptions.push(this.workOsAuthProvider);
+    this.eduSenseProvider = new EduSenseProvider(context);
+    context.subscriptions.push(this.eduSenseProvider);
 
-    let resolveWebviewProtocol: any = undefined;
     this.webviewProtocolPromise = new Promise<VsCodeWebviewProtocol>(
       (resolve) => {
-        resolveWebviewProtocol = resolve;
+        this.resolveWebviewProtocol = (protocol: VsCodeWebviewProtocol) => {
+          console.log("[VsCodeExtension] Resolving webviewProtocolPromise...");
+          resolve(protocol);
+        };
       },
     );
     this.diffManager = new DiffManager(context);
@@ -83,6 +91,7 @@ export class VsCodeExtension {
       configHandlerPromise,
       this.windowId,
       this.extensionContext,
+      this.resolveWebviewProtocol
     );
 
     // Sidebar + Overlay
@@ -118,15 +127,13 @@ export class VsCodeExtension {
 
     context.subscriptions.push(
       vscode.window.registerWebviewViewProvider(
-        PEARAI_CREATOR_VIEW_ID,
-        this.sidebar,//TODO: confirm sidebar is the right provider to use
+        PEARAI_CURRICULUM_VIEW_ID,
+        this.sidebar,
         {
           webviewOptions: { retainContextWhenHidden: true },
         },
       ),
     );
-
-    resolveWebviewProtocol(this.sidebar.webviewProtocol);
 
     // Config Handler with output channel
     const outputChannel = vscode.window.createOutputChannel("PearAI");
@@ -141,7 +148,7 @@ export class VsCodeExtension {
       this.ide,
       verticalDiffManagerPromise,
       configHandlerPromise,
-      this.workOsAuthProvider,
+      this.eduSenseProvider,
     );
 
     this.core = new Core(inProcessMessenger, this.ide, async (log: string) => {
@@ -167,8 +174,12 @@ export class VsCodeExtension {
       this.configHandler.reloadConfig.bind(this.configHandler),
     );
 
+    // Auth 리스너 설정 (extensionContext 할당 후 호출)
+    this.setupAuthListeners();
+
     // handleURI
     // This is the entry point when user signs in from web app
+    /* // Temporarily comment out to avoid 'Protocol handler already registered' error when running two extensions
     context.subscriptions.push(
       vscode.window.registerUriHandler({
         handleUri(uri: vscode.Uri) {
@@ -192,6 +203,7 @@ export class VsCodeExtension {
         },
       }),
     );
+    */
 
     // Indexing + pause token
     this.diffManager.webviewProtocol = this.sidebar.webviewProtocol;
@@ -254,19 +266,26 @@ export class VsCodeExtension {
     );
 
     // Commands
-    registerAllCommands(
-      context,
-      this.ide,
-      context,
-      this.sidebar,
-      this.configHandler,
-      this.diffManager,
-      this.verticalDiffManager,
-      this.core.continueServerClientPromise,
-      this.battery,
-      quickEdit,
-      this.core,
-    );
+    console.log("[VsCodeExtension] About to call registerAllCommands...");
+    try {
+      registerAllCommands(
+        context,
+        this.ide,
+        context,
+        this.sidebar,
+        this.configHandler,
+        this.diffManager,
+        this.verticalDiffManager,
+        this.core.continueServerClientPromise,
+        this.battery,
+        quickEdit,
+        this.core,
+        this.eduSenseProvider,
+      );
+      console.log("[VsCodeExtension] Successfully called registerAllCommands.");
+    } catch (error) {
+      console.error("[VsCodeExtension] Error calling registerAllCommands:", error);
+    }
 
     registerDebugTracker(this.sidebar.webviewProtocol, this.ide);
 
@@ -341,17 +360,6 @@ export class VsCodeExtension {
     vscode.authentication.onDidChangeSessions(async (e) => {
       if (e.provider.id === "github") {
         this.configHandler.reloadConfig();
-      } else if (e.provider.id === "pearai") {
-        const sessionInfo = await getControlPlaneSessionInfo(true);
-        this.webviewProtocolPromise.then(async (webviewProtocol) => {
-          webviewProtocol.request("didChangeControlPlaneSessionInfo", {
-            sessionInfo,
-          });
-
-          // To make sure continue-proxy models and anything else requiring it get updated access token
-          this.configHandler.reloadConfig();
-        });
-        this.core.invoke("didChangeControlPlaneSessionInfo", { sessionInfo });
       }
     });
 
@@ -382,8 +390,7 @@ export class VsCodeExtension {
 
     // Register a content provider for the readonly virtual documents
     const documentContentProvider = new (class
-      implements vscode.TextDocumentContentProvider
-    {
+      implements vscode.TextDocumentContentProvider {
       // emitter and its event
       onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
       onDidChange = this.onDidChangeEmitter.event;
@@ -413,6 +420,48 @@ export class VsCodeExtension {
     });
 
     this.updateNewWindowActiveFilePath();
+
+    // --- EduSense 커리큘럼 편집기에서 열기 명령어 등록 ---
+    context.subscriptions.push(
+      vscode.commands.registerCommand('edusense.openCurriculumInEditor', async () => {
+        const column = vscode.window.activeTextEditor
+          ? vscode.window.activeTextEditor.viewColumn
+          : undefined;
+
+        if (this.curriculumPanel) {
+          this.curriculumPanel.reveal(column);
+          return;
+        }
+
+        this.curriculumPanel = vscode.window.createWebviewPanel(
+          'pearai.curriculum', // 웹뷰 타입 (기존 뷰 ID와 동일하게 유지)
+          'EduSense', // 패널 제목 변경
+          column || vscode.ViewColumn.One, // 표시할 열
+          {
+            enableScripts: true, // 스크립트 활성화
+            retainContextWhenHidden: true, // 숨겨졌을 때 상태 유지
+            localResourceRoots: [vscode.Uri.joinPath(this.extensionContext.extensionUri, 'gui')]
+          }
+        );
+
+        const webviewProtocol = await this.getWebviewProtocol();
+        if (webviewProtocol) {
+          const panelId = this.curriculumPanel.viewType;
+          webviewProtocol.addWebview(panelId, this.curriculumPanel.webview);
+          console.log(`Webview panel added to protocol with ID: ${panelId}`);
+        } else {
+          console.warn("Webview protocol not available, panel cannot communicate effectively.");
+        }
+
+        this.curriculumPanel.webview.html = this.getWebviewContentForPanel(this.extensionContext, this.curriculumPanel);
+
+        this.curriculumPanel.onDidDispose(
+          () => { this.curriculumPanel = undefined; },
+          null,
+          this.extensionContext.subscriptions
+        );
+      })
+    );
   }
 
   static continueVirtualDocumentScheme = "pearai";
@@ -431,5 +480,250 @@ export class VsCodeExtension {
 
   registerCustomContextProvider(contextProvider: IContextProvider) {
     this.configHandler.registerCustomContextProvider(contextProvider);
+  }
+
+  private async setupAuthListeners(): Promise<void> {
+    // --- 추가된 로그 0 --- 
+    console.log('[VsCodeExtension] setupAuthListeners FUNCTION CALLED.');
+
+    this.extensionContext.subscriptions.push(
+      this.eduSenseProvider.onDidChangeSessions(async (e) => {
+        // --- 추가된 로그 1 ---
+        console.log(`[VsCodeExtension] onDidChangeSessions HANDLER STARTED for ${AUTH_PROVIDER_ID}. Event:`, JSON.stringify(e, null, 2));
+
+        try {
+          // --- 추가된 로그 2 ---
+          console.log('[VsCodeExtension] Attempting to get current session...');
+          const currentSession = await vscode.authentication.getSession(AUTH_PROVIDER_ID, SCOPES, { createIfNone: false });
+          // --- 추가된 로그 3 ---
+          console.log(`[VsCodeExtension] Session check complete. Session ${currentSession ? 'exists' : 'does NOT exist'}.`);
+
+          // --- sessionInfo 구성 (주석 제거 및 실제 로직 복원) ---
+          const sessionInfo = currentSession
+            ? {
+              sessionId: currentSession.id,
+              accessToken: currentSession.accessToken,
+              account: {
+                id: currentSession.account.id,
+                label: currentSession.account.label,
+              },
+              providerId: AUTH_PROVIDER_ID
+            }
+            : undefined;
+          // -------------------------------------------
+          // --- 추가된 로그 4 ---
+          console.log('[VsCodeExtension] Constructed sessionInfo:', sessionInfo);
+
+
+          if (currentSession && sessionInfo) {
+            console.log('[VsCodeExtension] Auth Listener: Handling existing session for', currentSession.account.label);
+
+            try {
+              // --- 추가된 로그 5 ---
+              console.log('[VsCodeExtension] Awaiting webviewProtocolPromise...');
+              const webviewProtocol = await this.webviewProtocolPromise;
+              // --- 추가된 로그 6 ---
+              console.log('[VsCodeExtension] webviewProtocolPromise resolved. Attempting to send message to webview...');
+              // --- 추가 로그: 보내는 페이로드 확인 (세션 변경 시) ---
+              console.log('[VsCodeExtension] Sending payload to webview (session changed):', { sessionInfo });
+              // -----------------------------------------------
+              webviewProtocol.request("didChangeControlPlaneSessionInfo", { sessionInfo });
+              console.log('[VsCodeExtension] Sent didChangeControlPlaneSessionInfo to webview'); // <--- 원래 확인하려던 로그
+            } catch (webviewError) {
+              console.error('[VsCodeExtension] Error sending didChangeControlPlaneSessionInfo to webview:', webviewError);
+            }
+
+            // ... 코어 호출 및 나머지 로직 ...
+
+          } else {
+            console.log('[VsCodeExtension] Auth Listener: Handling no active session (logout or initial state).');
+
+            try {
+              // --- 추가된 로그 7 (else 블록) ---
+              console.log('[VsCodeExtension] (else) Awaiting webviewProtocolPromise...');
+              const webviewProtocol = await this.webviewProtocolPromise;
+              // --- 추가된 로그 8 (else 블록) ---
+              console.log('[VsCodeExtension] (else) webviewProtocolPromise resolved. Attempting to send undefined sessionInfo to webview...');
+              // --- 추가 로그: 보내는 페이로드 확인 (세션 변경, else 블록) ---
+              console.log('[VsCodeExtension] Sending undefined payload to webview (session changed):', { sessionInfo: undefined });
+              // -------------------------------------------------------
+              webviewProtocol.request("didChangeControlPlaneSessionInfo", { sessionInfo: undefined });
+              console.log('[VsCodeExtension] Sent didChangeControlPlaneSessionInfo (undefined) to webview');
+            } catch (webviewError) {
+              console.error('[VsCodeExtension] Error sending didChangeControlPlaneSessionInfo (undefined) to webview:', webviewError);
+            }
+
+            // ... 코어 호출 및 나머지 로직 ...
+          }
+
+          // ... 나머지 로직 ...
+
+        } catch (error: any) {
+          // --- 추가된 로그 9 (catch 블록) ---
+          console.error('[VsCodeExtension] Error INSIDE onDidChangeSessions handler:', error);
+        }
+      })
+    );
+
+    // --- Initial check 부분도 동일하게 수정 필요 ---
+    console.log('[VsCodeExtension] Performing initial authentication check...');
+    try {
+      // 자동으로 로그인 시도하지 않고, 현재 세션만 조용히 확인
+      const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, SCOPES, { createIfNone: false, silent: true });
+      const initialSessionInfo = session
+        ? { // 세션이 있으면 sessionInfo 구성
+          sessionId: session.id,
+          accessToken: session.accessToken,
+          account: { id: session.account.id, label: session.account.label },
+          providerId: AUTH_PROVIDER_ID
+        }
+        : undefined;
+      console.log('[VsCodeExtension] Constructed initialSessionInfo:', initialSessionInfo);
+
+      if (session && initialSessionInfo) { // 세션이 존재하면
+        console.log('[VsCodeExtension] Initial auth check: Found active session for', session.account.label);
+
+        // 1. 웹뷰 알림 <-- 여기가 초기 상태를 보내는 부분입니다
+        try {
+          const webviewProtocol = await this.webviewProtocolPromise;
+          // --- 추가 로그: 보내는 페이로드 확인 ---
+          console.log('[VsCodeExtension] Sending initial payload to webview:', { sessionInfo: initialSessionInfo });
+          // -----------------------------------
+          webviewProtocol.request("didChangeControlPlaneSessionInfo", { sessionInfo: initialSessionInfo });
+          console.log('[VsCodeExtension] Sent initial didChangeControlPlaneSessionInfo to webview');
+        } catch (webviewError) {
+          console.error('[VsCodeExtension] Error sending initial didChangeControlPlaneSessionInfo to webview:', webviewError);
+        }
+        // 2. 코어 알림
+        this.core?.invoke("didChangeControlPlaneSessionInfo", { sessionInfo: initialSessionInfo });
+        console.log('[VsCodeExtension] Invoked initial didChangeControlPlaneSessionInfo on core');
+        // 3. 코어 인증 정보 설정
+        this.core?.invoke("llm/setPearAICredentials", { accessToken: session.accessToken });
+        // 4. 웹뷰 로그인 상태
+        this.sidebar.webviewProtocol?.request("pearAISignedIn", undefined, [PEARAI_CHAT_VIEW_ID, PEARAI_SEARCH_VIEW_ID, PEARAI_MEM0_VIEW_ID, PEARAI_CURRICULUM_VIEW_ID]);
+
+      } else { // 초기 세션이 없으면
+        console.log('[VsCodeExtension] Initial auth check: No active session found.');
+        // ... 로그아웃 상태 처리 ...
+      }
+      // ...
+
+    } catch (error: any) { // 초기 확인 중 오류 발생 시
+      console.error('[VsCodeExtension] Error during initial silent auth check:', error);
+      // ... 오류 처리 ...
+    }
+  }
+
+  // 웹뷰 HTML 콘텐츠 생성 로직 (클래스 메서드로 정의)
+  private getWebviewContentForPanel(context: vscode.ExtensionContext, panel: vscode.WebviewPanel): string {
+    const extensionUri = getExtensionUri();
+    const nonce = getNonce();
+    let styleMainUri: string;
+    let scriptUri: string;
+
+    const inDevelopmentMode =
+      context.extensionMode === vscode.ExtensionMode.Development;
+
+    if (!inDevelopmentMode) {
+      scriptUri = panel.webview
+        .asWebviewUri(vscode.Uri.joinPath(extensionUri, "gui/assets/index.js"))
+        .toString();
+      styleMainUri = panel.webview
+        .asWebviewUri(vscode.Uri.joinPath(extensionUri, "gui/assets/index.css"))
+        .toString();
+    } else {
+      scriptUri = "http://localhost:5173/src/main.tsx";
+      styleMainUri = "http://localhost:5173/src/index.css";
+    }
+
+    const currentTheme = getTheme();
+    // windowId를 panel.viewType으로 사용 (고유성 확보)
+    const windowId = panel.viewType; // 예: 'pearai.curriculum'
+    const vscMediaUrl: string = panel.webview
+      .asWebviewUri(vscode.Uri.joinPath(extensionUri, "gui"))
+      .toString();
+
+    const isFullScreen = false;
+    const isOverlay = false;
+    const initialRoute = "/education";
+
+    return `<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+          <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+          <script>
+            const vscode = acquireVsCodeApi();
+          </script>
+          <link href="${styleMainUri}" rel="stylesheet">
+          <title>EduSense</title>
+      </head>
+      <body>
+          <div id="root"></div>
+          <div id="modal-root"></div>
+
+          ${`<script>
+          function log(level, ...args) {
+            const text = args.map(arg =>
+              typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+            ).join(' ');
+            vscode.postMessage({ messageType: 'log', level, text, messageId: "log" });
+          }
+
+          window.console.log = (...args) => log('log', ...args);
+          window.console.info = (...args) => log('info', ...args);
+          window.console.warn = (...args) => log('warn', ...args);
+          window.console.error = (...args) => log('error', ...args);
+          window.console.debug = (...args) => log('debug', ...args);
+
+          console.debug('Logging initialized for editor panel');
+          </script>`}
+          ${inDevelopmentMode
+        ? /*html*/ `<script type="module">
+            import RefreshRuntime from "http://localhost:5173/@react-refresh"
+            RefreshRuntime.injectIntoGlobalHook(window)
+            window.$RefreshReg$ = () => {}
+            window.$RefreshSig$ = () => (type) => type
+            window.__vite_plugin_react_preamble_installed__ = true
+            </script>`
+        : /*html*/ ""
+      }
+
+          <script type="module" nonce="${nonce}" src="${scriptUri}"></script>
+
+          <script>localStorage.setItem("ide", '"vscode"')</script>
+          <script>localStorage.setItem("extensionVersion", '"${getExtensionVersion()}"')</script>
+          <script>window.windowId = "${windowId}"</script>
+          <script>window.vscMachineId = "${getUniqueId()}"</script>
+          <script>window.vscMediaUrl = "${vscMediaUrl}"</script>
+          <script>window.ide = "vscode"</script>
+          <script>window.fullColorTheme = ${JSON.stringify(currentTheme)}</script>
+          <script>window.colorThemeName = "dark-plus"</script> // TODO: 실제 테마 이름 동적 반영?
+          <script>window.workspacePaths = ${JSON.stringify(
+        vscode.workspace.workspaceFolders?.map(
+          (folder) => folder.uri.fsPath,
+        ) || [],
+      )}</script>
+          <script>window.isFirstLaunch = ${isFirstLaunch(context)}</script>
+          <script>window.isFullScreen = ${isFullScreen}</script>
+          <script>window.viewType = "${panel.viewType}"</script>
+          <script>window.isPearOverlay = ${isOverlay}</script>
+          <script>window.initialRoute = "${initialRoute}"</script>
+
+          <!-- 에디터 패널에는 edits가 필요 없을 수 있음 -->
+
+      </body>
+      </html>`;
+  }
+
+  public async getWebviewProtocol(): Promise<VsCodeWebviewProtocol | undefined> {
+    try {
+      return await this.webviewProtocolPromise;
+    } catch (error) {
+      console.error("Error resolving webviewProtocolPromise:", error);
+      return undefined;
+    }
   }
 }

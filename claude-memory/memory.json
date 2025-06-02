@@ -1,0 +1,28 @@
+{"type":"entity","name":"백엔드 구조","entityType":"ProjectComponent","observations":["src/main/java/com/example/demo/ 디렉토리 구조를 포함","api, application, config, domain, infrastructure, presentation 계층으로 구성","OpenAPI 명세는 src/main/resources/openapi/ 디렉토리에 위치"]}
+{"type":"entity","name":"프론트엔드 구조","entityType":"ProjectComponent","observations":["gui/microblog-lms/ 디렉토리 구조를 포함","아토믹 디자인 기반 components 디렉토리 (atoms, molecules, organisms, template, pages)","contexts, hooks, openapi-axios, services, stores, utils, types 디렉토리로 구성"]}
+{"type":"entity","name":"DDD","entityType":"ArchitecturalPattern","observations":["도메인 모델, 레포지토리 인터페이스 등을 포함","엔티티, 애그리게이트 루트, 팩토리 메서드 패턴 활용","도메인 이벤트를 통한 비즈니스 로직 처리","도메인 모델에서 Tweet 클래스는 AggregateRoot를 상속하고 비즈니스 로직과 도메인 이벤트 관리","엔티티에는 생성 메서드를 위한 팩토리 메서드 패턴 적용(Tweet.create)","도메인별 레포지토리가 각 애그리게이트 루트에 대해 정의됨(TweetRepository)"]}
+{"type":"entity","name":"CQRS","entityType":"ArchitecturalPattern","observations":["명령(Command)과 쿼리(Query) 책임 분리","명령 서비스와 쿼리 서비스 분리 구현","상태 변경과 데이터 조회 로직 분리","명령 서비스(TweetCommandService)는 상태 변경을 담당하고 @Transactional 사용","쿼리 서비스(TweetQueryService)는 readOnly=true 트랜잭션으로 데이터 조회 담당","CreateTweetCommand, TweetQuery와 같은 DTO로 데이터 교환"]}
+{"type":"entity","name":"아토믹 디자인","entityType":"DesignPattern","observations":["Atoms(원자), Molecules(분자), Organisms(유기체), Templates(템플릿), Pages(페이지) 계층 구조","React 컴포넌트 기반 구현","재사용 가능한 UI 요소 체계적 구성","Atoms: Button, Input, Label 등 기본 UI 요소 구현","Molecules: InputWithLabel과 같이 기본 요소들의 조합","Organisms: LoginForm과 같은 복잡한 UI 섹션 구현","Templates: LoginTemplate과 같은 페이지 레이아웃 구성","Pages: LoginPage와 같은 실제 페이지 구현과 비즈니스 로직 처리"]}
+{"type":"entity","name":"API 주도 설계","entityType":"DesignApproach","observations":["OpenAPI 스펙으로 API 정의 후 코드 생성","백엔드와 프론트엔드 간 일관성 유지","Java 인터페이스와 TypeScript 클라이언트 자동 생성","Gradle 태스크(generateAll)를 통한 자동화된 코드 생성 프로세스","OpenAPI 스펙을 기반으로 Java 인터페이스와 TypeScript 클라이언트 생성","TweetApi와 TweetApiImpl과 같은 인터페이스와 구현체 패턴 사용"]}
+{"type":"entity","name":"VSCode 웹뷰 통합","entityType":"IntegrationFeature","observations":["웹뷰와 웹 환경 모두 지원하는 구현","VSCode API를 통한 메시지 교환","환경에 따른 조건부 로직 처리","acquireVsCodeApi() 함수를 사용하여 VSCode API 접근","sendMessageToVSCode와 useVSCodeMessages를 통한 메시지 교환 구현","환경에 따라 웹 또는 VSCode 기능 선택적 실행"]}
+{"type":"entity","name":"개발 워크플로우","entityType":"Process","observations":["API 명세 정의 → 코드 생성 → 백엔드 구현 → 프론트엔드 구현 흐름","OpenAPI 기반 자동화된 코드 생성 프로세스","공통 데이터 모델 동기화 방식","API 명세는 /backend/demo/src/main/resources/openapi/ 디렉토리에 정의","./gradlew generateAll 명령으로 코드 자동 생성","도메인 모델 → DTO → API 모델 → TypeScript 모델 흐름 유지"]}
+{"type":"entity","name":"테스트 및 배포","entityType":"Process","observations":["백엔드 테스트: SpringBootTest를 활용한 서비스 테스트","프론트엔드 테스트: React Testing Library 활용","빌드 및 패키징 절차 (백엔드, 프론트엔드, VSCode 익스텐션)","백엔드: @SpringBootTest 활용한 통합 테스트 구현","프론트엔드: React Testing Library로 컴포넌트 테스트","배포 준비: ./gradlew build, npm run build, vsce package 순서로 진행"]}
+{"type":"entity","name":"문제 해결 팁","entityType":"Knowledge","observations":["백엔드: API 변경 시 코드 재생성, 도메인 모델과 영속성 계층 분리","프론트엔드: 컴포넌트 재사용성, 웹뷰와 웹 환경 호환성 확인","통합: API 명세 변경의 영향 범위, CORS 설정, 통합 테스트 중요성"]}
+{"type":"relation","from":"DDD","to":"백엔드 구조","relationType":"적용됨"}
+{"type":"relation","from":"CQRS","to":"백엔드 구조","relationType":"적용됨"}
+{"type":"relation","from":"아토믹 디자인","to":"프론트엔드 구조","relationType":"적용됨"}
+{"type":"relation","from":"API 주도 설계","to":"백엔드 구조","relationType":"연결함"}
+{"type":"relation","from":"API 주도 설계","to":"프론트엔드 구조","relationType":"연결함"}
+{"type":"relation","from":"VSCode 웹뷰 통합","to":"프론트엔드 구조","relationType":"구현됨"}
+{"type":"relation","from":"개발 워크플로우","to":"백엔드 구조","relationType":"관리함"}
+{"type":"relation","from":"개발 워크플로우","to":"프론트엔드 구조","relationType":"관리함"}
+{"type":"relation","from":"API 주도 설계","to":"개발 워크플로우","relationType":"포함됨"}
+{"type":"relation","from":"테스트 및 배포","to":"백엔드 구조","relationType":"검증함"}
+{"type":"relation","from":"테스트 및 배포","to":"프론트엔드 구조","relationType":"검증함"}
+{"type":"relation","from":"문제 해결 팁","to":"DDD","relationType":"지원함"}
+{"type":"relation","from":"문제 해결 팁","to":"CQRS","relationType":"지원함"}
+{"type":"relation","from":"문제 해결 팁","to":"아토믹 디자인","relationType":"지원함"}
+{"type":"relation","from":"문제 해결 팁","to":"API 주도 설계","relationType":"지원함"}
+{"type":"relation","from":"문제 해결 팁","to":"VSCode 웹뷰 통합","relationType":"지원함"}
+{"type":"relation","from":"DDD","to":"CQRS","relationType":"상호보완함"}
+{"type":"relation","from":"개발 워크플로우","to":"테스트 및 배포","relationType":"연결됨"}

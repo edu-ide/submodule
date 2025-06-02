@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import ContinueButton from "../components/mainInput/ContinueButton";
-import "@/continue-styles.css";
 
 function MigrationPage() {
   const navigate = useNavigate();

@@ -1,0 +1,245 @@
+{
+  "id": "python-db",
+  "nodes": [
+    {
+      "id": "db-intro",
+      "type": "custom",
+      "data": {
+        "title": "CSV 및 JSON 파일 처리",
+        "description": "데이터 파일 처리 기본",
+        "status": "not-started",
+        "order": "7.1",
+        "column": "main",
+        "content_file": "db-intro.md"
+      }
+    },
+    {
+      "id": "db-sqlite",
+      "type": "custom",
+      "data": {
+        "title": "SQLite 데이터베이스 연결",
+        "description": "경량 데이터베이스 활용",
+        "status": "not-started",
+        "order": "7.2",
+        "column": "main",
+        "content_file": "db-sqlite.md"
+      }
+    },
+    {
+      "id": "db-mysql",
+      "type": "custom",
+      "data": {
+        "title": "MySQL/PostgreSQL 연동",
+        "description": "서버 기반 데이터베이스 연결",
+        "status": "not-started",
+        "order": "7.3",
+        "column": "main",
+        "content_file": "db-mysql.md"
+      }
+    },
+    {
+      "id": "db-orm",
+      "type": "custom",
+      "data": {
+        "title": "ORM 개념 및 활용",
+        "description": "객체-관계 매핑",
+        "status": "not-started",
+        "order": "7.4",
+        "column": "main",
+        "content_file": "db-orm.md"
+      }
+    },
+    {
+      "id": "db-summary",
+      "type": "custom",
+      "data": {
+        "title": "데이터베이스 활용 요약",
+        "description": "주요 개념 정리",
+        "status": "not-started",
+        "order": "7.5",
+        "column": "main",
+        "content_file": "db-summary.md"
+      }
+    },
+    {
+      "id": "db-project",
+      "type": "custom",
+      "data": {
+        "title": "실습 프로젝트",
+        "description": "데이터베이스 활용 실습",
+        "status": "not-started",
+        "order": "7.6",
+        "column": "main",
+        "content_file": "db-project.md"
+      }
+    },
+    {
+      "id": "db-intro-csv",
+      "type": "custom",
+      "data": {
+        "title": "CSV 파일 다루기",
+        "description": "CSV 파일 읽기/쓰기",
+        "status": "not-started",
+        "order": "7.1.1",
+        "column": "child",
+        "content_file": "db-intro.md",
+        "content_section": "7.1.1 CSV 파일 다루기"
+      }
+    },
+    {
+      "id": "db-intro-json",
+      "type": "custom",
+      "data": {
+        "title": "JSON 파일 다루기",
+        "description": "JSON 데이터 처리",
+        "status": "not-started",
+        "order": "7.1.2",
+        "column": "child",
+        "content_file": "db-intro.md",
+        "content_section": "7.1.2 JSON 파일 다루기"
+      }
+    },
+    {
+      "id": "db-project-student",
+      "type": "custom",
+      "data": {
+        "title": "학생 성적 관리 시스템",
+        "description": "CSV 활용 실습",
+        "status": "not-started",
+        "order": "7.6.1",
+        "column": "child",
+        "content_file": "db-project.md",
+        "content_section": "[실습 1] 학생 성적 관리 시스템"
+      }
+    },
+    {
+      "id": "db-project-library",
+      "type": "custom",
+      "data": {
+        "title": "도서 관리 데이터베이스",
+        "description": "SQLite 활용 실습",
+        "status": "not-started",
+        "order": "7.6.2",
+        "column": "child",
+        "content_file": "db-project.md",
+        "content_section": "[실습 2] 도서 관리 데이터베이스"
+      }
+    },
+    {
+      "id": "db-project-orm",
+      "type": "custom",
+      "data": {
+        "title": "ORM 회원 관리",
+        "description": "SQLAlchemy 활용 실습",
+        "status": "not-started",
+        "order": "7.6.3",
+        "column": "child",
+        "content_file": "db-project.md",
+        "content_section": "[실습 3] ORM을 활용한 회원 관리"
+      }
+    },
+    {
+      "id": "db-summary-points",
+      "type": "custom",
+      "data": {
+        "title": "핵심 포인트",
+        "description": "중요 개념 정리",
+        "status": "not-started",
+        "order": "7.5.1",
+        "column": "child",
+        "content_file": "db-summary.md",
+        "content_section": "핵심 포인트"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "db-intro",
+      "target": "db-sqlite",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "db-sqlite",
+      "target": "db-mysql",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "db-mysql",
+      "target": "db-orm",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "db-orm",
+      "target": "db-summary",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "db-summary",
+      "target": "db-project",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "db-intro",
+      "target": "db-intro-csv",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "db-intro",
+      "target": "db-intro-json",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "db-project",
+      "target": "db-project-student",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "db-project",
+      "target": "db-project-library",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e10",
+      "source": "db-project",
+      "target": "db-project-orm",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "db-summary",
+      "target": "db-summary-points",
+      "data": {
+        "type": "child"
+      }
+    }
+  ]
+}

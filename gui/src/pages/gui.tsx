@@ -10,7 +10,7 @@ import {
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { JSONContent } from "@tiptap/react";
-import { InputModifiers } from "core";
+import { InputModifiers, ChatMessage } from "core";
 import { usePostHog } from "posthog-js/react";
 import {
   Fragment,
@@ -49,7 +49,10 @@ import {
   setInactive,
   setMem0Memories,
   setShowInteractiveContinueTutorial,
+  addContextItems,
+  addAssistantMessage,
 } from "../redux/slices/stateSlice";
+import { setBottomMessage } from "../redux/slices/uiStateSlice";
 import { RootState } from "../redux/store";
 import {
   getFontSize,
@@ -61,8 +64,7 @@ import OnboardingTutorial from "./onboarding/OnboardingTutorial";
 import { getLogoPath } from "./welcome/setup/ImportExtensions";
 import { Badge } from "../components/ui/badge";
 import { cn } from "@/lib/utils";
-import "@/continue-styles.css";
-
+import { EditorContent } from 'core/protocol/types';
 
 const LENGTHY_MESSAGE_WARNING_INDEX = 15; // number of messages after which we show the warning card
 
@@ -165,10 +167,6 @@ function GUI() {
   const defaultModel = useSelector(defaultModelSelector);
   const active = useSelector((state: RootState) => state.state.active);
   const [stepsOpen, setStepsOpen] = useState<(boolean | undefined)[]>([]);
-  // If getting this from redux state, it is false. So need to get from localStorage directly.
-  // This is likely because it becomes true only after user onboards, upon which the local storage is updated.
-  // On first launch, showTutorialCard will be null, so we want to show it (true)
-  // Once it's been shown and closed, it will be false in localStorage
   const showTutorialCard = getLocalStorage("showTutorialCard") ?? (setLocalStorage("showTutorialCard", true), true);
 
   const fetchMemories = async () => {
@@ -189,7 +187,6 @@ function GUI() {
   };
 
   useEffect(() => {
-    // Set the redux state to the updated localStorage value (true)
     dispatch(setShowInteractiveContinueTutorial(showTutorialCard ?? false));
 
     if (memories.length === 0) {
@@ -209,6 +206,7 @@ function GUI() {
   const state = useSelector((state: RootState) => state.state);
   const isNewSession = state.history.length === 0;
   const [shouldShowSplash, setShouldShowSplash] = useState(true);
+  const history = useSelector((state: RootState) => state.state.history);
 
   const handleScroll = () => {
     const OFFSET_HERUISTIC = 300;
@@ -406,9 +404,48 @@ function GUI() {
     }
   }, []);
 
+  useEffect(() => {
+    dispatch({ type: 'state/clearContextItems' });
+  }, []);
+
+  useWebviewListener(
+    "forwardEducationContextToChat",
+    async (data: { content: EditorContent }) => {
+      console.log("[GUI Listener] Received forwardEducationContextToChat:", data);
+      if (data.content.type !== "assistant") {
+        console.error("유효하지 않은 문서 형식:", data.content);
+        return;
+      }
+      const educationGreeting = "안녕하세요! 오늘은 어떤 내용을 학습하고 싶으신가요?";
+      const alreadyExists = history.some(
+        (item) =>
+          item.message.role === 'assistant' &&
+          typeof item.message.content === 'string' &&
+          item.message.content.startsWith(educationGreeting)
+      );
+
+      if (alreadyExists) {
+        console.log("[GUI Listener] Education context message already exists, skipping addition.");
+        return;
+      }
+
+      try {
+        const messageText = data.content?.content?.[0]?.attrs?.content || "AI 메시지를 처리하는 중 오류 발생";
+        const assistantMessage: ChatMessage = {
+          role: 'assistant',
+          content: messageText
+        };
+        console.log("[GUI Listener] Dispatching addAssistantMessage.");
+        dispatch(addAssistantMessage({ message: assistantMessage, source: 'continue' }));
+      } catch (error) {
+        console.error("[GUI Listener] Error processing education context message:", error);
+      }
+    },
+    [dispatch, history]
+  );
+
   return (
     <>
-      {/* Disabling Tutorial Card until we improve it */}
       {false &&
         <TutorialCardDiv>
           <OnboardingTutorial onClose={onCloseTutorialCard} />
@@ -417,7 +454,6 @@ function GUI() {
 
       <TopGuiDiv ref={topGuiDivRef} onScroll={handleScroll} isNewSession={isNewSession}>
         {state.history.map((item, index: number) => {
-          // Insert warning card if conversation is too long
           const showWarningHere = index === LENGTHY_MESSAGE_WARNING_INDEX;
 
           return (
@@ -603,14 +639,6 @@ function GUI() {
             <StatusBar />
           </InputContainer>
         )}
-        {/* {isNewSession &&
-        <>
-          <div className="px-3">
-            <ShortcutContainer />
-          </div>
-        </>
-      } */}
-
         {active && (
           <StopButtonContainer>
             <StopButton

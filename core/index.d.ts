@@ -1,4 +1,11 @@
-import * as vscode from "vscode";
+export type { EditorContent, EditorContentNode } from "./protocol/types";
+export interface ContextMenuConfig {
+  comment?: string;
+  docstring?: string;
+  fix?: string;
+  optimize?: string;
+  fixGrammar?: string;
+}
 
 declare global {
   interface Window {
@@ -45,9 +52,9 @@ export interface IndexingProgressUpdate {
 export type PromptTemplate =
   | string
   | ((
-      history: ChatMessage[],
-      otherData: Record<string, string>,
-    ) => string | ChatMessage[]);
+    history: ChatMessage[],
+    otherData: Record<string, string>,
+  ) => string | ChatMessage[]);
 
 export interface ILLM extends LLMOptions {
   get providerName(): ModelProvider;
@@ -74,6 +81,7 @@ export interface ILLM extends LLMOptions {
   region?: string;
   projectId?: string;
   getCurrentDirectory?: (() => Promise<string>) | undefined | null;
+
 
   complete(prompt: string, options?: LLMFullCompletionOptions): Promise<string>;
 
@@ -197,12 +205,11 @@ export interface IContextProvider {
 }
 
 export interface IntegrationHistoryMap {
-  perplexityHistory: "perplexity";
-  history: "continue";
+  perplexityHistory: 'perplexity';
+  history: 'continue';
 }
 
-export type IntegrationType =
-  IntegrationHistoryMap[keyof IntegrationHistoryMap];
+export type IntegrationType = IntegrationHistoryMap[keyof IntegrationHistoryMap];
 
 export interface PersistedSessionInfo {
   history: ChatHistory;
@@ -339,7 +346,6 @@ export interface LLMFullCompletionOptions extends BaseCompletionOptions {
   log?: boolean;
 
   model?: string;
-  prompt_key?: string;
 }
 export interface LLMOptions {
   model: string;
@@ -537,6 +543,10 @@ export interface IDE {
   pathSep(): Promise<string>;
 
   getCurrentDirectory(): Promise<string>;
+
+  createPracticeWorkspace(url: string, practiceId: string): Promise<void>;
+  createPracticeFile(language: string, code: string): Promise<void>;
+  submitPractice(practiceId: string, requirements: string): Promise<void>;
 }
 
 // Slash Commands
@@ -575,7 +585,7 @@ type StepName =
   | "GenerateShellCommandStep"
   | "DraftIssueStep";
 
-type ContextProviderName =
+export type ContextProviderName =
   | "file"
   | "diff"
   | "github"
@@ -600,7 +610,7 @@ type ContextProviderName =
   | "relativefilecontext"
   | "relativegitfilecontext";
 
-type TemplateType =
+export type TemplateType =
   | "llama2"
   | "alpaca"
   | "zephyr"
@@ -618,7 +628,7 @@ type TemplateType =
   | "gemma"
   | "llama3";
 
-type ModelProvider =
+export type ModelProvider =
   | "openai"
   | "free-trial"
   | "anthropic"
@@ -765,7 +775,7 @@ export interface CustomCommand {
   description: string;
 }
 
-interface BaseCompletionOptions {
+export interface BaseCompletionOptions {
   temperature?: number;
   topP?: number;
   topK?: number;
@@ -887,44 +897,6 @@ export interface ContinueUIConfig {
   displayRawMarkdown?: boolean;
 }
 
-interface ContextMenuConfig {
-  comment?: string;
-  docstring?: string;
-  fix?: string;
-  optimize?: string;
-  fixGrammar?: string;
-}
-
-interface ModelRoles {
-  inlineEdit?: string;
-  applyCodeBlock?: string;
-}
-
-/**
- * Represents the configuration for a quick action in the Code Lens.
- * Quick actions are custom commands that can be added to function and class declarations.
- */
-interface QuickActionConfig {
-  /**
-   * The title of the quick action that will display in the Code Lens.
-   */
-  title: string;
-
-  /**
-   * The prompt that will be sent to the model when the quick action is invoked,
-   * with the function or class body concatenated.
-   */
-  prompt: string;
-
-  /**
-   * If `true`, the result of the quick action will be sent to the chat panel.
-   * If `false`, the streamed result will be inserted into the document.
-   *
-   * Defaults to `false`.
-   */
-  sendToChat: boolean;
-}
-
 interface ExperimentalConfig {
   contextMenuPrompts?: ContextMenuConfig;
   modelRoles?: ModelRoles;
@@ -1006,9 +978,9 @@ export interface Config {
   embeddingsProvider?: EmbeddingsProviderDescription | EmbeddingsProvider;
   /** The model that PearAI will use for tab autocompletions. */
   tabAutocompleteModel?:
-    | CustomLLM
-    | ModelDescription
-    | (CustomLLM | ModelDescription)[];
+  | CustomLLM
+  | ModelDescription
+  | (CustomLLM | ModelDescription)[];
   /** Options for tab autocomplete */
   tabAutocompleteOptions?: Partial<TabAutocompleteOptions>;
   /** UI styles customization */
@@ -1070,122 +1042,28 @@ export interface PearAuth {
   refreshToken?: string;
 }
 
-export type NewProjectType = "NONE" | "WEBAPP" | "MOBILE" | "AIAPP" | "OTHER";
-
-/**
- * Represents a request to execute a plan
- */
-export interface ExecutePlanRequest {
+export interface QuickActionConfig {
   /**
-   * The path to the file containing the plan
+   * The title of the quick action that will display in the Code Lens.
    */
-  // filePath?: string;
+  title: string;
 
   /**
-   * Optional code to include in the plan execution
+   * The prompt that will be sent to the model when the quick action is invoked,
+   * with the function or class body concatenated.
    */
-  // code?: string;
+  prompt: string;
 
   /**
-   * Additional context for the plan execution
+   * If `true`, the result of the quick action will be sent to the chat panel.
+   * If `false`, the streamed result will be inserted into the document.
+   *
+   * Defaults to `false`.
    */
-  plan?: string;
-
-  /**
-   * Optional base64-encoded images to include with the task
-   * TODO: are we doing images?
-   */
-  images?: string[];
-  creatorMode: boolean;
-  newProjectType?: NewProjectType;
-  newProjectPath?: string;
+  sendToChat: boolean;
 }
 
-export type CreatorModeState =
-  | "OVERLAY_CLOSED"
-  | "OVERLAY_OPEN"
-  | "OVERLAY_CLOSED_CREATOR_ACTIVE";
-
-/**
- * Interface for the Creator Mode API
- * Provides methods and events for controlling the Creator Mode UI and functionality
- */
-export interface IPearAICreatorMode {
-  /**
-   * Event that fires when the creator mode is activated or deactivated
-   */
-  readonly onDidChangeCreatorModeState: vscode.Event<CreatorModeState>;
-
-  /**
-   * Event that fires when a plan has been created and needs to be executed
-   */
-  readonly onDidRequestExecutePlan: vscode.Event<ExecutePlanRequest>;
-
-  /**
-   * Opens the creator mode interface
-   * @returns A Promise that resolves when the interface is opened
-   */
-  openCreatorOverlay(): Promise<void>;
-
-  /**
-   * Closes the creator mode interface
-   * @returns A Promise that resolves when the interface is closed
-   */
-  closeCreatorOverlay(): Promise<void>;
-
-  changeState(state: CreatorModeState): Promise<void>;
-
-  triggerCachedCreatorEvent(clear?: boolean): void;
-
-  openFeedbackForm(messages: any[]): Promise<void>;
-
-  /**
-   * Disposes of resources used by the creator mode
-   */
-  dispose(): void;
-}
-
-export type SubmitIdeaType = {
-  messageType: "SubmitIdea";
-  payload: {
-    request: string;
-    creatorMode: boolean;
-    newProjectType: NewProjectType;
-    newProjectPath?: string;
-    images?: string[];
-  };
-};
-
-export type ProcessLLMType = {
-  messageType: "ProcessLLM";
-  payload: {
-    messages: ChatMessage[];
-    plan: boolean;
-  };
-};
-
-export type CloseMessageType = {
-  messageType: "Close";
-};
-
-export type PearAICreatorModeMessage = {
-  messageId: string;
-} & (SubmitIdeaType | ProcessLLMType | CloseMessageType);
-
-export type PearAICreatorSavedGlobalState =
-  | {
-      msg: SubmitIdeaType;
-      creatorState: CreatorModeState;
-      timestamp: number;
-    }
-  | undefined;
-
-export interface IPearAIApi {
-  readonly creatorMode: IPearAICreatorMode;
-  getUserId(): Promise<string | undefined>;
-}
-
-export interface PearAIExtensionExports {
-  pearAPI: IPearAIApi;
-  extension: vscode.Extension<any>;
+export interface ModelRoles {
+  inlineEdit?: string;
+  applyCodeBlock?: string;
 }

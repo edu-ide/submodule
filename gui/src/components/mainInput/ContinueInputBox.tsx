@@ -67,7 +67,7 @@ const pulse = keyframes`
   50% { transform: scale(0.85); opacity: 0.5; }
 `;
 
-export const LoadingContainer = styled.div`
+const LoadingContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -78,14 +78,14 @@ export const LoadingContainer = styled.div`
   width: 100%;
 `;
 
-export const DotsContainer = styled.div`
+const DotsContainer = styled.div`
   display: flex;
   gap: 4px;
   align-items: center;
   margin-top 8px;
 `;
 
-export const Dot = styled.div<{ delay: number }>`
+const Dot = styled.div<{ delay: number }>`
   width: 3px;
   height: 3px;
   background-color: #4DA587;

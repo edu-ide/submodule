@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Active Context
+
+## Current Work Focus
+
+- Building OpenAPI specification and code generation workflow
+- Implementing backend with DDD/CQRS patterns
+- Developing detailed backend services
+- Integrating frontend with APIs
+
+## Recent Changes
+
+- Completed setup of OpenAPI code generation process
+- Designed backend DDD layer structure
+- Designed frontend atomic component structure
+
+## Next Steps
+
+- Expand API specifications
+- Implement backend domain models and detailed services
+- Develop frontend components
+- Integrate VSCode webview
+
+## Current Considerations
+
+- Methods for synchronizing types between backend and frontend
+- Defining appropriate boundaries for CQRS pattern
+- Strategy for code sharing between VSCode webview and web environment

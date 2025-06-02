@@ -25,7 +25,7 @@ export class MessageIde implements IDE {
       messageType: T,
       callback: (data: FromIdeProtocol[T][0]) => FromIdeProtocol[T][1],
     ) => void,
-  ) {}
+  ) { }
   pathSep(): Promise<string> {
     return this.request("pathSep", undefined);
   }
@@ -218,5 +218,15 @@ export class MessageIde implements IDE {
     return this.request("authenticatePear", undefined);
   }
 
+  async createPracticeWorkspace(url: string, practiceId: string): Promise<void> {
+    return this.request("createPracticeWorkspace", { url, practiceId });
+  }
 
+  async createPracticeFile(language: string, code: string): Promise<void> {
+    return this.request("createPracticeFile", { language, code });
+  }
+
+  async submitPractice(practiceId: string, requirements: string): Promise<void> {
+    return this.request("submitPractice", { practiceId, requirements });
+  }
 }

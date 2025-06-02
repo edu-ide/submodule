@@ -1,0 +1,143 @@
+{
+  "id": "python-analysis",
+  "nodes": [
+    {
+      "id": "intro",
+      "title": "데이터 분석 및 시각화 입문",
+      "shortTitle": "입문",
+      "description": "데이터 분석 및 시각화의 개요와 학습 목표",
+      "icon": "book-open"
+    },
+    {
+      "id": "analysis-basics",
+      "title": "데이터 분석 개념 및 기초",
+      "shortTitle": "분석 기초",
+      "description": "데이터 분석의 단계, 통계 개념, 전처리 기법 등",
+      "icon": "database"
+    },
+    {
+      "id": "numpy-pandas",
+      "title": "NumPy와 Pandas를 사용한 데이터 처리",
+      "shortTitle": "NumPy & Pandas",
+      "description": "효율적인 데이터 처리를 위한 NumPy와 Pandas 활용법",
+      "icon": "table"
+    },
+    {
+      "id": "matplotlib-seaborn",
+      "title": "Matplotlib과 Seaborn을 사용한 데이터 시각화",
+      "shortTitle": "Matplotlib & Seaborn",
+      "description": "정적 시각화 라이브러리를 활용한 다양한 그래프 제작",
+      "icon": "bar-chart"
+    },
+    {
+      "id": "plotly",
+      "title": "Plotly를 활용한 대화형 그래프 제작",
+      "shortTitle": "Plotly",
+      "description": "인터랙티브 시각화와 대시보드 구현",
+      "icon": "trending-up"
+    },
+    {
+      "id": "project",
+      "title": "실습 프로젝트",
+      "shortTitle": "프로젝트",
+      "description": "COVID-19 데이터 분석 및 시각화 실전 프로젝트",
+      "icon": "code"
+    },
+    {
+      "id": "summary",
+      "title": "요약",
+      "shortTitle": "요약",
+      "description": "학습 내용 요약 및 다음 단계 안내",
+      "icon": "check-circle"
+    }
+  ],
+  "categories": {
+    "libraries": [
+      {
+        "name": "NumPy",
+        "description": "다차원 배열 처리와 수치 계산을 위한 핵심 라이브러리"
+      },
+      {
+        "name": "Pandas",
+        "description": "데이터 조작과 분석을 위한 라이브러리"
+      },
+      {
+        "name": "Matplotlib",
+        "description": "파이썬의 기본 시각화 라이브러리"
+      },
+      {
+        "name": "Seaborn",
+        "description": "통계 시각화를 위한 고수준 라이브러리"
+      },
+      {
+        "name": "Plotly",
+        "description": "대화형 그래프 제작을 위한 라이브러리"
+      },
+      {
+        "name": "Dash",
+        "description": "대시보드 구축을 위한 웹 애플리케이션 프레임워크"
+      }
+    ],
+    "concepts": [
+      {
+        "name": "데이터 전처리",
+        "description": "결측값 처리, 이상치 제거, 정규화 등 데이터 준비 과정"
+      },
+      {
+        "name": "통계 분석",
+        "description": "기술 통계, 추론 통계, 가설 검정 등 통계적 분석 방법"
+      },
+      {
+        "name": "데이터 시각화",
+        "description": "데이터를 시각적으로 표현하여 이해하기 쉽게 만드는 과정"
+      },
+      {
+        "name": "탐색적 데이터 분석",
+        "description": "데이터의 특성과 패턴을 발견하기 위한 초기 분석 과정"
+      },
+      {
+        "name": "대화형 시각화",
+        "description": "사용자와 상호작용이 가능한 동적 시각화 방법"
+      }
+    ],
+    "skills": [
+      {
+        "name": "데이터 조작",
+        "description": "다양한 형태의 데이터를 처리하고 변환하는 능력"
+      },
+      {
+        "name": "시각적 표현",
+        "description": "데이터의 특성에 맞는 적절한 시각화 방법 선택 능력"
+      },
+      {
+        "name": "데이터 기반 의사결정",
+        "description": "데이터 분석 결과를 바탕으로 합리적인 결정을 내리는 능력"
+      },
+      {
+        "name": "성능 최적화",
+        "description": "대용량 데이터 처리를 위한 효율적인 코드 작성 능력"
+      },
+      {
+        "name": "결과 커뮤니케이션",
+        "description": "분석 결과를 효과적으로 전달하는 능력"
+      }
+    ]
+  },
+  "relatedTopics": [
+    {
+      "id": "python-basics",
+      "title": "파이썬 기초",
+      "description": "파이썬 프로그래밍의 기본 개념과 문법을 학습합니다."
+    },
+    {
+      "id": "python-advanced",
+      "title": "파이썬 고급",
+      "description": "파이썬의 고급 기능과 프로그래밍 패턴을 학습합니다."
+    },
+    {
+      "id": "machine-learning",
+      "title": "머신러닝 기초",
+      "description": "머신러닝의 기본 개념과 알고리즘 구현 방법을 학습합니다."
+    }
+  ]
+} 

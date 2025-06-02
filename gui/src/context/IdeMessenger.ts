@@ -4,6 +4,7 @@ import { MessageIde } from "core/util/messageIde";
 import { Message } from "core/util/messenger";
 import { createContext } from "react";
 import { v4 as uuidv4 } from "uuid";
+import "vscode-webview";
 import { isJetBrains } from "../util";
 
 interface vscode {
@@ -51,7 +52,7 @@ export class IdeMessenger implements IIdeMessenger {
   ide: IDE;
 
   constructor() {
-    this.ide = new MessageIde(this.request.bind(this), () => {});
+    this.ide = new MessageIde(this.request.bind(this), () => { });
   }
 
   private _postToIde(messageType: string, data: any, messageId?: string) {
@@ -174,7 +175,7 @@ export class IdeMessenger implements IIdeMessenger {
       if (buffer.length > index) {
         const chunk = buffer.slice(index);
         index = buffer.length;
-        yield {content: chunk, citations};
+        yield { content: chunk, citations };
       }
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
@@ -182,7 +183,7 @@ export class IdeMessenger implements IIdeMessenger {
     if (buffer.length > index) {
       const chunk = buffer.slice(index);
       index = buffer.length;
-      yield {content: chunk, citations};
+      yield { content: chunk, citations };
     }
 
     return returnVal;

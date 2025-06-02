@@ -4,7 +4,6 @@ import { getHeaders } from "../../pearaiServer/stubs/headers.js";
 import {
   ChatMessage,
   CompletionOptions,
-  LLMFullCompletionOptions,
   LLMOptions,
   ModelProvider,
   PearAuth,
@@ -162,54 +161,72 @@ class PearAIServer extends BaseLLM {
       true,
     );
 
-    const promptKey = "prompt_key" in options ? (options.prompt_key as string) : undefined;
-
     await this.credentials.checkAndUpdateCredentials();
 
     const body = JSON.stringify({
       messages: messages.map(this._convertMessage),
       ...args,
     });
-
+    console.log("PearAI 서버 요청 본문:", body);
     const response = await this.fetch(`${SERVER_URL}/server_chat`, {
       method: "POST",
       headers: {
         ...(await this._getHeaders()),
         Authorization: `Bearer ${this.credentials.getAccessToken()}`,
-        ...(promptKey ? {"prompt_key": promptKey} : {})
       },
       body: body,
     });
 
+    console.log("PearAI 서버 응답 원본:", response);
+    console.log("응답 상태:", response.status, response.statusText);
+    console.log("응답 헤더:", [...response.headers.entries()]);
+
     let completion = "";
     let warningMsg = "";
 
-    for await (const value of streamJSON(response)) {
-      if (value.metadata && Object.keys(value.metadata).length > 0) {
-        console.dir("Metadata received:")
-        console.dir(value.metadata);
-        if (value.metadata.ui_only) {
-          warningMsg += value.content;
-          continue;
+    try {
+      console.log("streamJSON 대신 직접 응답 처리 시작");
+      
+      // streamResponse 직접 사용
+      for await (const chunk of streamResponse(response)) {
+        console.log("받은 청크:", chunk);
+        
+        try {
+          // 각 청크를 직접 파싱
+          const value = JSON.parse(chunk);
+          console.log("파싱된 값:", value);
+          
+          if (value.metadata && Object.keys(value.metadata).length > 0) {
+            console.dir("Metadata received:");
+            console.dir(value.metadata);
+            if (value.metadata.ui_only) {
+              warningMsg += value.content;
+              continue;
+            }
+          }
+          if (value.content) {
+            yield {
+              role: "assistant",
+              content: value.content,
+              citations: value?.citations,
+            };
+            completion += value.content;
+          }
+        } catch (parseError) {
+          console.error("청크 파싱 오류:", parseError, "원본:", chunk);
         }
       }
-      if (value.content) {
-        yield {
-          role: "assistant",
-          content: value.content,
-          citations: value?.citations,
-        };
-        completion += value.content;
-      }
+    } catch (error) {
+      console.error("응답 처리 중 오류 발생:", error);
     }
 
     if (warningMsg.includes("pay-as-you-go")) {
           vscode.window.showInformationMessage(
             warningMsg,
-            'View Pay-As-You-Go'
+            "View Pay-As-You-Go"
         ).then(selection => {
-            if (selection === 'View Pay-As-You-Go') {
-                vscode.env.openExternal(vscode.Uri.parse('https://trypear.ai/pay-as-you-go'));
+            if (selection === "View Pay-As-You-Go") {
+                vscode.env.openExternal(vscode.Uri.parse("https://trypear.ai/pay-as-you-go"));
             }
         });
     }
@@ -217,6 +234,11 @@ class PearAIServer extends BaseLLM {
     // vscode.window.showInformationMessage(warningMsg);
     // vscode.commands.executeCommand("pearai.freeModelSwitch", {warningMsg});
     this._countTokens(completion, args.model, false);
+        const parsedResponse = {
+      role: "assistant",
+      content: completion,
+    };
+    console.log("PearAI 파싱된 응답:", parsedResponse);
   }
 
   async *_streamFim(
@@ -288,7 +310,7 @@ class PearAIServer extends BaseLLM {
         promptTokens,
         generatedTokens
       }),
-    })
+    });
   }
 }
 

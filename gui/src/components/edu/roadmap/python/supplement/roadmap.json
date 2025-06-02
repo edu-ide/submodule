@@ -1,0 +1,350 @@
+{
+  "nodes": [
+    {
+      "id": "supplement-intro",
+      "type": "custom",
+      "data": {
+        "title": "부록: 추가 학습 자료 및 실전 가이드",
+        "description": "파이썬 개발을 위한 실용적인 가이드",
+        "status": "not-started",
+        "order": "A.0",
+        "column": "main",
+        "content_file": "index.md"
+      }
+    },
+    {
+      "id": "development-tools",
+      "type": "custom",
+      "data": {
+        "title": "개발 도구 및 환경 설정",
+        "description": "파이썬 개발 환경 구축하기",
+        "status": "not-started",
+        "order": "A.1",
+        "column": "main",
+        "content_file": "development-tools.md"
+      }
+    },
+    {
+      "id": "interview-problems",
+      "type": "custom",
+      "data": {
+        "title": "고급 파이썬 인터뷰 문제",
+        "description": "취업 준비를 위한 문제 풀이",
+        "status": "not-started",
+        "column": "main",
+        "order": "A.2",
+        "content_file": "interview-problems.md"
+      }
+    },
+    {
+      "id": "deployment-guide",
+      "type": "custom",
+      "data": {
+        "title": "프로젝트 배포 가이드",
+        "description": "프로젝트 배포 방법",
+        "status": "not-started",
+        "column": "main",
+        "order": "A.3",
+        "content_file": "deployment-guide.md"
+      }
+    },
+    {
+      "id": "coding-style",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 코딩 스타일 가이드",
+        "description": "파이썬 코드 작성 모범 사례",
+        "status": "not-started",
+        "column": "main",
+        "order": "A.4",
+        "content_file": "coding-style.md"
+      }
+    },
+    {
+      "id": "packaging",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 프로젝트 배포 및 패키징",
+        "description": "패키지 관리 및 배포",
+        "status": "not-started",
+        "column": "main",
+        "order": "A.5",
+        "content_file": "packaging.md"
+      }
+    },
+    {
+      "id": "dev-env-setup",
+      "type": "custom",
+      "data": {
+        "title": "개발 환경 설정 가이드",
+        "description": "IDE 및 가상 환경 설정",
+        "status": "not-started",
+        "order": "A.1.1",
+        "column": "child",
+        "content_file": "development-tools.md",
+        "content_section": "개발 환경 설정 가이드"
+      }
+    },
+    {
+      "id": "algorithms",
+      "type": "custom",
+      "data": {
+        "title": "알고리즘 및 자료구조 문제",
+        "description": "코딩 테스트 대비 알고리즘",
+        "status": "not-started",
+        "order": "A.2.1",
+        "column": "child",
+        "content_file": "interview-problems.md",
+        "content_section": "알고리즘 및 자료구조 문제"
+      }
+    },
+    {
+      "id": "design-patterns",
+      "type": "custom",
+      "data": {
+        "title": "디자인 패턴 문제",
+        "description": "디자인 패턴 구현 사례",
+        "status": "not-started",
+        "order": "A.2.2",
+        "column": "child",
+        "content_file": "interview-problems.md",
+        "content_section": "디자인 패턴 문제"
+      }
+    },
+    {
+      "id": "package-deployer",
+      "type": "custom",
+      "data": {
+        "title": "패키지 배포 도구",
+        "description": "패키지 배포 유틸리티",
+        "status": "not-started",
+        "order": "A.3.1",
+        "column": "child",
+        "content_file": "deployment-guide.md",
+        "content_section": "패키지 배포 도구"
+      }
+    },
+    {
+      "id": "pep8",
+      "type": "custom",
+      "data": {
+        "title": "PEP 8 스타일 가이드",
+        "description": "파이썬 코딩 스타일 표준",
+        "status": "not-started",
+        "order": "A.4.1",
+        "column": "child",
+        "content_file": "coding-style.md",
+        "content_section": "PEP 8 스타일 가이드"
+      }
+    },
+    {
+      "id": "code-documentation",
+      "type": "custom",
+      "data": {
+        "title": "코드 문서화",
+        "description": "Docstring 작성법",
+        "status": "not-started",
+        "order": "A.4.2",
+        "column": "child",
+        "content_file": "coding-style.md",
+        "content_section": "코드 문서화"
+      }
+    },
+    {
+      "id": "refactoring",
+      "type": "custom",
+      "data": {
+        "title": "코드 리팩토링 가이드",
+        "description": "코드 개선 기법",
+        "status": "not-started",
+        "order": "A.4.3",
+        "column": "child",
+        "content_file": "coding-style.md",
+        "content_section": "코드 리팩토링 가이드"
+      }
+    },
+    {
+      "id": "package-structure",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 패키지 구조",
+        "description": "표준 패키지 구성",
+        "status": "not-started",
+        "order": "A.5.1",
+        "column": "child",
+        "content_file": "packaging.md",
+        "content_section": "파이썬 패키지 구조"
+      }
+    },
+    {
+      "id": "virtual-env",
+      "type": "custom",
+      "data": {
+        "title": "가상 환경과 의존성 관리",
+        "description": "venv와 pip 활용",
+        "status": "not-started",
+        "order": "A.5.2",
+        "column": "child",
+        "content_file": "packaging.md",
+        "content_section": "가상 환경과 의존성 관리"
+      }
+    },
+    {
+      "id": "pypi-guide",
+      "type": "custom",
+      "data": {
+        "title": "PyPI 배포 가이드",
+        "description": "PyPI에 패키지 배포하기",
+        "status": "not-started",
+        "order": "A.5.3",
+        "column": "child",
+        "content_file": "packaging.md",
+        "content_section": "PyPI 배포 가이드"
+      }
+    },
+    {
+      "id": "cicd",
+      "type": "custom",
+      "data": {
+        "title": "지속적 통합 및 배포",
+        "description": "CI/CD 설정 방법",
+        "status": "not-started",
+        "order": "A.5.4",
+        "column": "child",
+        "content_file": "packaging.md",
+        "content_section": "지속적 통합 및 배포 (CI/CD)"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "supplement-intro",
+      "target": "development-tools",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e2",
+      "source": "development-tools",
+      "target": "interview-problems",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e3",
+      "source": "interview-problems",
+      "target": "deployment-guide",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e4",
+      "source": "deployment-guide",
+      "target": "coding-style",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e5",
+      "source": "coding-style",
+      "target": "packaging",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e6",
+      "source": "development-tools",
+      "target": "dev-env-setup",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e7",
+      "source": "interview-problems",
+      "target": "algorithms",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e8",
+      "source": "interview-problems",
+      "target": "design-patterns",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e9",
+      "source": "deployment-guide",
+      "target": "package-deployer",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e10",
+      "source": "coding-style",
+      "target": "pep8",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e11",
+      "source": "coding-style",
+      "target": "code-documentation",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e12",
+      "source": "coding-style",
+      "target": "refactoring",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e13",
+      "source": "packaging",
+      "target": "package-structure",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e14",
+      "source": "packaging",
+      "target": "virtual-env",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e15",
+      "source": "packaging",
+      "target": "pypi-guide",
+      "data": {
+        "type": "child"
+      }
+    },
+    {
+      "id": "e16",
+      "source": "packaging",
+      "target": "cicd",
+      "data": {
+        "type": "child"
+      }
+    }
+  ],
+  "id": "python-supplement"
+}

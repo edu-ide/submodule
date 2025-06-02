@@ -1,26 +1,17 @@
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect } from 'react';
 import { IdeMessengerContext } from "@/context/IdeMessenger";
 import { SERVER_URL } from "core/util/parameters";
-import { Auth, AccountDetails, UsageDetails } from "../types";
+import { Auth, AccountDetails, UsageDetails } from '../types';
 
 export const useAccountSettings = () => {
   const [auth, setAuth] = useState<Auth | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
   const [usageDetails, setUsageDetails] = useState<UsageDetails | null>(null);
-  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(
-    null,
-  );
+  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(null);
   const [isUsageLoading, setIsUsageLoading] = useState(false);
   const ideMessenger = useContext(IdeMessengerContext);
 
-  const clearUserData = useCallback(() => {
-    localStorage.removeItem("pearai_account_details");
-    setAuth(null);
-    setUsageDetails(null);
-    setAccountDetails(null);
-  }, []);
-
-  const fetchUsageData = useCallback(async (authData: Auth) => {
+  const fetchUsageData = async (authData: Auth) => {
     setIsUsageLoading(true);
     try {
       const response = await fetch(`${SERVER_URL}/get-usage`, {
@@ -32,9 +23,7 @@ export const useAccountSettings = () => {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `HTTP error! {fetchUsageData} Status: ${response.status}`,
-        );
+        throw new Error(`HTTP error! {fetchUsageData} Status: ${response.status}`);
       }
       const data = await response.json();
       setUsageDetails(data);
@@ -43,35 +32,30 @@ export const useAccountSettings = () => {
     } finally {
       setIsUsageLoading(false);
     }
-  }, []);
+  };
 
-  const fetchAccountData = useCallback(
-    async (authData: Auth) => {
-      try {
-        const response = await fetch(`${SERVER_URL}/account`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${authData.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+  const fetchAccountData = async (authData: Auth) => {
+    try {
+      const response = await fetch(`${SERVER_URL}/account`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authData.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!response.ok) {
-          throw new Error(
-            `HTTP error! {fetchAccountData} Status: ${response.status}`,
-          );
-        }
-        const data = await response.json();
-        localStorage.setItem("pearai_account_details", JSON.stringify(data));
-        setAccountDetails(data);
-      } catch (err) {
-        console.error("Error fetching account data", err);
+      if (!response.ok) {
+        throw new Error(`HTTP error! {fetchAccountData} Status: ${response.status}`);
       }
-    },
-    [setAccountDetails],
-  );
+      const data = await response.json();
+      localStorage.setItem('pearai_account_details', JSON.stringify(data));
+      setAccountDetails(data);
+    } catch (err) {
+      console.error("Error fetching account data", err);
+    }
+  };
 
-  const checkAuth = useCallback(async () => {
+  const checkAuth = async () => {
     try {
       const res = await ideMessenger.request("getPearAuth", undefined);
       setAuth(res);
@@ -79,18 +63,25 @@ export const useAccountSettings = () => {
     } catch (error) {
       console.error("Error checking auth status:", error);
     }
-  }, [ideMessenger]);
+  };
 
-  const handleLogin = useCallback(() => {
+  const handleLogin = () => {
     ideMessenger.post("pearaiLogin", undefined);
-  }, [ideMessenger]);
+  };
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = () => {
     clearUserData();
     ideMessenger.post("pearaiLogout", undefined);
-  }, [clearUserData, ideMessenger]);
+  };
 
-  const copyApiKey = useCallback(async () => {
+  const clearUserData = () => {
+    localStorage.removeItem('pearai_account_details');
+    setAuth(null);
+    setUsageDetails(null);
+    setAccountDetails(null);
+  };
+
+  const copyApiKey = async () => {
     if (auth?.accessToken) {
       try {
         await navigator.clipboard.writeText(auth.accessToken);
@@ -98,17 +89,17 @@ export const useAccountSettings = () => {
         console.error("Failed to copy API key:", error);
       }
     }
-  }, [auth]);
+  };
 
-  const refreshData = useCallback(async () => {
+  const refreshData = async () => {
     const authData = await checkAuth();
     if (authData) {
       await Promise.all([fetchUsageData(authData), fetchAccountData(authData)]);
     }
-  }, [checkAuth, fetchUsageData, fetchAccountData]);
+  };
 
   useEffect(() => {
-    const cachedAccountDetails = localStorage.getItem("pearai_account_details");
+    const cachedAccountDetails = localStorage.getItem('pearai_account_details');
     if (cachedAccountDetails) {
       try {
         const parsedDetails = JSON.parse(cachedAccountDetails);
@@ -119,7 +110,7 @@ export const useAccountSettings = () => {
     }
 
     refreshData();
-  }, [refreshData]);
+  }, []);
 
   return {
     auth,
@@ -137,4 +128,4 @@ export const useAccountSettings = () => {
     fetchAccountData,
     refreshData,
   };
-};
+}; 

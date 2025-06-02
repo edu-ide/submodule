@@ -1,0 +1,1204 @@
+{
+  "id": "python-programming",
+  "title": "파이썬 프로그래밍 로드맵",
+  "description": "파이썬 프로그래밍의 모든 영역을 다루는 종합 로드맵",
+  "nodes": [
+    {
+      "id": "python-intro",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 입문",
+        "description": "프로그래밍 경험이 없는 사람을 위한 파이썬 첫걸음",
+        "status": "not-started",
+        "order": "1.0",
+        "column": "main",
+        "level": "초급",
+        "category": "programming",
+        "content_file": "intro-roadmap.json",
+        "thumbnail": "/images/python-intro.png",
+        "next": ["python-basic"],
+        "prerequisites": []
+      }
+    },
+    {
+      "id": "python-basic",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 기초 문법",
+        "description": "파이썬의 기본 문법 요소를 차근차근 배워봅시다",
+        "status": "not-started",
+        "order": "2.0",
+        "column": "main",
+        "level": "초급",
+        "category": "programming",
+        "content_file": "basic-roadmap.json",
+        "thumbnail": "/images/python-basic.png",
+        "next": ["python-data", "python-error"],
+        "prerequisites": ["python-intro"]
+      }
+    },
+    {
+      "id": "python-data",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 데이터 구조",
+        "description": "파이썬의 다양한 데이터 구조 탐색하기",
+        "status": "not-started",
+        "order": "3.0",
+        "column": "main",
+        "level": "초급",
+        "category": "programming",
+        "content_file": "data-roadmap.json", 
+        "thumbnail": "/images/python-data.png",
+        "next": ["python-oop"],
+        "prerequisites": ["python-basic"]
+      }
+    },
+    {
+      "id": "python-error",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 에러 및 예외 처리",
+        "description": "다양한 에러 유형과 효과적인 예외 처리 전략 학습",
+        "status": "not-started",
+        "order": "4.0",
+        "column": "main",
+        "level": "초급",
+        "category": "programming",
+        "content_file": "error-roadmap.json",
+        "thumbnail": "/images/python-error.png",
+        "next": ["python-oop"],
+        "prerequisites": ["python-basic"]
+      }
+    },
+    {
+      "id": "python-oop",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 객체지향 프로그래밍",
+        "description": "파이썬의 객체지향 프로그래밍 개념과 활용 기법 학습",
+        "status": "not-started",
+        "order": "5.0",
+        "column": "main",
+        "level": "중급",
+        "category": "programming",
+        "content_file": "oop-roadmap.json",
+        "thumbnail": "/images/python-oop.png",
+        "next": ["python-io", "python-module"],
+        "prerequisites": ["python-data", "python-error"]
+      }
+    },
+    {
+      "id": "python-io",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 입출력 처리",
+        "description": "파일, 네트워크, 데이터베이스 등 다양한 입출력 처리 기법",
+        "status": "not-started",
+        "order": "6.0",
+        "column": "main",
+        "level": "중급",
+        "category": "programming",
+        "content_file": "io-roadmap.json",
+        "thumbnail": "/images/python-io.png",
+        "next": ["python-db"],
+        "prerequisites": ["python-oop"]
+      }
+    },
+    {
+      "id": "python-module",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 모듈과 패키지 개발",
+        "description": "재사용 가능한 파이썬 모듈과 패키지 설계 및 개발 방법",
+        "status": "not-started",
+        "order": "7.0",
+        "column": "main",
+        "level": "중급",
+        "category": "programming",
+        "content_file": "module-roadmap.json",
+        "thumbnail": "/images/python-module.png",
+        "next": ["python-log"],
+        "prerequisites": ["python-oop"]
+      }
+    },
+    {
+      "id": "python-db",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 데이터베이스 연동",
+        "description": "SQL 및 NoSQL 데이터베이스와 파이썬 연동 방법",
+        "status": "not-started",
+        "order": "8.0",
+        "column": "main",
+        "level": "중급",
+        "category": ["programming", "web-development"],
+        "content_file": "db-roadmap.json",
+        "thumbnail": "/images/python-db.png",
+        "next": ["python-log", "python-webapp"],
+        "prerequisites": ["python-io"]
+      }
+    },
+    {
+      "id": "python-log",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 로깅과 테스트 자동화",
+        "description": "효율적인 로깅 설정과 테스트 자동화 방법 학습",
+        "status": "not-started",
+        "order": "9.0",
+        "column": "main",
+        "level": "중급",
+        "category": "programming",
+        "content_file": "log-roadmap.json",
+        "thumbnail": "/images/python-log.png",
+        "next": ["python-advanced-data"],
+        "prerequisites": ["python-module", "python-db"]
+      }
+    },
+    {
+      "id": "python-advanced-data",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 고급 데이터 처리",
+        "description": "파이썬의 고급 데이터 처리 기술 마스터하기",
+        "status": "not-started",
+        "order": "10.0",
+        "column": "main",
+        "level": "고급",
+        "category": "programming",
+        "content_file": "advanced-data-roadmap.json",
+        "thumbnail": "/images/python-advanced-data.png",
+        "next": ["python-performance"],
+        "prerequisites": ["python-log"]
+      }
+    },
+    {
+      "id": "python-performance",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 성능 최적화",
+        "description": "파이썬 코드의 실행 속도와 메모리 사용 최적화 기법",
+        "status": "not-started",
+        "order": "11.0",
+        "column": "main",
+        "level": "고급",
+        "category": "programming",
+        "content_file": "performance-roadmap.json",
+        "thumbnail": "/images/python-performance.png",
+        "next": ["python-automation", "python-advanced-performance"],
+        "prerequisites": ["python-advanced-data"]
+      }
+    },
+    {
+      "id": "python-automation",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 자동화 및 시스템 스크립트",
+        "description": "파이썬을 활용한 반복 작업 자동화와 시스템 스크립트 작성 기법",
+        "status": "not-started",
+        "order": "12.0",
+        "column": "main",
+        "level": "고급",
+        "category": "programming",
+        "content_file": "automation-roadmap.json",
+        "thumbnail": "/images/python-automation.png",
+        "featured": true,
+        "next": ["python-crawling"],
+        "prerequisites": ["python-performance"]
+      }
+    },
+    {
+      "id": "python-advanced-performance",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 성능 최적화 및 병렬 프로그래밍",
+        "description": "파이썬 코드의 성능을 최적화하고 병렬 처리하는 기법 학습",
+        "status": "not-started",
+        "order": "13.0",
+        "column": "main",
+        "level": "고급",
+        "category": "programming",
+        "content_file": "advanced-performance-roadmap.json",
+        "thumbnail": "/images/python-advanced-performance.png",
+        "next": ["python-webapp"],
+        "prerequisites": ["python-performance"]
+      }
+    },
+    {
+      "id": "python-webapp",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 웹 애플리케이션 개발",
+        "description": "Flask와 Django를 활용한 웹 애플리케이션 개발 방법 학습",
+        "status": "not-started",
+        "order": "14.0",
+        "column": "main",
+        "level": "고급",
+        "category": ["programming", "web-development"],
+        "content_file": "webapp-roadmap.json",
+        "thumbnail": "/images/python-webapp.png",
+        "next": ["python-crawling"],
+        "prerequisites": ["python-db", "python-advanced-performance"]
+      }
+    },
+    {
+      "id": "python-crawling",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 웹 크롤링과 스크래핑",
+        "description": "웹 데이터 추출 및 자동화된 데이터 수집 기법 학습",
+        "status": "not-started",
+        "order": "15.0",
+        "column": "main",
+        "level": "고급",
+        "category": ["programming", "data-science"],
+        "content_file": "crawling-roadmap.json",
+        "thumbnail": "/images/python-crawling.png",
+        "next": ["python-analysis"],
+        "prerequisites": ["python-automation", "python-webapp"]
+      }
+    },
+    {
+      "id": "python-analysis",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 데이터 분석 및 시각화",
+        "description": "NumPy, Pandas, Matplotlib, Seaborn, Plotly를 활용한 데이터 분석과 시각화 마스터하기",
+        "status": "not-started",
+        "order": "16.0",
+        "column": "main",
+        "level": "중급",
+        "category": "data-science",
+        "content_file": "analysis-roadmap.json",
+        "thumbnail": "/images/python-data-analysis.png",
+        "featured": true,
+        "next": ["python-ai", "python-ml"],
+        "prerequisites": ["python-crawling"]
+      }
+    },
+    {
+      "id": "python-ai",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 머신러닝과 딥러닝",
+        "description": "파이썬을 활용한 머신러닝과 딥러닝의 기본 개념부터 실제 구현까지",
+        "status": "not-started",
+        "order": "17.0",
+        "column": "main",
+        "level": "고급",
+        "category": ["programming", "data-science"],
+        "content_file": "ai-roadmap.json",
+        "thumbnail": "/images/python-ai.png",
+        "next": [],
+        "prerequisites": ["python-analysis"]
+      }
+    },
+    {
+      "id": "python-ml",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 머신러닝과 딥러닝",
+        "description": "파이썬을 활용한 머신러닝과 딥러닝의 기본 개념부터 실제 구현까지",
+        "status": "not-started",
+        "order": "17.0",
+        "column": "main",
+        "level": "고급",
+        "category": ["programming", "data-science"],
+        "content_file": "ml-roadmap.json",
+        "thumbnail": "/images/python-ml.png",
+        "next": [],
+        "prerequisites": ["python-analysis"]
+      }
+    },
+    {
+      "id": "python-supplement",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 부록: 실전 가이드",
+        "description": "실무에서 활용 가능한 파이썬 개발 도구, 패키징, 배포 가이드",
+        "status": "not-started",
+        "order": "18.0",
+        "column": "main",
+        "level": "고급",
+        "category": "programming",
+        "content_file": "supplement-roadmap.json",
+        "thumbnail": "/images/python-supplement.png",
+        "next": [],
+        "prerequisites": ["python-ai", "python-ml", "python-advanced-performance"]
+      }
+    },
+    {
+      "id": "basic-path",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 기초 학습 경로",
+        "description": "파이썬을 처음 시작하는 분들을 위한 기초 학습 경로",
+        "status": "path",
+        "column": "path",
+        "steps": ["python-intro", "python-basic", "python-data", "python-error"]
+      }
+    },
+    {
+      "id": "web-path",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 웹 개발 경로",
+        "description": "파이썬을 활용한 웹 개발자가 되기 위한 학습 경로",
+        "status": "path",
+        "column": "path",
+        "steps": ["python-basic", "python-data", "python-oop", "python-io", "python-db", "python-webapp"]
+      }
+    },
+    {
+      "id": "data-science-path",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 데이터 사이언스 경로",
+        "description": "파이썬을 활용한 데이터 사이언티스트가 되기 위한 학습 경로",
+        "status": "path",
+        "column": "path",
+        "steps": ["python-basic", "python-data", "python-advanced-data", "python-analysis", "python-crawling", "python-ai"]
+      }
+    },
+    {
+      "id": "automation-path",
+      "type": "custom",
+      "data": {
+        "title": "파이썬 자동화 전문가 경로",
+        "description": "파이썬을 활용한 자동화 전문가가 되기 위한 학습 경로",
+        "status": "path",
+        "column": "path",
+        "steps": ["python-basic", "python-data", "python-error", "python-io", "python-log", "python-automation", "python-crawling"]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-intro-basic",
+      "source": "python-intro",
+      "target": "python-basic",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-basic-data",
+      "source": "python-basic",
+      "target": "python-data",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-basic-error",
+      "source": "python-basic",
+      "target": "python-error",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-data-oop",
+      "source": "python-data",
+      "target": "python-oop",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-data-advanced-data",
+      "source": "python-data",
+      "target": "python-advanced-data",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-error-io",
+      "source": "python-error",
+      "target": "python-io",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-oop-module",
+      "source": "python-oop",
+      "target": "python-module",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-io-db",
+      "source": "python-io",
+      "target": "python-db",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-io-log",
+      "source": "python-io",
+      "target": "python-log",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-module-performance",
+      "source": "python-module",
+      "target": "python-performance",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-module-automation",
+      "source": "python-module",
+      "target": "python-automation",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-db-webapp",
+      "source": "python-db",
+      "target": "python-webapp",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-log-automation",
+      "source": "python-log",
+      "target": "python-automation",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-advanced-data-analysis",
+      "source": "python-advanced-data",
+      "target": "python-analysis",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-advanced-data-performance",
+      "source": "python-advanced-data",
+      "target": "python-performance",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-performance-advanced-performance",
+      "source": "python-performance",
+      "target": "python-advanced-performance",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-automation-crawling",
+      "source": "python-automation",
+      "target": "python-crawling",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-advanced-performance-supplement",
+      "source": "python-advanced-performance",
+      "target": "python-supplement",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-webapp-crawling",
+      "source": "python-webapp",
+      "target": "python-crawling",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-crawling-ai",
+      "source": "python-crawling",
+      "target": "python-ai",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-analysis-ai",
+      "source": "python-analysis",
+      "target": "python-ai",
+      "data": {
+        "type": "main"
+      }
+    },
+    {
+      "id": "e-ai-supplement",
+      "source": "python-ai",
+      "target": "python-supplement",
+      "data": {
+        "type": "main"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": "programming",
+      "title": "프로그래밍 학습",
+      "description": "다양한 프로그래밍 언어와 개발 기술을 배워보세요",
+      "thumbnail": "/images/programming.png",
+      "order": "1.0"
+    },
+    {
+      "id": "data-science",
+      "title": "데이터 사이언스",
+      "description": "데이터 분석과 머신러닝 역량을 키워보세요",
+      "thumbnail": "/images/data-science.png",
+      "order": "2.0"
+    },
+    {
+      "id": "web-development",
+      "title": "웹 개발",
+      "description": "웹 개발 기술 완벽 마스터하기",
+      "thumbnail": "/images/web-dev.png",
+      "order": "3.0"
+    }
+  ],
+  "paths": [
+    {
+      "id": "python-basic-path",
+      "title": "파이썬 기초 학습 경로",
+      "description": "파이썬을 처음 시작하는 분들을 위한 기초 학습 경로",
+      "steps": ["python-intro", "python-basic", "python-data", "python-error"],
+      "nodes": [
+        {
+          "id": "python-basic-path-root",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 기초 학습 경로",
+            "description": "파이썬을 처음 시작하는 분들을 위한 기초 학습 경로",
+            "status": "not-started",
+            "order": "1.0",
+            "level": "초급",
+            "category": "programming",
+            "isPath": true,
+            "thumbnail": "/images/programming.png"
+          }
+        },
+        {
+          "id": "python-intro-path",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 입문",
+            "description": "프로그래밍 경험이 없는 사람을 위한 파이썬 첫걸음",
+            "status": "not-started",
+            "order": "1.1",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-basic-path",
+            "originalNodeId": "python-intro"
+          }
+        },
+        {
+          "id": "python-basic-path-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 기초 문법",
+            "description": "파이썬의 기본 문법 요소를 차근차근 배워봅시다",
+            "status": "not-started",
+            "order": "1.2",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-basic-path",
+            "originalNodeId": "python-basic"
+          }
+        },
+        {
+          "id": "python-data-path-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 구조",
+            "description": "파이썬의 다양한 데이터 구조 탐색하기",
+            "status": "not-started",
+            "order": "1.3",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-basic-path",
+            "originalNodeId": "python-data"
+          }
+        },
+        {
+          "id": "python-error-path-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 에러 및 예외 처리",
+            "description": "다양한 에러 유형과 효과적인 예외 처리 전략 학습",
+            "status": "not-started",
+            "order": "1.4",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-basic-path",
+            "originalNodeId": "python-error"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-basic-path-intro",
+          "source": "python-basic-path-root",
+          "target": "python-intro-path",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-path-intro-basic",
+          "source": "python-intro-path",
+          "target": "python-basic-path-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-path-basic-data",
+          "source": "python-basic-path-step",
+          "target": "python-data-path-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-path-data-error",
+          "source": "python-data-path-step",
+          "target": "python-error-path-step",
+          "data": {
+            "type": "path"
+          }
+        }
+      ]
+    },
+    {
+      "id": "python-web-path",
+      "title": "파이썬 웹 개발 경로",
+      "description": "파이썬을 활용한 웹 개발자가 되기 위한 학습 경로",
+      "steps": ["python-basic", "python-data", "python-oop", "python-io", "python-db", "python-webapp"],
+      "nodes": [
+        {
+          "id": "python-web-path-root",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 웹 개발 경로",
+            "description": "파이썬을 활용한 웹 개발자가 되기 위한 학습 경로",
+            "status": "not-started",
+            "order": "2.0",
+            "level": "중급",
+            "category": "web-development",
+            "isPath": true,
+            "thumbnail": "/images/web-dev.png"
+          }
+        },
+        {
+          "id": "python-basic-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 기초 문법",
+            "description": "파이썬의 기본 문법 요소를 차근차근 배워봅시다",
+            "status": "not-started",
+            "order": "2.1",
+            "level": "초급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-basic"
+          }
+        },
+        {
+          "id": "python-data-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 구조",
+            "description": "파이썬의 다양한 데이터 구조 탐색하기",
+            "status": "not-started",
+            "order": "2.2",
+            "level": "초급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-data"
+          }
+        },
+        {
+          "id": "python-oop-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 객체지향 프로그래밍",
+            "description": "파이썬의 객체지향 프로그래밍 개념과 활용 기법 학습",
+            "status": "not-started",
+            "order": "2.3",
+            "level": "중급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-oop"
+          }
+        },
+        {
+          "id": "python-io-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 입출력 처리",
+            "description": "파일, 네트워크, 데이터베이스 등 다양한 입출력 처리 기법",
+            "status": "not-started",
+            "order": "2.4",
+            "level": "중급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-io"
+          }
+        },
+        {
+          "id": "python-db-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터베이스 연동",
+            "description": "SQL 및 NoSQL 데이터베이스와 파이썬 연동 방법",
+            "status": "not-started",
+            "order": "2.5",
+            "level": "중급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-db"
+          }
+        },
+        {
+          "id": "python-webapp-web-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 웹 애플리케이션 개발",
+            "description": "Flask와 Django를 활용한 웹 애플리케이션 개발 방법 학습",
+            "status": "not-started",
+            "order": "2.6",
+            "level": "고급",
+            "category": "web-development",
+            "isPathStep": true,
+            "pathId": "python-web-path",
+            "originalNodeId": "python-webapp"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-web-path-basic",
+          "source": "python-web-path-root",
+          "target": "python-basic-web-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-web-basic-data",
+          "source": "python-basic-web-step",
+          "target": "python-data-web-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-web-data-oop",
+          "source": "python-data-web-step",
+          "target": "python-oop-web-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-web-oop-io",
+          "source": "python-oop-web-step",
+          "target": "python-io-web-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-web-io-db",
+          "source": "python-io-web-step",
+          "target": "python-db-web-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-web-db-webapp",
+          "source": "python-db-web-step",
+          "target": "python-webapp-web-step",
+          "data": {
+            "type": "path"
+          }
+        }
+      ]
+    },
+    {
+      "id": "python-data-science-path",
+      "title": "파이썬 데이터 사이언스 경로",
+      "description": "파이썬을 활용한 데이터 사이언티스트가 되기 위한 학습 경로",
+      "steps": ["python-basic", "python-data", "python-advanced-data", "python-analysis", "python-crawling", "python-ai"],
+      "nodes": [
+        {
+          "id": "python-ds-path-root",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 사이언스 경로",
+            "description": "파이썬을 활용한 데이터 사이언티스트가 되기 위한 학습 경로",
+            "status": "not-started",
+            "order": "3.0",
+            "level": "중급",
+            "category": "data-science",
+            "isPath": true,
+            "thumbnail": "/images/data-science.png"
+          }
+        },
+        {
+          "id": "python-basic-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 기초 문법",
+            "description": "파이썬의 기본 문법 요소를 차근차근 배워봅시다",
+            "status": "not-started",
+            "order": "3.1",
+            "level": "초급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-basic"
+          }
+        },
+        {
+          "id": "python-data-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 구조",
+            "description": "파이썬의 다양한 데이터 구조 탐색하기",
+            "status": "not-started",
+            "order": "3.2",
+            "level": "초급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-data"
+          }
+        },
+        {
+          "id": "python-advanced-data-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 고급 데이터 처리",
+            "description": "파이썬의 고급 데이터 처리 기술 마스터하기",
+            "status": "not-started",
+            "order": "3.3",
+            "level": "중급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-advanced-data"
+          }
+        },
+        {
+          "id": "python-analysis-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 분석 및 시각화",
+            "description": "NumPy, Pandas, Matplotlib, Seaborn, Plotly를 활용한 데이터 분석과 시각화 마스터하기",
+            "status": "not-started",
+            "order": "3.4",
+            "level": "중급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-analysis"
+          }
+        },
+        {
+          "id": "python-crawling-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 웹 크롤링과 스크래핑",
+            "description": "웹 데이터 추출 및 자동화된 데이터 수집 기법 학습",
+            "status": "not-started",
+            "order": "3.5",
+            "level": "중급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-crawling"
+          }
+        },
+        {
+          "id": "python-ai-ds-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 머신러닝과 딥러닝",
+            "description": "파이썬을 활용한 머신러닝과 딥러닝의 기본 개념부터 실제 구현까지",
+            "status": "not-started",
+            "order": "3.6",
+            "level": "고급",
+            "category": "data-science",
+            "isPathStep": true,
+            "pathId": "python-data-science-path",
+            "originalNodeId": "python-ai"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-ds-path-basic",
+          "source": "python-ds-path-root",
+          "target": "python-basic-ds-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-ds-basic-data",
+          "source": "python-basic-ds-step",
+          "target": "python-data-ds-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-ds-data-advanced",
+          "source": "python-data-ds-step",
+          "target": "python-advanced-data-ds-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-ds-advanced-analysis",
+          "source": "python-advanced-data-ds-step",
+          "target": "python-analysis-ds-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-ds-analysis-crawling",
+          "source": "python-analysis-ds-step",
+          "target": "python-crawling-ds-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-ds-crawling-ai",
+          "source": "python-crawling-ds-step",
+          "target": "python-ai-ds-step",
+          "data": {
+            "type": "path"
+          }
+        }
+      ]
+    },
+    {
+      "id": "python-automation-path",
+      "title": "파이썬 자동화 전문가 경로",
+      "description": "파이썬을 활용한 자동화 전문가가 되기 위한 학습 경로",
+      "steps": ["python-basic", "python-data", "python-error", "python-io", "python-log", "python-automation", "python-crawling"],
+      "nodes": [
+        {
+          "id": "python-auto-path-root",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 자동화 전문가 경로",
+            "description": "파이썬을 활용한 자동화 전문가가 되기 위한 학습 경로",
+            "status": "not-started",
+            "order": "4.0",
+            "level": "중급",
+            "category": "programming",
+            "isPath": true,
+            "thumbnail": "/images/python-automation.png"
+          }
+        },
+        {
+          "id": "python-basic-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 기초 문법",
+            "description": "파이썬의 기본 문법 요소를 차근차근 배워봅시다",
+            "status": "not-started",
+            "order": "4.1",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-basic"
+          }
+        },
+        {
+          "id": "python-data-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 데이터 구조",
+            "description": "파이썬의 다양한 데이터 구조 탐색하기",
+            "status": "not-started",
+            "order": "4.2",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-data"
+          }
+        },
+        {
+          "id": "python-error-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 에러 및 예외 처리",
+            "description": "다양한 에러 유형과 효과적인 예외 처리 전략 학습",
+            "status": "not-started",
+            "order": "4.3",
+            "level": "초급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-error"
+          }
+        },
+        {
+          "id": "python-io-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 입출력 처리",
+            "description": "파일, 네트워크, 데이터베이스 등 다양한 입출력 처리 기법",
+            "status": "not-started",
+            "order": "4.4",
+            "level": "중급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-io"
+          }
+        },
+        {
+          "id": "python-log-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 로깅과 테스트 자동화",
+            "description": "효율적인 로깅 설정과 테스트 자동화 방법 학습",
+            "status": "not-started",
+            "order": "4.5",
+            "level": "중급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-log"
+          }
+        },
+        {
+          "id": "python-automation-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 자동화 및 시스템 스크립트",
+            "description": "파이썬을 활용한 반복 작업 자동화와 시스템 스크립트 작성 기법",
+            "status": "not-started",
+            "order": "4.6",
+            "level": "고급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-automation"
+          }
+        },
+        {
+          "id": "python-crawling-auto-step",
+          "type": "custom",
+          "data": {
+            "title": "파이썬 웹 크롤링과 스크래핑",
+            "description": "웹 데이터 추출 및 자동화된 데이터 수집 기법 학습",
+            "status": "not-started",
+            "order": "4.7",
+            "level": "고급",
+            "category": "programming",
+            "isPathStep": true,
+            "pathId": "python-automation-path",
+            "originalNodeId": "python-crawling"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e-auto-path-basic",
+          "source": "python-auto-path-root",
+          "target": "python-basic-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-basic-data",
+          "source": "python-basic-auto-step",
+          "target": "python-data-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-data-error",
+          "source": "python-data-auto-step",
+          "target": "python-error-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-error-io",
+          "source": "python-error-auto-step",
+          "target": "python-io-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-io-log",
+          "source": "python-io-auto-step",
+          "target": "python-log-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-log-automation",
+          "source": "python-log-auto-step",
+          "target": "python-automation-auto-step",
+          "data": {
+            "type": "path"
+          }
+        },
+        {
+          "id": "e-auto-automation-crawling",
+          "source": "python-automation-auto-step",
+          "target": "python-crawling-auto-step",
+          "data": {
+            "type": "path"
+          }
+        }
+      ]
+    }
+  ]
+} 

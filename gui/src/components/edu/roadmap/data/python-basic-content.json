@@ -1,0 +1,67 @@
+{
+  "roadmap": {
+    "python-basic-intro": {
+      "title": "파이썬 기초 문법",
+      "description": "파이썬의 기본 문법을 배워봅시다",
+      "order": "2.0",
+      "prerequisites": [],
+      "content": "2.0-intro.md"
+    },
+    "python-variables": {
+      "title": "변수와 데이터 타입",
+      "description": "변수 선언과 데이터 타입 개념",
+      "order": "2.1",
+      "prerequisites": ["python-basic-intro"],
+      "content": "2.1-variables.md"
+    },
+    "python-data-types": {
+      "title": "기본 데이터 타입",
+      "description": "정수, 실수, 문자열, 불리언 등 기본 타입",
+      "order": "2.2",
+      "prerequisites": ["python-variables"],
+      "content": "2.2-data-types.md"
+    },
+    "python-operators": {
+      "title": "기본 연산자",
+      "description": "산술, 비교, 논리 연산자 사용법",
+      "order": "2.3",
+      "prerequisites": ["python-data-types"],
+      "content": "2.3-operators.md"
+    },
+    "python-conditionals": {
+      "title": "조건문",
+      "description": "if, else, elif를 사용한 조건 분기",
+      "order": "2.4",
+      "prerequisites": ["python-operators"],
+      "content": "2.4-conditionals.md"
+    },
+    "python-loops": {
+      "title": "반복문",
+      "description": "for, while 반복문 활용법",
+      "order": "2.5",
+      "prerequisites": ["python-conditionals"],
+      "content": "2.5-loops.md"
+    },
+    "python-functions": {
+      "title": "함수 정의 및 사용",
+      "description": "함수 작성법과 다양한 매개변수 활용",
+      "order": "2.6",
+      "prerequisites": ["python-loops"],
+      "content": "2.6-functions.md"
+    },
+    "python-practice": {
+      "title": "실습 문제",
+      "description": "기본 문법을 활용한 실전 연습",
+      "order": "2.7",
+      "prerequisites": ["python-functions"],
+      "content": "2.7-practice.md"
+    },
+    "python-summary": {
+      "title": "요약",
+      "description": "파이썬 기초 문법 정리",
+      "order": "2.8",
+      "prerequisites": ["python-practice"],
+      "content": "2.8-summary.md"
+    }
+  }
+} 

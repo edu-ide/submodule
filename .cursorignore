@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+/build/
+dist/
+.next/
+.story/
+out/
+/binary/
+/docs/
+/eval/
+/extensions/intellij/
+
+
+/media/
+/scripts/
+/resources/
+/archive/
+/packages/
+/src/
+/sync/
+
+
+# Testing
+/coverage/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Large data files
+*.csv
+*.xlsx
+.changie.yaml
+/LICENSE
+.continueignore
+
+/CHANGELOG.md
+/README.md
+
+.git
+.gitignore
+.nvmrc
+.prettierignore
+.prettierrc
