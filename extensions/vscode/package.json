@@ -406,6 +406,21 @@
         "command": "pearai.notifyOverlayOpened",
         "title": "Dev - Overlay Opened",
         "group": "PearAI"
+      },
+      {
+        "command": "pearai.refreshCurriculumView",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "pearai.createPracticeWorkspace",
+        "title": "Create Practice Workspace",
+        "icon": "$(new-folder)"
+      },
+      {
+        "command": "pearai.submitPractice",
+        "title": "Submit Practice",
+        "icon": "$(check)"
       }
     ],
     "keybindings": [
@@ -667,6 +682,11 @@
           "id": "pearaiMemory",
           "title": "PearAI Memory",
           "icon": "media/sidebar-icon.png"
+        },
+        {
+          "id": "pearaiCurriculum",
+          "title": "EduSense",
+          "icon": "media/curriculum-icon.svg"
         }
       ]
     },
@@ -693,6 +713,21 @@
           "id": "pearai.mem0View",
           "name": "PearAI Memory",
           "visibility": "visible"
+        }
+      ],
+      "pearaiCurriculum": [
+        {
+          "id": "pearai-curriculum",
+          "name": "EduSense Curriculum",
+          "type": "tree",
+          "visibility": "visible"
+        },
+        {
+          "id": "practice-explorer",
+          "name": "Practice Files",
+          "type": "tree",
+          "visibility": "collapsed",
+          "when": "edusense:practiceFolderVisible"
         }
       ]
     },
