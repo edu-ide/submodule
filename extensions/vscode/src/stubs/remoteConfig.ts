@@ -12,7 +12,7 @@ export class RemoteConfigSync {
   private remoteConfigServerUrl: string | null;
   private remoteConfigSyncPeriod: number;
 
-  private syncInterval: NodeJS.Timer | undefined = undefined;
+  private syncInterval: NodeJS.Timeout | undefined = undefined;
 
   constructor(
     private triggerReloadConfig: () => void,
