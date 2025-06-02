@@ -11,12 +11,9 @@ export default defineConfig({
   ],
   optimizeDeps: {
     include: [
-      '@tanstack/react-query',
       'react',
       'react-dom',
       'react-router-dom',
-      '@emotion/react',
-      '@emotion/styled',
       'lucide-react'
     ],
     exclude: [],

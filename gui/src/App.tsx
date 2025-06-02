@@ -24,8 +24,7 @@ import Welcome from "./pages/welcome/welcomeGui";
 import { ContextMenuProvider } from "./components/ContextMenuProvider";
 import Mem0SidebarGUI from "./integrations/mem0/Mem0SidebarGUI";
 import PearSettings from "./inventory/pearSettings/PearSettings";
-import { CreatorOverlay } from "./pages/creator";
-import { MessagingProvider } from "./util/messagingContext";
+// Creator page was removed in merge
 
 const router = createMemoryRouter(
   [
@@ -47,10 +46,6 @@ const router = createMemoryRouter(
               <PerplexityGUI />
             ) : window.viewType === "pearai.mem0View" ? (
               <Mem0SidebarGUI />
-            ) : window.viewType === "pearai.creatorView" ? (
-              <MessagingProvider destination="creator">
-                <CreatorOverlay />
-              </MessagingProvider>
             ) : (
               <GUI />
             ), // default to GUI if viewType is undefined or different
@@ -124,11 +119,7 @@ const router = createMemoryRouter(
         // },
         {
           path: "/pearSettings",
-          element: (
-            <MessagingProvider destination="settings">
-              <PearSettings />
-            </MessagingProvider>
-          ),
+          element: <PearSettings />,
         },
         {
           path: "/welcome",
