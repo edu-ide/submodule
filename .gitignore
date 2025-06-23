@@ -173,3 +173,25 @@ db-orm/
 dummy_projects/
 *.md
 edusense.practice/
+
+# MCP configuration with sensitive data
+.mcp.json
+
+# Binary files
+binary/
+
+# Large project directories
+gui/my-mfe-project/
+gui/dcr-fix-20250622/
+gui/my-mfe-project-fix-auth/
+gui/my-mfe-project-opensearch-auth/
+gui/naver-mcp-integration/
+gui/spring-shrimp-context-tools/
+gui/edusense-full-sync/
+
+# MCP servers
+mcp-mysql-server/
+mcp-server-mysql/
+
+# Shrimp data
+.shrimp-data/

@@ -16,7 +16,7 @@ export default defineConfig({
       'react-router-dom',
       'lucide-react'
     ],
-    exclude: [],
+    exclude: ['vscode-webview'],
     esbuildOptions: {
       sourcemap: false
     }
@@ -55,7 +55,7 @@ export default defineConfig({
   build: {
     // Change the output .js filename to not include a hash
     rollupOptions: {
-      // external: ["vscode-webview"],
+      external: ["vscode-webview"],
       output: {
         entryFileNames: `assets/[name].js`,
         chunkFileNames: `assets/[name].js`,
@@ -69,6 +69,7 @@ export default defineConfig({
       "@microblog": path.resolve(__dirname, "./my-mfe-project/microblog-lms"),
       "components": path.resolve(__dirname, "./components"),
       "@ide": path.resolve(__dirname, "./src"),
+      "vscode-webview": path.resolve(__dirname, "./src/util/vscode-webview-mock.ts"),
     },
     dedupe: ['react', 'react-dom'],
     extensions: ['.js', '.jsx', '.ts', '.tsx']

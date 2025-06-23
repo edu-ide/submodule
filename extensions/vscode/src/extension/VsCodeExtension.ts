@@ -361,6 +361,31 @@ export class VsCodeExtension {
       if (e.provider.id === "github") {
         this.configHandler.reloadConfig();
       }
+      // When EduSense sign-in status changes, notify webview
+      if (e.provider.id === AUTH_PROVIDER_ID) {
+        console.log('[VsCodeExtension] EduSense authentication session changed:', e);
+        
+        // Get current session info
+        try {
+          const sessionInfo = await vscode.authentication.getSession(AUTH_PROVIDER_ID, SCOPES, { silent: true });
+          const webviewProtocol = await this.webviewProtocolPromise;
+          
+          // Notify webview about session change
+          await webviewProtocol.request("didChangeControlPlaneSessionInfo", {
+            sessionInfo: sessionInfo ? {
+              accessToken: sessionInfo.accessToken,
+              account: {
+                label: sessionInfo.account.label,
+                id: sessionInfo.account.id
+              }
+            } : undefined
+          });
+          
+          console.log('[VsCodeExtension] Notified webview about EduSense session change');
+        } catch (error) {
+          console.error('[VsCodeExtension] Error handling EduSense session change:', error);
+        }
+      }
     });
 
     // Refresh index when branch is changed
@@ -716,6 +741,10 @@ export class VsCodeExtension {
 
       </body>
       </html>`;
+  }
+
+  public getIde(): VsCodeIde {
+    return this.ide;
   }
 
   public async getWebviewProtocol(): Promise<VsCodeWebviewProtocol | undefined> {

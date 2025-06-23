@@ -290,7 +290,16 @@ export class ContinueGUIWebviewViewProvider
         <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
         <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
         <script>
-          const vscode = acquireVsCodeApi();
+          // VSCode API 초기화 및 전역 객체 설정
+          try {
+            const vscode = acquireVsCodeApi();
+            window.vscode = vscode;
+            window.vscodeApi = vscode;
+            window.ide = 'vscode';
+            console.log('[VSCode Extension] Successfully initialized VSCode API');
+          } catch (error) {
+            console.error('[VSCode Extension] Failed to initialize VSCode API:', error);
+          }
         </script>
         <link href="${styleMainUri}" rel="stylesheet">
 

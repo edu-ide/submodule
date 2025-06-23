@@ -557,6 +557,31 @@ export class VsCodeMessenger {
         return null;
       }
     });
+    this.onWebviewOrCore("pearaiLogin", async (msg) => {
+      console.log("[VsCodeMessenger] pearaiLogin called, starting EduSense authentication flow");
+      try {
+        const session = await vscode.authentication.getSession(AUTH_PROVIDER_ID, SCOPES, { 
+          createIfNone: true,  // 이것이 실제 로그인 플로우를 시작합니다
+          silent: false 
+        });
+        if (session) {
+          console.log(`[VsCodeMessenger] EduSense login successful for ${session.account.label}`);
+          return {
+            accessToken: session.accessToken,
+            account: session.account,
+            scopes: session.scopes,
+            id: session.id,
+          };
+        } else {
+          console.log("[VsCodeMessenger] EduSense login failed or cancelled.");
+          return null;
+        }
+      } catch (error) {
+        console.error("[VsCodeMessenger] Error during EduSense login:", error);
+        throw error;
+      }
+    });
+
     this.onWebviewOrCore("logoutOfControlPlane", async (msg) => {
       console.log("[VsCodeMessenger] logoutOfControlPlane called, triggering pearai.logout command.");
       vscode.commands.executeCommand("pearai.logout");

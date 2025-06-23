@@ -24,10 +24,13 @@ import Welcome from "./pages/welcome/welcomeGui";
 import { ContextMenuProvider } from "./components/ContextMenuProvider";
 import Mem0SidebarGUI from "./integrations/mem0/Mem0SidebarGUI";
 import PearSettings from "./inventory/pearSettings/PearSettings";
+import { microblogRoutes } from "./routes/microblogRoutes";
 // Creator page was removed in merge
 
 const router = createMemoryRouter(
   [
+    // microblog 라우트 추가
+    ...microblogRoutes,
     {
       path: "/",
       element: <Layout darkBg={window.viewType !== "pearai.creatorView"} />,

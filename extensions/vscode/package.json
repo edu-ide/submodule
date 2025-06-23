@@ -650,6 +650,21 @@
           "command": "pearai.viewHistorySearch",
           "group": "navigation@1",
           "when": "view == pearai.searchView"
+        },
+        {
+          "command": "pearai.refreshCurriculumView",
+          "group": "navigation@1",
+          "when": "view == practice-explorer"
+        },
+        {
+          "command": "pearai.createPracticeWorkspace",
+          "group": "navigation@2",
+          "when": "view == practice-explorer"
+        },
+        {
+          "command": "pearai.submitPractice",
+          "group": "navigation@3",
+          "when": "view == practice-explorer"
         }
       ],
       "editor/title": [
@@ -663,6 +678,18 @@
         {
           "command": "pearai.debugTerminal",
           "group": "navigation@top"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "pearai.createPracticeWorkspace",
+          "when": "view == practice-explorer && viewItem == practiceRoot",
+          "group": "inline"
+        },
+        {
+          "command": "pearai.submitPractice",
+          "when": "view == practice-explorer && viewItem == practiceFile",
+          "group": "inline"
         }
       ]
     },
@@ -717,16 +744,15 @@
       ],
       "pearaiCurriculum": [
         {
-          "id": "pearai-curriculum",
-          "name": "EduSense Curriculum",
-          "type": "tree",
+          "type": "webview",
+          "id": "pearai.curriculum",
+          "name": "EduSense",
           "visibility": "visible"
         },
         {
-          "id": "practice-explorer",
-          "name": "Practice Files",
           "type": "tree",
-          "visibility": "collapsed",
+          "id": "practice-explorer",
+          "name": "실습 파일",
           "when": "edusense:practiceFolderVisible"
         }
       ]

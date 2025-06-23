@@ -16,7 +16,7 @@ export class PracticeTreeItem extends vscode.TreeItem {
         // 파일 타입에 따라 아이콘 설정 (VSCode 기본 아이콘 사용)
         this.iconPath = fileType === vscode.FileType.Directory ? vscode.ThemeIcon.Folder : vscode.ThemeIcon.File;
         // 파일을 클릭했을 때 실행될 명령 설정 (파일 열기)
-        this.contextValue = 'practiceItem'; // TreeItem의 종류를 식별하는 값
+        this.contextValue = fileType === vscode.FileType.Directory ? 'practiceRoot' : 'practiceFile'; // TreeItem의 종류를 식별하는 값
         if (fileType === vscode.FileType.File) {
             // 마크다운 파일(.md)인 경우 미리보기 명령 사용
             if (resourceUri.fsPath.toLowerCase().endsWith('.md')) {

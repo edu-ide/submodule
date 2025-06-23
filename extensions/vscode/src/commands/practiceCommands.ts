@@ -604,4 +604,13 @@ export function registerPracticeCommands(
             }
         })
     );
+
+    // 실습 탐색기 새로고침 명령어
+    context.subscriptions.push(
+        vscode.commands.registerCommand('pearai.refreshCurriculumView', () => {
+            // TreeDataProvider의 새로고침을 위해 전체 파일 탐색기를 새로고침
+            vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+            vscode.window.showInformationMessage('실습 파일 목록이 새로고침되었습니다.');
+        })
+    );
 } 

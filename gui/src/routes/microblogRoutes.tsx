@@ -8,6 +8,8 @@ import GlobalStyle from '@microblog/styles/GlobalStyle';
 import { Toaster } from 'react-hot-toast';
 import LoadingScreen from '@microblog/components/atoms/feedback/LoadingScreen/LoadingScreen';
 import LearnEntryWrapper from '../components/edu/LearnEntryWrapper'; // LearnEntryWrapper 임포트 추가
+import { AuthProvider } from '@microblog/contexts/AuthContext';
+import { useVSCodeAPI } from '../hooks/useVSCodeAPI';
 
 // VSCode 테마 감지 및 연동을 위한 글로벌 이벤트 리스너
 declare global {
@@ -21,16 +23,6 @@ declare global {
   }
 }
 
-// vscode api를 안전하게 가져오는 함수
-const getVSCodeAPI = () => {
-  try {
-    // @ts-ignore
-    return window.acquireVsCodeApi();
-  } catch (error) {
-    console.error("Could not acquire vscode API:", error);
-    return null;
-  }
-};
 
 // 색상이 어두운지 판단하는 함수
 const isColorDark = (color: string): boolean => {
@@ -100,6 +92,7 @@ const CourseDetailPage = lazy(() => import('@microblog/components/pages/CourseDe
 const CourseReviewsPage = lazy(() => import('@microblog/components/pages/CourseReviewsPage'));
 const LecturePage = lazy(() => import('@microblog/components/pages/LecturePage'));
 const RoadmapDetailPage = lazy(() => import('@microblog/components/pages/RoadmapDetailPage'));
+const PricingPage = lazy(() => import('@microblog/components/pages/PricingPage'));
 
 // 나머지는 스텁 컴포넌트 사용
 const ForgotPasswordPage = () => <div>비밀번호 찾기 페이지</div>;
@@ -107,20 +100,15 @@ const ForgotPasswordPage = () => <div>비밀번호 찾기 페이지</div>;
 // VSCode 테마를 감지하여 ThemeProvider에 전달하는 래퍼 컴포넌트
 const VSCodeThemedMainLayout = ({ children }: { children: any }) => {
   const location = useLocation();
-  const vscode = getVSCodeAPI(); // vscode API 가져오기
+  const { vscode, isVSCodeEnv, sendLog, requestTheme } = useVSCodeAPI();
 
   useEffect(() => {
     const logMessage = `[VSCodeThemedMainLayout] Current Path: ${location.pathname}`;
     console.log(logMessage); // 웹뷰 개발자 도구용 로그 (유지)
 
     // 확장 호스트로 로그 메시지 전송
-    if (vscode) {
-      vscode.postMessage({
-        type: 'webviewLog', // 메시지 타입 지정
-        message: logMessage
-      });
-    }
-  }, [location.pathname, vscode]); // vscode 추가
+    sendLog('info', logMessage);
+  }, [location.pathname, sendLog]);
 
   // 테마 감지 로직 개선
   const detectInitialTheme = useCallback((): 'light' | 'dark' => {
@@ -319,15 +307,7 @@ const VSCodeThemedMainLayout = ({ children }: { children: any }) => {
     window.addEventListener('message', handleThemeChange);
 
     // VSCode API를 사용하여 현재 테마 요청
-    const vscodeApi = getVSCodeAPI();
-    if (vscodeApi) {
-      // 현재 익스텐션에서 지원하는 형식으로 요청
-      vscodeApi.postMessage({ messageType: 'request-theme' });
-      // 예전 형식도 함께 요청 (하위 호환성)
-      setTimeout(() => {
-        vscodeApi.postMessage({ type: 'request-theme' });
-      }, 300);
-    }
+    requestTheme();
 
     // 테마 변경 자동 감지 - body 클래스 변경 감시
     const bodyObserver = new MutationObserver((mutations) => {
@@ -357,39 +337,34 @@ const VSCodeThemedMainLayout = ({ children }: { children: any }) => {
       window.removeEventListener('message', handleThemeChange);
       bodyObserver.disconnect();
     };
-  }, [detectInitialTheme, syncThemeState, vsCodeTheme]);
+  }, [detectInitialTheme, syncThemeState, vsCodeTheme, requestTheme]);
 
-  // VSCode 환경인지 확인 (window.ide 전역 변수 사용)
-  const isVSCodeEnv = window.ide === 'vscode';
   console.log('isVSCodeEnv', isVSCodeEnv);
   return (
-    <ThemeProvider initialTheme={vsCodeTheme} isVSCodeThemed={true}>
-      <GlobalStyle />
-      {/* <Toaster position="bottom-center" /> */}
-      <MainLayout isVSCodeEnv={isVSCodeEnv}>
-        <Suspense fallback={<LoadingScreen />}>{children}</Suspense>
-      </MainLayout>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider initialTheme={vsCodeTheme} isVSCodeThemed={true}>
+        <GlobalStyle />
+        <Toaster position="bottom-center" />
+        <MainLayout isVSCodeEnv={isVSCodeEnv}>
+          <Suspense fallback={<LoadingScreen />}>{children}</Suspense>
+        </MainLayout>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
 // 로그인/회원가입 페이지를 위한 MainLayout 없는 레이아웃 컴포넌트
 const VSCodeThemedOnlyLayout = ({ children }: { children: any }) => {
   const location = useLocation();
-  const vscode = getVSCodeAPI(); // vscode API 가져오기
+  const { vscode, isVSCodeEnv, sendLog, requestTheme } = useVSCodeAPI();
 
   useEffect(() => {
     const logMessage = `[VSCodeThemedOnlyLayout] Current Path: ${location.pathname}`;
     console.log(logMessage); // 웹뷰 개발자 도구용 로그 (유지)
 
     // 확장 호스트로 로그 메시지 전송
-    if (vscode) {
-      vscode.postMessage({
-        type: 'webviewLog', // 메시지 타입 지정
-        message: logMessage
-      });
-    }
-  }, [location.pathname, vscode]); // vscode 추가
+    sendLog('info', logMessage);
+  }, [location.pathname, sendLog]);
 
   // 테마 감지 로직 개선
   const detectInitialTheme = useCallback((): 'light' | 'dark' => {
@@ -588,15 +563,7 @@ const VSCodeThemedOnlyLayout = ({ children }: { children: any }) => {
     window.addEventListener('message', handleThemeChange);
 
     // VSCode API를 사용하여 현재 테마 요청
-    const vscodeApi = getVSCodeAPI();
-    if (vscodeApi) {
-      // 현재 익스텐션에서 지원하는 형식으로 요청
-      vscodeApi.postMessage({ messageType: 'request-theme' });
-      // 예전 형식도 함께 요청 (하위 호환성)
-      setTimeout(() => {
-        vscodeApi.postMessage({ type: 'request-theme' });
-      }, 300);
-    }
+    requestTheme();
 
     // 테마 변경 자동 감지 - body 클래스 변경 감시
     const bodyObserver = new MutationObserver((mutations) => {
@@ -626,15 +593,17 @@ const VSCodeThemedOnlyLayout = ({ children }: { children: any }) => {
       window.removeEventListener('message', handleThemeChange);
       bodyObserver.disconnect();
     };
-  }, [detectInitialTheme, syncThemeState, vsCodeTheme]);
+  }, [detectInitialTheme, syncThemeState, vsCodeTheme, requestTheme]);
 
   // MainLayout 없이 ThemeProvider만 반환
   return (
-    <ThemeProvider initialTheme={vsCodeTheme} isVSCodeThemed={true}>
-      <GlobalStyle />
-      <Toaster position="bottom-center" />
-      <Suspense fallback={<LoadingScreen />}>{children}</Suspense>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider initialTheme={vsCodeTheme} isVSCodeThemed={true}>
+        <GlobalStyle />
+        <Toaster position="bottom-center" />
+        <Suspense fallback={<LoadingScreen />}>{children}</Suspense>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 
@@ -650,6 +619,7 @@ export const microblogRoutes: RouteObject[] = [
       { path: "explore", element: <ExplorePage /> },
       { path: "notifications", element: <NotificationsPage /> },
       { path: "settings", element: <SettingsPage /> },
+      { path: "pricing", element: <PricingPage /> },
       { path: "post/:postId", element: <PostPage /> },
       { path: "user/:username", element: <ProfilePage /> },
       { path: "user/edit", element: <ProfileEditPage /> },
@@ -657,6 +627,7 @@ export const microblogRoutes: RouteObject[] = [
       { path: "project/new", element: <ProjectUploadPage /> },
       { path: "project/:projectId", element: <ProjectDetailPage /> },
       { path: "share/:userId", element: <SharePage /> },
+      { path: "messages", element: <MessagesPage /> }, // 메시지 페이지 추가
 
       // --- Education 관련 중첩 라우트 ---
       {
@@ -694,6 +665,8 @@ export const microblogRoutes: RouteObject[] = [
     element: <VSCodeThemedOnlyLayout><Outlet /></VSCodeThemedOnlyLayout>,
     children: [
       { path: "home", element: <LoginPage /> },
+      { path: "signup", element: <SignupPage /> }, // 회원가입 페이지 추가
+      { path: "forgot-password", element: <ForgotPasswordPage /> } // 비밀번호 찾기 페이지 추가
     ]
   }
 ];

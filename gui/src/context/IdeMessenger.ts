@@ -13,6 +13,44 @@ interface vscode {
 
 declare const vscode: any;
 
+// VSCode API를 가져오는 함수
+function getVSCodeAPI() {
+  // 미리 초기화된 API 사용
+  if ((window as any).vscodeApi) {
+    console.debug("[IdeMessenger] Using pre-initialized VSCode API");
+    return (window as any).vscodeApi;
+  }
+  
+  // 전역 vscode 객체 사용 (VSCode webview가 제공)
+  if (typeof vscode !== "undefined" && vscode && vscode.postMessage) {
+    console.debug("[IdeMessenger] Using global vscode object");
+    return vscode;
+  }
+  
+  // acquireVsCodeApi 직접 시도
+  if (typeof (window as any).acquireVsCodeApi === "function") {
+    try {
+      const api = (window as any).acquireVsCodeApi();
+      if (api && api.postMessage) {
+        console.debug("[IdeMessenger] Successfully acquired VSCode API");
+        return api;
+      }
+    } catch (error) {
+      console.error("[IdeMessenger] Failed to acquire VSCode API:", error);
+    }
+  }
+  
+  // VSCode 환경 체크를 위한 다른 방법들
+  if ((window as any).ide === 'vscode' || 
+      (window.location.protocol === 'vscode-webview:') ||
+      (window.location.href.includes('vscode-webview'))) {
+    console.warn("[IdeMessenger] VSCode environment detected but API not available");
+  }
+  
+  console.debug("[IdeMessenger] VSCode API not available");
+  return null;
+}
+
 export interface IIdeMessenger {
   post<T extends keyof FromWebviewProtocol>(
     messageType: T,
@@ -56,7 +94,9 @@ export class IdeMessenger implements IIdeMessenger {
   }
 
   private _postToIde(messageType: string, data: any, messageId?: string) {
-    if (typeof vscode === "undefined") {
+    const vscodeAPI = getVSCodeAPI();
+    
+    if (!vscodeAPI) {
       if (isJetBrains()) {
         if (window.postIntellijMessage === undefined) {
           console.log(
@@ -71,19 +111,20 @@ export class IdeMessenger implements IIdeMessenger {
         return;
       } else {
         console.log(
-          "Unable to send message: vscode is undefined. ",
+          "Unable to send message: VSCode API is undefined. ",
           messageType,
           data,
         );
         return;
       }
     }
+    
     const msg: Message = {
       messageId: messageId ?? uuidv4(),
       messageType,
       data,
     };
-    vscode.postMessage(msg);
+    vscodeAPI.postMessage(msg);
   }
 
   post<T extends keyof FromWebviewProtocol>(
